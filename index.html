@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>バンボー</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: whitesmoke;
+    }
+    #canvasContainer {
+      margin: 0;
+      padding: 0;
+      border: 8px solid black;
+    }
+  </style>
+    <script src="./dist/bundle.js"></script>
+</head>
+<body>
+  <div id="canvasContainer">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+</body>
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = 800;
+canvas.height = 800;
+
+const player = new lib.Player(
+    canvas.width / 2,
+    20,
+    40,
+    40,
+    0,
+    0,
+    0.5,
+    -15,
+    false,
+    8,
+)
+
+const cm = new lib.CanvasManager(
+    canvas,
+    ctx,
+    player
+)
+cm.startGame()
+</script>
+</html>
