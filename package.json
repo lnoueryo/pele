@@ -7,5 +7,8 @@
   },
   "scripts": {
     "start": "webpack --watch"
+  },
+  "dependencies": {
+    "firebase": "^10.2.0"
   }
 }
