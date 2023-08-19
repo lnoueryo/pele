@@ -20,11 +20,20 @@
       padding: 0;
       border: 8px solid black;
     }
+    #start-button {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+    }
+    .hide {
+        display: none;
+    }
   </style>
     <script src="./dist/bundle.js"></script>
 </head>
 <body>
   <div id="canvasContainer">
+    <button id="start-button" onclick="onStartGameClicked()">start</button>
     <canvas id="gameCanvas"></canvas>
   </div>
 </body>
@@ -35,24 +44,47 @@ const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 800;
 
-const player = new lib.Player(
-    canvas.width / 2,
-    20,
-    40,
-    40,
-    0,
-    0,
-    0.5,
-    -15,
-    false,
-    8,
-)
+const createPlayer = () => {
+    return new lib.Player(
+        canvas.width / 2,
+        20,
+        40,
+        40,
+        0,
+        0,
+        0.5,
+        -15,
+        false,
+        8,
+    )
+}
 
-const cm = new lib.CanvasManager(
-    canvas,
-    ctx,
-    player
-)
-cm.startGame()
+const onStartGameClicked = (e) => {
+    const button = document.getElementById('start-button')
+    button.classList.add('hide');
+    cm = new lib.CanvasManager(
+        canvas,
+        ctx,
+        createPlayer()
+    )
+    cm.startGame()
+    isPlaying = true;
+    timer = setInterval(() => {
+        if(cm.isGameOver()) {
+            clearInterval(timer)
+            button.classList.remove('hide');
+        }
+    }, 100)
+}
+
+let timer = null;
+
+let cm = null;
+
+document.addEventListener('keyup', (e) => {
+    if(e.key === 'Enter') {
+        if(cm === null || cm.isGameOver()) onStartGameClicked()
+    }
+})
 </script>
 </html>

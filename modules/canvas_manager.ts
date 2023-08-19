@@ -10,20 +10,13 @@ export class CanvasManager {
     startGame() {
 
         document.addEventListener('keydown', (event) => {
-            console.log('Hello')
-            if (event.key === 'ArrowLeft') {
-                this.player.moveToLeft();
-            } else if (event.key === 'ArrowRight') {
-                this.player.moveToRight()
-            } else if (event.key === 'ArrowUp' && !this.player.isJumping) {
-                this.player.jump()
-            }
+            if (event.key === 'ArrowLeft') this.player.moveToLeft();
+            else if (event.key === 'ArrowRight') this.player.moveToRight();
+            else if (event.key === 'ArrowUp' && !this.player.isJumping) this.player.jump();
         });
 
         document.addEventListener('keyup', (event) => {
-            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-                this.player.stopMovement()
-            }
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') this.player.stopMovement()
         });
 
         this.loop(0)
@@ -58,6 +51,7 @@ export class CanvasManager {
     }
 
     private updateCurrentTime(timestamp) {
+        if (this.startTime === 0) this.startTime = timestamp;
         this.currentTime = (timestamp - this.startTime) / 1000;
     }
 
