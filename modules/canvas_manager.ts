@@ -11,7 +11,6 @@ export class CanvasManager {
     private boxCreationProbability = 0.07
     private currentTime = 0
     constructor(private canvas, private ctx, private players,private maguma, private boxes: Box[] = [], private startTime = 0) {
-        console.log(players)
     }
 
     startGame() {
@@ -28,7 +27,6 @@ export class CanvasManager {
             });
         });
 
-        let timer = null;
         document.getElementById('right').addEventListener('touchstart', (event) => {
             this.players[0].moveToRight();
             event.preventDefault();
@@ -62,7 +60,7 @@ export class CanvasManager {
         if(this.currentTime > PLAYER_DELAY) {
             for (const player of this.players) {
                 player.moveOnIdle()
-    
+
             }
         }
 
