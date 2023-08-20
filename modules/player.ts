@@ -2,6 +2,7 @@ import { Box } from './box'
 
 export class Player {
     constructor(
+        private id,
         private x,
         private y,
         private width,
