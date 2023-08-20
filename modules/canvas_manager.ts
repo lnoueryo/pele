@@ -61,7 +61,7 @@ export class CanvasManager {
     }
 
     private fillPlayer() {
-        this.ctx.strokeStyle = 'blue';
+        this.ctx.strokeStyle = 'green';
         this.ctx.fillStyle = 'red';
         this.ctx.strokeRect(this.player.x, this.player.y, this.player.width, this.player.height);
         this.ctx.fillRect(this.player.x + 10, this.player.y + 5, this.player.width / 5, this.player.height / 5);
