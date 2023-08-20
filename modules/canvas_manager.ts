@@ -3,8 +3,7 @@ import { Box } from './box'
 export class CanvasManager {
     private boxCreationProbability = 0.07
     private currentTime = 0
-    constructor(private canvas, private ctx, private player, private boxes: Box[] = [], private startTime = 0) {
-
+    constructor(private canvas, private ctx, private player,private maguma, private boxes: Box[] = [], private startTime = 0) {
     }
 
     startGame() {
@@ -47,6 +46,9 @@ export class CanvasManager {
 
         this.fillPlayer()
 
+        this.fillMaguma();
+        
+
         requestAnimationFrame(this.loop);
     }
 
@@ -67,6 +69,11 @@ export class CanvasManager {
         this.ctx.fillRect(this.player.x + 10, this.player.y + 5, this.player.width / 5, this.player.height / 5);
         this.ctx.fillRect(this.player.x + this.player.width - 15, this.player.y + 5, this.player.width / 5, this.player.height / 5);
         this.ctx.fillRect(this.player.x + 10, this.player.y + this.player.height - 15, this.player.width - 20, this.player.height / 5);
+    }
+
+    private fillMaguma(){
+        this.ctx.fillStyle = `rgb(${ Math.random() * (255-200)+200},30, 20)`;
+        this.ctx.fillRect(this.maguma.x, this.maguma.y, this.maguma.width, this.maguma.height);
     }
 
     private createBox() {

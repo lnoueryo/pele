@@ -59,13 +59,23 @@ const createPlayer = () => {
     )
 }
 
+const createMaguma = () => {
+    return new lib.Maguma(
+        0,
+        canvas.height-50,
+        800,
+        50,
+    )
+}
+
 const onStartGameClicked = (e) => {
     const button = document.getElementById('start-button')
     button.classList.add('hide');
     cm = new lib.CanvasManager(
         canvas,
         ctx,
-        createPlayer()
+        createPlayer(),
+        createMaguma(),
     )
     cm.startGame()
     isPlaying = true;
