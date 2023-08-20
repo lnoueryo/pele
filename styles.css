@@ -22,3 +22,8 @@ body {
   .hide {
       display: none;
   }
+
+  .button {
+    padding: 14px;
+    margin: 0 7px;
+  }

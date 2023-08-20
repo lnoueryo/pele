@@ -5,6 +5,8 @@ const KEYBOARDS = [
     {top: 'x', left: 'z', right: 'c'},
 ]
 
+const PLAYER_DELAY = 1
+
 export class CanvasManager {
     private boxCreationProbability = 0.07
     private currentTime = 0
@@ -36,10 +38,11 @@ export class CanvasManager {
         this.resetCanvas()
 
         if (this.isGameOver()) return this.endGame();
-        for (const player of this.players) {
-
-            player.moveOnIdle()
-
+        if(this.currentTime > PLAYER_DELAY) {
+            for (const player of this.players) {
+                player.moveOnIdle()
+    
+            }
         }
 
         for (const box of this.boxes) {
@@ -115,11 +118,12 @@ export class CanvasManager {
     endGame() {
         this.ctx.fillStyle = 'black';
         this.ctx.font = '48px Arial';
-        this.ctx.fillText(`頑張った時間: ${this.currentTime.toFixed(2)} 秒`, 180, this.canvas.height / 2);
+        this.ctx.fillText(`${this.isGameOver().id ? '黒' : '白'}の勝ち。`, 180, this.canvas.height / 4);
+        this.ctx.fillText(`頑張った時間: ${(this.currentTime - PLAYER_DELAY).toFixed(2)} 秒`, 180, this.canvas.height / 3);
     }
 
     isGameOver() {
-        return this.players.some((player) => {
+        return this.players.find((player) => {
             return player.y + player.height > this.canvas.height;
         })
     }
