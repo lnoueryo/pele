@@ -28,6 +28,27 @@ export class CanvasManager {
             });
         });
 
+        let timer = null;
+        document.getElementById('right').addEventListener('touchstart', (event) => {
+            this.players[0].moveToRight();
+            event.preventDefault();
+        });
+        document.getElementById('right').addEventListener('touchend', (event) => {
+        this.players[0].stopMovement()
+            event.preventDefault();
+        });
+        document.getElementById('left').addEventListener('touchstart', (event) => {
+            this.players[0].moveToLeft();
+            event.preventDefault();
+        });
+        document.getElementById('left').addEventListener('touchend', (event) => {
+            this.players[0].stopMovement()
+            event.preventDefault();
+        });
+        document.getElementById('top').addEventListener('touchstart', (event) => {
+            if(!this.players[0].isJumping) this.players[0].jump();
+            event.preventDefault();
+        });
 
         this.loop(0)
     }

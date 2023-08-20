@@ -4,7 +4,14 @@ import { Maguma } from './maguma'
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d');
-
+const height = window.innerHeight;
+canvas.style.width = (height - 20) + 'px';
+canvas.style.height = (height - 20) + 'px';
+window.addEventListener('resize', function() {
+    const height = window.innerHeight;
+    canvas.style.width = (height - 20) + 'px';
+    canvas.style.height = (height - 20) + 'px';
+});
 canvas.width = 800;
 canvas.height = 800;
 

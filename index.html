@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>バンボー</title>
     <link rel="stylesheet" href="./styles.css">
     <script src="./dist/bundle.js" defer></script>
@@ -15,5 +15,13 @@
     </div>
     <canvas id="gameCanvas"></canvas>
   </div>
+  <div style="position: absolute;left: 0;">
+    <button id="left" class="controller">左</button>
+    <button id="right" class="controller">右</button>
+  </div>
+  <div style="position: absolute;right: 0;">
+    <button id="top" class="controller">上</button>
+  </div>
 </body>
+
 </html>

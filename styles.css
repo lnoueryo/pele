@@ -5,7 +5,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     background-color: whitesmoke;
   }
   #canvasContainer {
@@ -19,6 +18,11 @@ body {
       left: 50%;
       transform: translate(-50%, -50%);
   }
+
+  canvas {
+    height: 100vh;
+  }
+
   .hide {
       display: none;
   }
@@ -26,4 +30,9 @@ body {
   .button {
     padding: 14px;
     margin: 0 7px;
+    user-select: none;
+  }
+
+  .controller {
+    padding: 14px 32px;
   }
