@@ -1,5 +1,6 @@
 import { CanvasManager } from './canvas_manager'
 import { Player } from './player'
+import { Maguma } from './maguma'
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d');
@@ -23,13 +24,23 @@ const createPlayer = (id) => {
     )
 }
 
+const createMaguma = () => {
+    return new Maguma(
+        0,
+        canvas.height-50,
+        800,
+        50,
+    )
+}
+
 const onStartGameClicked = () => {
     const button = document.getElementById('start-button')
     button.classList.add('hide');
     cm = new CanvasManager(
         canvas,
         ctx,
-        createPlayer(0)
+        createPlayer(0),
+        createMaguma(),
     )
     cm.startGame()
     timer = setInterval(() => {
@@ -49,4 +60,4 @@ document.addEventListener('keyup', (e) => {
         if(cm === null || cm.isGameOver()) onStartGameClicked()
     }
 })
-export { CanvasManager, Player}
+export { CanvasManager, Player , Maguma}

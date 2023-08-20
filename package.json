@@ -6,7 +6,8 @@
     "webpack-cli": "^5.1.4"
   },
   "scripts": {
-    "start": "webpack --watch"
+    "start": "webpack --watch",
+    "build": "webpack"
   },
   "dependencies": {
     "firebase": "^10.2.0"
