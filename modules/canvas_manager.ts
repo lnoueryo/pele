@@ -74,7 +74,7 @@ export class CanvasManager {
         const height = Math.random() * 50 + 20
         const x = this.canvas.width
         const y = this.canvas.height - 100 - Math.random() * 100
-        const speed = 8
+        const speed = Math.random() * 10
         const box = new Box(width, height, x, y, speed)
         this.boxes.push(box);
     }
