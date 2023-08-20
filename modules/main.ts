@@ -21,6 +21,7 @@ const createPlayer = (id) => {
         -15,
         false,
         8,
+        id ? `rgb(255,255,255)` : `rgb(0,0,0)`
     )
 }
 
@@ -33,20 +34,27 @@ const createMaguma = () => {
     )
 }
 
-const onStartGameClicked = () => {
-    const button = document.getElementById('start-button')
-    button.classList.add('hide');
+let tempIndex = 1;
+
+export const onStartGameClicked = (index) => {
+    tempIndex = index
+    const buttons = document.getElementById('start-buttons')
+    buttons.classList.add('hide');
+    const players = []
+    for (let i = 0; i < index; i++) {
+        players.push(createPlayer(i))
+    }
     cm = new CanvasManager(
         canvas,
         ctx,
-        createPlayer(0),
+        players,
         createMaguma(),
     )
     cm.startGame()
     timer = setInterval(() => {
         if(cm.isGameOver()) {
             clearInterval(timer)
-            button.classList.remove('hide');
+            buttons.classList.remove('hide');
         }
     }, 100)
 }
@@ -57,7 +65,7 @@ let cm = null;
 
 document.addEventListener('keyup', (e) => {
     if(e.key === 'Enter') {
-        if(cm === null || cm.isGameOver()) onStartGameClicked()
+        if(cm === null || cm.isGameOver()) onStartGameClicked(tempIndex)
     }
 })
 export { CanvasManager, Player , Maguma}

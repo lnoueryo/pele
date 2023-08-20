@@ -9,7 +9,10 @@
 </head>
 <body>
   <div id="canvasContainer">
-    <button id="start-button" onclick="onStartGameClicked()">start</button>
+    <div id="start-buttons">
+      <button onclick="lib.onStartGameClicked(1)">1p start</button>
+      <button onclick="lib.onStartGameClicked(2)">2p start</button>
+    </div>
     <canvas id="gameCanvas"></canvas>
   </div>
 </body>

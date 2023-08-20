@@ -12,7 +12,8 @@ export class Player {
         private vg,
         private jumpStrength,
         private isJumping,
-        private speed
+        private speed,
+        private color
     ) {}
 
     moveToLeft() {

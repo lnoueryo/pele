@@ -1,22 +1,31 @@
 import { Box } from './box'
 
+const KEYBOARDS = [
+    {top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight'},
+    {top: 'x', left: 'z', right: 'c'},
+]
+
 export class CanvasManager {
     private boxCreationProbability = 0.07
     private currentTime = 0
-    constructor(private canvas, private ctx, private player,private maguma, private boxes: Box[] = [], private startTime = 0) {
+    constructor(private canvas, private ctx, private players,private maguma, private boxes: Box[] = [], private startTime = 0) {
+        console.log(players)
     }
 
     startGame() {
 
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowLeft') this.player.moveToLeft();
-            else if (event.key === 'ArrowRight') this.player.moveToRight();
-            else if (event.key === 'ArrowUp' && !this.player.isJumping) this.player.jump();
+        this.players.forEach((player, i) => {
+            document.addEventListener('keydown', (event) => {
+                if (event.key === KEYBOARDS[i].left) player.moveToLeft();
+                else if (event.key === KEYBOARDS[i].right) player.moveToRight();
+                else if (event.key === KEYBOARDS[i].top && !player.isJumping) player.jump();
+            });
+
+            document.addEventListener('keyup', (event) => {
+                if (event.key === KEYBOARDS[i].left || event.key === KEYBOARDS[i].right) player.stopMovement()
+            });
         });
 
-        document.addEventListener('keyup', (event) => {
-            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') this.player.stopMovement()
-        });
 
         this.loop(0)
     }
@@ -27,8 +36,11 @@ export class CanvasManager {
         this.resetCanvas()
 
         if (this.isGameOver()) return this.endGame();
+        for (const player of this.players) {
 
-        this.player.moveOnIdle()
+            player.moveOnIdle()
+
+        }
 
         for (const box of this.boxes) {
 
@@ -36,7 +48,9 @@ export class CanvasManager {
             if (box.isOutOfDisplay()) this.deleteBox(box);
 
             this.fillBox(box)
-            if (this.player.isPlayerCollidingWithBox(box)) this.player.moveOnTopBox(box.y)
+            this.players.forEach((player) => {
+                if (player.isPlayerCollidingWithBox(box)) player.moveOnTopBox(box.y)
+            })
 
         }
 
@@ -44,10 +58,11 @@ export class CanvasManager {
             this.createBox();
         }
 
-        this.fillPlayer()
+        this.players.forEach(player => {
+            this.fillPlayer(player)
+        });
 
         this.fillMaguma();
-        
 
         requestAnimationFrame(this.loop);
     }
@@ -62,13 +77,15 @@ export class CanvasManager {
         this.ctx.fillRect(box.x, box.y, box.width, box.height);
     }
 
-    private fillPlayer() {
+    private fillPlayer(player) {
         this.ctx.strokeStyle = 'blue';
+        this.ctx.fillStyle = player.color;
+        this.ctx.fillRect(player.x, player.y, player.width, player.height);
         this.ctx.fillStyle = 'red';
-        this.ctx.strokeRect(this.player.x, this.player.y, this.player.width, this.player.height);
-        this.ctx.fillRect(this.player.x + 10, this.player.y + 5, this.player.width / 5, this.player.height / 5);
-        this.ctx.fillRect(this.player.x + this.player.width - 15, this.player.y + 5, this.player.width / 5, this.player.height / 5);
-        this.ctx.fillRect(this.player.x + 10, this.player.y + this.player.height - 15, this.player.width - 20, this.player.height / 5);
+        this.ctx.strokeRect(player.x, player.y, player.width, player.height);
+        this.ctx.fillRect(player.x + 10, player.y + 5, player.width / 5, player.height / 5);
+        this.ctx.fillRect(player.x + player.width - 15, player.y + 5, player.width / 5, player.height / 5);
+        this.ctx.fillRect(player.x + 10, player.y + player.height - 15, player.width - 20, player.height / 5);
     }
 
     private fillMaguma(){
@@ -102,6 +119,8 @@ export class CanvasManager {
     }
 
     isGameOver() {
-        return this.player.y + this.player.height > this.canvas.height;
+        return this.players.some((player) => {
+            return player.y + player.height > this.canvas.height;
+        })
     }
 }
