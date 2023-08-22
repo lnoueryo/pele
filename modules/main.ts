@@ -42,8 +42,8 @@ export const onStartGameClicked = (index) => {
     cm = new CanvasManager(
         canvas,
         ctx,
-        players,
         createMaguma(),
+        players,
     )
     cm.startGame()
     timer = setInterval(() => {
@@ -52,6 +52,37 @@ export const onStartGameClicked = (index) => {
             buttons.classList.remove('hide');
         }
     }, 100)
+}
+
+const jump = () => {
+    !cm || cm.players[0].isJumping || cm.players[0].jump()
+}
+
+export const onChangeControllerPositionClicked = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const top = document.getElementById('top')
+    const right = document.getElementById('right')
+    const rightParentElement = right.parentElement;
+    const gamerRight = document.getElementById('gamer-right')
+    document.removeEventListener('touchstart', jump)
+    if(controllerPosition == 'default') {
+        top.classList.add('hide')
+        right.classList.add('hide')
+        rightParentElement.classList.remove('justify-between');
+        gamerRight.classList.remove('hide')
+        document.addEventListener('touchstart', jump)
+        controllerPosition = 'gamer'
+    }
+    else if(controllerPosition == 'gamer') {
+        top.classList.remove('hide')
+        right.classList.remove('hide')
+        rightParentElement.classList.add('justify-between');
+        gamerRight.classList.add('hide')
+        controllerPosition = 'default'
+    }
+
 }
 
 const adjustCanvasSize = () => {
@@ -91,6 +122,7 @@ const isMobileDevice = () => {
 
 let timer = null;
 let cm = null;
+let controllerPosition = 'default'
 const CANVAS_WIDTH_PIXEL = 800;
 const CANVAS_HEIGHT_PIXEL = 800;
 const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
@@ -104,10 +136,11 @@ const main = () => {
     document.addEventListener('keyup', (e) => {
         if(e.key === 'Enter') {
             if(cm === null || cm.isGameOver()) onStartGameClicked(tempIndex)
+            e.stopPropagation()
         }
     })
 
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', () => {
         adjustCanvasSize()
     });
 }

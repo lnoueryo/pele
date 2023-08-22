@@ -10,7 +10,7 @@ const PLAYER_DELAY = 1
 export class CanvasManager {
     private boxCreationProbability = 0.07
     private currentTime = 0
-    constructor(private canvas, private ctx, private players,private maguma, private boxes: Box[] = [], private startTime = 0) {
+    constructor(private canvas, private ctx, private maguma, private players = [], private boxes: Box[] = [], private startTime = 0) {
     }
 
     startGame() {
@@ -26,26 +26,40 @@ export class CanvasManager {
                 if (event.key === KEYBOARDS[i].left || event.key === KEYBOARDS[i].right) player.stopMovement()
             });
         });
-
-        document.getElementById('right').addEventListener('touchstart', (event) => {
+        document.getElementById('right').addEventListener('touchstart', (e) => {
             this.players[0].moveToRight();
-            event.preventDefault();
+            e.stopPropagation()
+            e.preventDefault();
         });
-        document.getElementById('right').addEventListener('touchend', (event) => {
-        this.players[0].stopMovement()
-            event.preventDefault();
-        });
-        document.getElementById('left').addEventListener('touchstart', (event) => {
-            this.players[0].moveToLeft();
-            event.preventDefault();
-        });
-        document.getElementById('left').addEventListener('touchend', (event) => {
+        document.getElementById('right').addEventListener('touchend', (e) => {
             this.players[0].stopMovement()
-            event.preventDefault();
+            e.stopPropagation()
+            e.preventDefault();
         });
-        document.getElementById('top').addEventListener('touchstart', (event) => {
-            if(!this.players[0].isJumping) this.players[0].jump();
-            event.preventDefault();
+        document.getElementById('gamer-right').addEventListener('touchstart', (e) => {
+            this.players[0].moveToRight();
+            e.stopPropagation()
+            e.preventDefault();
+        });
+        document.getElementById('gamer-right').addEventListener('touchend', (e) => {
+            this.players[0].stopMovement()
+            e.stopPropagation()
+            e.preventDefault();
+        });
+        document.getElementById('left').addEventListener('touchstart', (e) => {
+            this.players[0].moveToLeft();
+            e.stopPropagation()
+            e.preventDefault();
+        });
+        document.getElementById('left').addEventListener('touchend', (e) => {
+            this.players[0].stopMovement()
+            e.stopPropagation()
+            e.preventDefault();
+        });
+        document.getElementById('top').addEventListener('touchstart', (e) => {
+            this.players[0].isJumping || this.players[0].jump()
+            e.stopPropagation()
+            e.preventDefault();
         });
 
         this.loop(0)
