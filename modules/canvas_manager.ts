@@ -1,78 +1,27 @@
 import { Box } from './box'
 
-const KEYBOARDS = [
-    {top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight'},
-    {top: 'x', left: 'z', right: 'c'},
-]
-
+const CANVAS_WIDTH_PIXEL = 800;
+const CANVAS_HEIGHT_PIXEL = 800;
+const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
 const PLAYER_DELAY = 1
-
 export class CanvasManager {
-    private boxCreationProbability = 0.07
+    private startTime = 0
     private currentTime = 0
-    constructor(private canvas, private ctx, private maguma, private players = [], private boxes: Box[] = [], private startTime = 0) {
+    private lastTimestamp = 0
+    private boxCreationProbability = 0.07
+    constructor(private canvas, private ctx, private maguma, private boxes: Box[] = []) {
+        canvas.width = CANVAS_WIDTH_PIXEL;
+        canvas.height = CANVAS_HEIGHT_PIXEL;
     }
 
-    startGame() {
-
-        this.players.forEach((player, i) => {
-            document.addEventListener('keydown', (event) => {
-                if (event.key === KEYBOARDS[i].left) player.moveToLeft();
-                else if (event.key === KEYBOARDS[i].right) player.moveToRight();
-                else if (event.key === KEYBOARDS[i].top && !player.isJumping) player.jump();
-            });
-
-            document.addEventListener('keyup', (event) => {
-                if (event.key === KEYBOARDS[i].left || event.key === KEYBOARDS[i].right) player.stopMovement()
-            });
-        });
-        document.getElementById('right').addEventListener('touchstart', (e) => {
-            this.players[0].moveToRight();
-            e.stopPropagation()
-            e.preventDefault();
-        });
-        document.getElementById('right').addEventListener('touchend', (e) => {
-            this.players[0].stopMovement()
-            e.stopPropagation()
-            e.preventDefault();
-        });
-        document.getElementById('gamer-right').addEventListener('touchstart', (e) => {
-            this.players[0].moveToRight();
-            e.stopPropagation()
-            e.preventDefault();
-        });
-        document.getElementById('gamer-right').addEventListener('touchend', (e) => {
-            this.players[0].stopMovement()
-            e.stopPropagation()
-            e.preventDefault();
-        });
-        document.getElementById('left').addEventListener('touchstart', (e) => {
-            this.players[0].moveToLeft();
-            e.stopPropagation()
-            e.preventDefault();
-        });
-        document.getElementById('left').addEventListener('touchend', (e) => {
-            this.players[0].stopMovement()
-            e.stopPropagation()
-            e.preventDefault();
-        });
-        document.getElementById('top').addEventListener('touchstart', (e) => {
-            this.players[0].isJumping || this.players[0].jump()
-            e.stopPropagation()
-            e.preventDefault();
-        });
-
-        this.loop(0)
-    }
-
-    private loop = (timestamp) => {
+    private loop = (timestamp, players) => {
 
         this.updateCurrentTime(timestamp)
         this.resetCanvas()
 
-        if (this.isGameOver()) return this.endGame();
+        if (this.isGameOver(players)) return this.endGame(players);
         if(this.currentTime > PLAYER_DELAY) {
-            for (const player of this.players) {
+            for (const player of players) {
                 player.moveOnIdle()
 
             }
@@ -84,7 +33,7 @@ export class CanvasManager {
             if (box.isOutOfDisplay()) this.deleteBox(box);
 
             this.fillBox(box)
-            this.players.forEach((player) => {
+            players.forEach((player) => {
                 if (player.isPlayerCollidingWithBox(box)) player.moveOnTopBox(box.y)
             })
 
@@ -94,18 +43,38 @@ export class CanvasManager {
             this.createBox();
         }
 
-        this.players.forEach(player => {
+        players.forEach(player => {
             this.fillPlayer(player)
         });
 
         this.fillMaguma();
 
-        requestAnimationFrame(this.loop);
+        requestAnimationFrame((timestamp) => {
+            this.loop(timestamp, players)
+        });
     }
 
     private updateCurrentTime(timestamp) {
-        if (this.startTime === 0) this.startTime = timestamp;
-        this.currentTime = (timestamp - this.startTime) / 1000;
+        if (this.startTime === 0) {
+            this.startTime = timestamp;
+            this.lastTimestamp = timestamp;
+        }
+        const elapsedSinceLastFrame = timestamp - this.lastTimestamp;
+        if (elapsedSinceLastFrame < 100) {
+            this.currentTime += elapsedSinceLastFrame / 1000;
+        }
+
+        this.lastTimestamp = timestamp;
+    }
+
+    isGameOver(players) {
+        return players.find((player) => {
+            return player.y + player.height > this.canvas.height;
+        })
+    }
+
+    endGame(players) {
+        this.fillEndText(`${this.isGameOver(players).id ? '黒' : '白'}の勝ち。`, `頑張った時間: ${(this.currentTime - PLAYER_DELAY).toFixed(2)} 秒`)
     }
 
     private fillBox(box) {
@@ -124,7 +93,7 @@ export class CanvasManager {
         this.ctx.fillRect(player.x + 10, player.y + player.height - 15, player.width - 20, player.height / 5);
     }
 
-    private fillMaguma(){
+    private fillMaguma() {
         this.ctx.fillStyle = `rgb(${ Math.random() * (255-200)+200},30, 20)`;
         this.ctx.fillRect(this.maguma.x, this.maguma.y, this.maguma.width, this.maguma.height);
     }
@@ -148,16 +117,17 @@ export class CanvasManager {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    endGame() {
+    fillEndText(firstText, secondText) {
         this.ctx.fillStyle = 'black';
         this.ctx.font = '48px Arial';
-        this.ctx.fillText(`${this.isGameOver().id ? '黒' : '白'}の勝ち。`, 180, this.canvas.height / 4);
-        this.ctx.fillText(`頑張った時間: ${(this.currentTime - PLAYER_DELAY).toFixed(2)} 秒`, 180, this.canvas.height / 3);
+        this.ctx.fillText(firstText, 180, this.canvas.height / 4);
+        this.ctx.fillText(secondText, 180, this.canvas.height / 3);
     }
 
-    isGameOver() {
-        return this.players.find((player) => {
-            return player.y + player.height > this.canvas.height;
-        })
+    adjustCanvasSize = () => {
+        const height = window.innerHeight;
+        this.canvas.style.width = ((height - 20) * CANVAS_RATIO) + 'px';
+        this.canvas.style.height = (height - 20) + 'px';
     }
+
 }

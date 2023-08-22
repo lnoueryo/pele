@@ -1,7 +1,15 @@
 import { CanvasManager } from './canvas_manager'
 import { Player } from './player'
 import { Maguma } from './maguma'
+import { Game } from './game'
 
+const createCanvasManager = () => {
+    return new CanvasManager(
+        canvas,
+        ctx,
+        createMaguma()
+    )
+}
 
 const createPlayer = (id) => {
     return new Player(
@@ -39,112 +47,52 @@ export const onStartGameClicked = (index) => {
     for (let i = 0; i < index; i++) {
         players.push(createPlayer(i))
     }
-    cm = new CanvasManager(
-        canvas,
-        ctx,
-        createMaguma(),
-        players,
-    )
-    cm.startGame()
+    const cm = createCanvasManager()
+    controller = controller.resetGame(cm, players)
+    controller.startGame()
     timer = setInterval(() => {
-        if(cm.isGameOver()) {
+        if(controller.isGameOver()) {
             clearInterval(timer)
             buttons.classList.remove('hide');
         }
     }, 100)
 }
 
-const jump = () => {
-    !cm || cm.players[0].isJumping || cm.players[0].jump()
-}
-
 export const onChangeControllerPositionClicked = (e) => {
     e.preventDefault()
     e.stopPropagation()
-
-    const top = document.getElementById('top')
-    const right = document.getElementById('right')
-    const rightParentElement = right.parentElement;
-    const gamerRight = document.getElementById('gamer-right')
-    document.removeEventListener('touchstart', jump)
-    if(controllerPosition == 'default') {
-        top.classList.add('hide')
-        right.classList.add('hide')
-        rightParentElement.classList.remove('justify-between');
-        gamerRight.classList.remove('hide')
-        document.addEventListener('touchstart', jump)
-        controllerPosition = 'gamer'
-    }
-    else if(controllerPosition == 'gamer') {
-        top.classList.remove('hide')
-        right.classList.remove('hide')
-        rightParentElement.classList.add('justify-between');
-        gamerRight.classList.add('hide')
-        controllerPosition = 'default'
-    }
-
+    controller.changeControllerPosition()
 }
 
-const adjustCanvasSize = () => {
-    const wrapper = document.getElementById('wrapper')
-    const sideContainers = document.getElementsByClassName('side-container')
-    const warning = document.getElementById('warning')
-
-    if (isMobileDevice()) {
-        if ((window.innerWidth - 200) < window.innerHeight) {
-            // 縦向きまたは十分な画面サイズではない端末
-            wrapper.classList.add('hide')
-            warning.classList.remove('hide')
-            return;
-        }
-
-        // 横向き
-        Array.from(sideContainers).forEach(element => {
-            element.classList.remove('hide');
-        });
-    } else {
-        // PCの場合
-        Array.from(sideContainers).forEach(element => {
-            element.classList.add('hide');
-        });
-    }
-
-    wrapper.classList.remove('hide')
-    warning.classList.add('hide')
-    const height = window.innerHeight;
-    canvas.style.width = ((height - 20) * CANVAS_RATIO) + 'px';
-    canvas.style.height = (height - 20) + 'px';
-}
-
-const isMobileDevice = () => {
-    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
-}
 
 let timer = null;
-let cm = null;
-let controllerPosition = 'default'
-const CANVAS_WIDTH_PIXEL = 800;
-const CANVAS_HEIGHT_PIXEL = 800;
-const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
+let controller = null;
+
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d');
 
 const main = () => {
-    canvas.width = CANVAS_WIDTH_PIXEL;
-    canvas.height = CANVAS_HEIGHT_PIXEL;
-    adjustCanvasSize()
+    const top = document.getElementById('top')
+    const left = document.getElementById('left')
+    const right = document.getElementById('right')
+    const gamerRight = document.getElementById('gamer-right')
+    const cm = createCanvasManager()
+
+    controller = new Game(top, left, right, gamerRight, cm)
+    controller.showController()
+
     document.addEventListener('keyup', (e) => {
         if(e.key === 'Enter') {
-            if(cm === null || cm.isGameOver()) onStartGameClicked(tempIndex)
+            if(controller.isGameOver()) onStartGameClicked(tempIndex)
             e.stopPropagation()
         }
     })
 
     window.addEventListener('resize', () => {
-        adjustCanvasSize()
+        controller.showController()
     });
 }
 
 main()
 
-export { CanvasManager, Player , Maguma}
+export { CanvasManager, Player , Maguma, Game}
