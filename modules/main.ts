@@ -2,10 +2,6 @@ import { CanvasManager } from './canvas_manager'
 import { Player } from './player'
 import { Maguma } from './maguma'
 
-const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
-const ctx = canvas.getContext('2d');
-canvas.width = 800;
-canvas.height = 800;
 
 const createPlayer = (id) => {
     return new Player(
@@ -58,21 +54,64 @@ export const onStartGameClicked = (index) => {
     }, 100)
 }
 
-let timer = null;
+const adjustCanvasSize = () => {
+    const wrapper = document.getElementById('wrapper')
+    const sideContainers = document.getElementsByClassName('side-container')
+    const warning = document.getElementById('warning')
 
-let cm = null;
+    if (isMobileDevice()) {
+        if ((window.innerWidth - 200) < window.innerHeight) {
+            // 縦向きまたは十分な画面サイズではない端末
+            wrapper.classList.add('hide')
+            warning.classList.remove('hide')
+            return;
+        }
 
-document.addEventListener('keyup', (e) => {
-    if(e.key === 'Enter') {
-        if(cm === null || cm.isGameOver()) onStartGameClicked(tempIndex)
+        // 横向き
+        Array.from(sideContainers).forEach(element => {
+            element.classList.remove('hide');
+        });
+    } else {
+        // PCの場合
+        Array.from(sideContainers).forEach(element => {
+            element.classList.add('hide');
+        });
     }
-})
-const height = window.innerHeight;
-canvas.style.width = (height - 20) + 'px';
-canvas.style.height = (height - 20) + 'px';
-window.addEventListener('resize', function() {
+
+    wrapper.classList.remove('hide')
+    warning.classList.add('hide')
     const height = window.innerHeight;
-    canvas.style.width = (height - 20) + 'px';
+    canvas.style.width = ((height - 20) * CANVAS_RATIO) + 'px';
     canvas.style.height = (height - 20) + 'px';
-});
+}
+
+const isMobileDevice = () => {
+    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+}
+
+let timer = null;
+let cm = null;
+const CANVAS_WIDTH_PIXEL = 800;
+const CANVAS_HEIGHT_PIXEL = 800;
+const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
+const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+const ctx = canvas.getContext('2d');
+
+const main = () => {
+    canvas.width = CANVAS_WIDTH_PIXEL;
+    canvas.height = CANVAS_HEIGHT_PIXEL;
+    adjustCanvasSize()
+    document.addEventListener('keyup', (e) => {
+        if(e.key === 'Enter') {
+            if(cm === null || cm.isGameOver()) onStartGameClicked(tempIndex)
+        }
+    })
+
+    window.addEventListener('resize', function() {
+        adjustCanvasSize()
+    });
+}
+
+main()
+
 export { CanvasManager, Player , Maguma}
