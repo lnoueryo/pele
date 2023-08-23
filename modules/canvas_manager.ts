@@ -48,7 +48,7 @@ export class CanvasManager {
         this.fillPlayer()
 
         this.fillMaguma();
-        setInterval(this.fillMaguma, 300);
+        //setInterval(this.fillMaguma, 10);
         
 
         requestAnimationFrame(this.loop);
@@ -77,7 +77,7 @@ export class CanvasManager {
         this.ctx.fillStyle = "red";
         this.ctx.beginPath();
       for (let x = 0; x < this.canvas.width; x++) {
-        const y = this.canvas.height - this.maguma.magumaHeight + Math.sin(x * this.maguma.waveFrequency + Date.now() * 0.001) * this.maguma.waveAmplitude;
+        const y = this.canvas.height - this.maguma.magumaHeight + Math.sin(x * this.maguma.waveFrequency + Date.now() * Math.random()*0.01) * this.maguma.waveAmplitude;
         this.ctx.lineTo(x, y);
       }
       this.ctx.lineTo(this.canvas.width, this.canvas.height);
