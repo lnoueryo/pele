@@ -99,7 +99,7 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: whitesmoke;
+    background-color: black;
   }
   #canvas-container {
     margin: 0;
@@ -119,11 +119,21 @@ body {
 
   canvas {
     height: 100vh;
+    background-color: whitesmoke;
   }
 
   .button {
     padding: 14px;
     margin: 0 7px;
+
+    border-radius: 50px;
+    border: 2px solid whitesmoke;
+    background-color:grey;
+    color: whitesmoke;
+    font-size: 20px;
+    font-weight: bold;
+    text-size-adjust: inherit;
+    text-align: center;
   }
 
   #warning {
@@ -189,7 +199,15 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
+    border-radius: 50px;
+    border: 2px solid whitesmoke;
+    background-color:grey;
+    color: whitesmoke;
+    font-size: 30px;
+    font-weight: bold;
+    text-size-adjust: inherit;
+    text-align: center;
+  } 
 
   .hide {
     display: none!important;
