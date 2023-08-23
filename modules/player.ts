@@ -2,6 +2,7 @@ import { Box } from './box'
 
 export class Player {
     constructor(
+        private id,
         private x,
         private y,
         private width,
@@ -11,7 +12,8 @@ export class Player {
         private vg,
         private jumpStrength,
         private isJumping,
-        private speed
+        private speed,
+        private color
     ) {}
 
     moveToLeft() {

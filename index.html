@@ -2,98 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>バンボー</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: whitesmoke;
-    }
-    #gameCanvas {
-      margin: 0;
-      padding: 0;
-      border: 8px solid black;
-    }
-    #start-button {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-    }
-    .hide {
-        display: none;
-    }
-  </style>
-    <script src="./dist/bundle.js"></script>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./dist/bundle.js" defer></script>
+  <link rel="icon" href="./favicon.ico" sizes="any">
 </head>
 <body>
-  <div id="canvasContainer">
-    <button id="start-button" onclick="onStartGameClicked()">start</button>
-    <canvas id="gameCanvas"></canvas>
+  <div id="warning">端末が縦向きかまたは対応してない可能性があります。</div>
+  <div id="wrapper">
+    <div class="side-container">
+      <div class="buttons-container justify-between">
+        <div id="left" class="button-container">
+          <button class="controller">左</button>
+          <div class="button-size"></div>
+        </div>
+        <div id="right" class="button-container">
+          <button class="controller">右</button>
+          <div class="button-size"></div>
+        </div>
+      </div>
+    </div>
+    <div id="canvas-container">
+      <div id="start-buttons">
+        <button class="button" onclick="lib.onStartGameClicked(1)">1p start</button>
+        <button class="button" onclick="lib.onStartGameClicked(2)">2p start</button>
+      </div>
+      <div id="canvas-frame">
+        <canvas id="game-canvas"></canvas>
+      </div>
+    </div>
+    <div class="side-container">
+      <div style="position: absolute;top: 25px;right: 25px;">
+        <button onclick="lib.onChangeControllerPositionClicked(event)">配置変更</button>
+      </div>
+      <div class="buttons-container">
+        <div id="top" class="button-container">
+          <button class="controller">上</button>
+          <div class="button-size"></div>
+        </div>
+        <div id="gamer-right" class="button-container hide">
+          <button class="controller">右</button>
+          <div class="button-size"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </body>
-<script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-
-canvas.width = 800;
-canvas.height = 800;
-
-const createPlayer = () => {
-    return new lib.Player(
-        canvas.width / 2,
-        20,
-        40,
-        40,
-        0,
-        0,
-        0.5,
-        -15,
-        false,
-        8,
-    )
-}
-
-const createMaguma = () => {
-    return new lib.Maguma(
-        0.05,
-        10,
-        50,
-    )
-}
-
-const onStartGameClicked = (e) => {
-    const button = document.getElementById('start-button')
-    button.classList.add('hide');
-    cm = new lib.CanvasManager(
-        canvas,
-        ctx,
-        createPlayer(),
-        createMaguma(),
-    )
-    cm.startGame()
-    isPlaying = true;
-    timer = setInterval(() => {
-        if(cm.isGameOver()) {
-            clearInterval(timer)
-            button.classList.remove('hide');
-        }
-    }, 100)
-}
-
-let timer = null;
-
-let cm = null;
-
-document.addEventListener('keyup', (e) => {
-    if(e.key === 'Enter') {
-        if(cm === null || cm.isGameOver()) onStartGameClicked()
-    }
-})
-</script>
 </html>

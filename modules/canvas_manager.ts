@@ -1,35 +1,32 @@
 import { Box } from './box'
 import { Maguma } from './maguma'
 
+const CANVAS_WIDTH_PIXEL = 800;
+const CANVAS_HEIGHT_PIXEL = 800;
+const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
+const PLAYER_DELAY = 1
 export class CanvasManager {
-    private boxCreationProbability = 0.07
+    private startTime = 0
     private currentTime = 0
-    constructor(private canvas, private ctx, private player,private maguma, private boxes: Box[] = [], private startTime = 0) {
+    private lastTimestamp = 0
+    private boxCreationProbability = 0.07
+    constructor(private canvas, private ctx, private maguma, private boxes: Box[] = []) {
+        canvas.width = CANVAS_WIDTH_PIXEL;
+        canvas.height = CANVAS_HEIGHT_PIXEL;
     }
 
-    startGame() {
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowLeft') this.player.moveToLeft();
-            else if (event.key === 'ArrowRight') this.player.moveToRight();
-            else if (event.key === 'ArrowUp' && !this.player.isJumping) this.player.jump();
-        });
-
-        document.addEventListener('keyup', (event) => {
-            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') this.player.stopMovement()
-        });
-
-        this.loop(0)
-    }
-
-    private loop = (timestamp) => {
+    private loop = (timestamp, players) => {
 
         this.updateCurrentTime(timestamp)
         this.resetCanvas()
 
-        if (this.isGameOver()) return this.endGame();
+        if (this.isGameOver(players)) return this.endGame(players);
+        if(this.currentTime > PLAYER_DELAY) {
+            for (const player of players) {
+                player.moveOnIdle()
 
-        this.player.moveOnIdle()
+            }
+        }
 
         for (const box of this.boxes) {
 
@@ -37,7 +34,9 @@ export class CanvasManager {
             if (box.isOutOfDisplay()) this.deleteBox(box);
 
             this.fillBox(box)
-            if (this.player.isPlayerCollidingWithBox(box)) this.player.moveOnTopBox(box.y)
+            players.forEach((player) => {
+                if (player.isPlayerCollidingWithBox(box)) player.moveOnTopBox(box.y)
+            })
 
         }
 
@@ -45,18 +44,38 @@ export class CanvasManager {
             this.createBox();
         }
 
-        this.fillPlayer()
+        players.forEach(player => {
+            this.fillPlayer(player)
+        });
 
         this.fillMaguma();
-        //setInterval(this.fillMaguma, 10);
-        
 
-        requestAnimationFrame(this.loop);
+        requestAnimationFrame((timestamp) => {
+            this.loop(timestamp, players)
+        });
     }
 
     private updateCurrentTime(timestamp) {
-        if (this.startTime === 0) this.startTime = timestamp;
-        this.currentTime = (timestamp - this.startTime) / 1000;
+        if (this.startTime === 0) {
+            this.startTime = timestamp;
+            this.lastTimestamp = timestamp;
+        }
+        const elapsedSinceLastFrame = timestamp - this.lastTimestamp;
+        if (elapsedSinceLastFrame < 100) {
+            this.currentTime += elapsedSinceLastFrame / 1000;
+        }
+
+        this.lastTimestamp = timestamp;
+    }
+
+    isGameOver(players) {
+        return players.find((player) => {
+            return player.y + player.height > this.canvas.height;
+        })
+    }
+
+    endGame(players) {
+        this.fillEndText(`${this.isGameOver(players).id ? '黒' : '白'}の勝ち。`, `頑張った時間: ${(this.currentTime - PLAYER_DELAY).toFixed(2)} 秒`)
     }
 
     private fillBox(box) {
@@ -64,16 +83,18 @@ export class CanvasManager {
         this.ctx.fillRect(box.x, box.y, box.width, box.height);
     }
 
-    private fillPlayer() {
+    private fillPlayer(player) {
         this.ctx.strokeStyle = 'blue';
+        this.ctx.fillStyle = player.color;
+        this.ctx.fillRect(player.x, player.y, player.width, player.height);
         this.ctx.fillStyle = 'red';
-        this.ctx.strokeRect(this.player.x, this.player.y, this.player.width, this.player.height);
-        this.ctx.fillRect(this.player.x + 10, this.player.y + 5, this.player.width / 5, this.player.height / 5);
-        this.ctx.fillRect(this.player.x + this.player.width - 15, this.player.y + 5, this.player.width / 5, this.player.height / 5);
-        this.ctx.fillRect(this.player.x + 10, this.player.y + this.player.height - 15, this.player.width - 20, this.player.height / 5);
+        this.ctx.strokeRect(player.x, player.y, player.width, player.height);
+        this.ctx.fillRect(player.x + 10, player.y + 5, player.width / 5, player.height / 5);
+        this.ctx.fillRect(player.x + player.width - 15, player.y + 5, player.width / 5, player.height / 5);
+        this.ctx.fillRect(player.x + 10, player.y + player.height - 15, player.width - 20, player.height / 5);
     }
 
-    private fillMaguma(){
+    private fillMaguma() {
         this.ctx.fillStyle = "red";
         this.ctx.beginPath();
       for (let x = 0; x < this.canvas.width; x++) {
@@ -91,7 +112,7 @@ export class CanvasManager {
         const height = Math.random() * 50 + 20
         const x = this.canvas.width
         const y = this.canvas.height - 100 - Math.random() * 100
-        const speed = Math.random() * 10
+        const speed = (Math.random() * (15 - 3) + 3)
         const box = new Box(width, height, x, y, speed)
         this.boxes.push(box);
     }
@@ -105,13 +126,17 @@ export class CanvasManager {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    endGame() {
+    fillEndText(firstText, secondText) {
         this.ctx.fillStyle = 'black';
         this.ctx.font = '48px Arial';
-        this.ctx.fillText(`頑張った時間: ${this.currentTime.toFixed(2)} 秒`, 180, this.canvas.height / 2);
+        this.ctx.fillText(firstText, 180, this.canvas.height / 4);
+        this.ctx.fillText(secondText, 180, this.canvas.height / 3);
     }
 
-    isGameOver() {
-        return this.player.y + this.player.height > this.canvas.height;
+    adjustCanvasSize = () => {
+        const height = window.innerHeight;
+        this.canvas.style.width = ((height - 20) * CANVAS_RATIO) + 'px';
+        this.canvas.style.height = (height - 20) + 'px';
     }
+
 }
