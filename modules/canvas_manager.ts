@@ -72,7 +72,7 @@ export class CanvasManager {
     }
 
     private fillMaguma(){
-        this.ctx.fillStyle = `rgb(${ Math.random() * (255-200)+200},30, 20)`;
+        this.ctx.fillStyle = `rgb(${ Math.random() * (255-200)+200},50, 50)`;
         this.ctx.fillRect(this.maguma.x, this.maguma.y, this.maguma.width, this.maguma.height);
     }
 
