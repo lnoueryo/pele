@@ -1,4 +1,5 @@
 import { Box } from './box'
+import { Maguma } from './maguma'
 
 export class CanvasManager {
     private boxCreationProbability = 0.07
@@ -47,6 +48,7 @@ export class CanvasManager {
         this.fillPlayer()
 
         this.fillMaguma();
+        setInterval(this.fillMaguma, 300);
         
 
         requestAnimationFrame(this.loop);
@@ -72,8 +74,16 @@ export class CanvasManager {
     }
 
     private fillMaguma(){
-        this.ctx.fillStyle = `rgb(${ Math.random() * (255-200)+200},50, 50)`;
-        this.ctx.fillRect(this.maguma.x, this.maguma.y, this.maguma.width, this.maguma.height);
+        this.ctx.fillStyle = "red";
+        this.ctx.beginPath();
+      for (let x = 0; x < this.canvas.width; x++) {
+        const y = this.canvas.height - this.maguma.magumaHeight + Math.sin(x * this.maguma.waveFrequency + Date.now() * 0.001) * waveAmplitude;
+        this.ctx.lineTo(x, y);
+      }
+      this.ctx.lineTo(this.canvas.width, this.canvas.height);
+      this.ctx.lineTo(0, this.canvas.height);
+      this.ctx.closePath();
+      this.ctx.fill();
     }
 
     private createBox() {
