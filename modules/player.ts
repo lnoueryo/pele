@@ -39,8 +39,8 @@ export class Player {
         this.y += this.vy;
     }
 
-    moveOnTopBox(boxY) {
-        this.y = boxY - this.height;
+    moveOnTopBox(box) {
+        this.y = box.y - this.height;
         this.vy = 0;
         this.isJumping = false;
     }

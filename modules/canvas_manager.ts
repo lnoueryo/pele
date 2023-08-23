@@ -34,7 +34,7 @@ export class CanvasManager {
 
             this.fillBox(box)
             players.forEach((player) => {
-                if (player.isPlayerCollidingWithBox(box)) player.moveOnTopBox(box.y)
+                if (player.isPlayerCollidingWithBox(box)) player.moveOnTopBox(box)
             })
 
         }
