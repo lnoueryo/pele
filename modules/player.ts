@@ -17,16 +17,19 @@ export class Player {
     ) {}
 
     moveToLeft() {
-        this.vx = -this.speed;
+        this.vx = -this.speed;                        
     }
 
     moveToRight() {
-        this.vx = this.speed;
+        this.vx = this.speed;                    
     }
 
     jump() {
         this.vy = this.jumpStrength;
         this.isJumping = true;
+        const music = new Audio('jump.mp3');
+        music.volume = 0.8 ;
+        music.play();
     }
 
     stopMovement() {

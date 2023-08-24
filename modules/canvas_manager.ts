@@ -1,5 +1,6 @@
 import { Box } from './box'
 import { Maguma } from './maguma'
+import { AUDIO } from './audio'
 
 const CANVAS_WIDTH_PIXEL = 800;
 const CANVAS_HEIGHT_PIXEL = 800;
@@ -76,15 +77,25 @@ export class CanvasManager {
 
     endGame(players) {
         this.fillEndText(`${this.isGameOver(players).id ? '黒' : '白'}の勝ち。`, `頑張った時間: ${(this.currentTime - PLAYER_DELAY).toFixed(2)} 秒`)
+        
+        const music = new Audio('./deathvoice.mp3');
+            music.volume = 0.5;
+            music.play();
+    
     }
 
     private fillBox(box) {
-        this.ctx.fillStyle = 'brown';
+        this.ctx.fillStyle = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
+        //this.ctx.fillStyle ='brown'
         this.ctx.fillRect(box.x, box.y, box.width, box.height);
+        this.ctx.strokeStyle = 'black';
+        this.ctx.lineWidth = 5;
+        this.ctx.strokeRect(box.x, box.y, box.width, box.height);
     }
 
     private fillPlayer(player) {
-        this.ctx.strokeStyle = 'blue';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = 'bulue';
         this.ctx.fillStyle = player.color;
         this.ctx.fillRect(player.x, player.y, player.width, player.height);
         this.ctx.fillStyle = 'red';
