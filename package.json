@@ -1,13 +1,12 @@
 {
   "devDependencies": {
-    "ts-loader": "^9.4.4",
-    "typescript": "^5.1.6",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4"
+  "typescript": "~5.6.2",
+  "vite": "^6.0.5"
   },
   "scripts": {
-    "start": "webpack --watch",
-    "build": "webpack"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "firebase": "^10.2.0"

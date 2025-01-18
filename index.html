@@ -10,45 +10,47 @@
   <link rel="icon" href="./favicon.ico" sizes="any">
 </head>
 <body>
-  <div id="warning">端末が縦向きかまたは対応してない可能性があります。</div>
-  <div id="wrapper">
-    <div class="side-container">
-      <div class="buttons-container justify-between">
-        <div id="left" class="button-container">
-          <button class="controller">左</button>
-          <div class="button-size"></div>
+  <div id="app">
+    <div id="warning">端末が縦向きかまたは対応してない可能性があります。</div>
+    <div id="wrapper">
+      <div class="side-container">
+        <div class="buttons-container justify-between">
+          <div id="left" class="button-container">
+            <button class="controller">左</button>
+            <div class="button-size"></div>
+          </div>
+          <div id="right" class="button-container">
+            <button class="controller">右</button>
+            <div class="button-size"></div>
+          </div>
         </div>
-        <div id="right" class="button-container">
-          <button class="controller">右</button>
-          <div class="button-size"></div>
+      </div>
+      <div id="canvas-container">
+        <div id="start-buttons">
+          <button class="button" onclick="lib.onStartGameClicked(1)">1p start</button>
+          <button class="button" onclick="lib.onStartGameClicked(2)">2p start</button>
+        </div>
+        <div id="canvas-frame">
+          <canvas id="game-canvas"></canvas>
         </div>
       </div>
-    </div>
-    <div id="canvas-container">
-      <div id="start-buttons">
-        <button class="button" onclick="lib.onStartGameClicked(1)">1p start</button>
-        <button class="button" onclick="lib.onStartGameClicked(2)">2p start</button>
-      </div>
-      <div id="canvas-frame">
-        <canvas id="game-canvas"></canvas>
-      </div>
-    </div>
-    <div class="side-container">
-      <div style="position: absolute;top: 25px;right: 25px;">
-        <button onclick="lib.onChangeControllerPositionClicked(event)">配置変更</button>
-      </div>
-      <div class="buttons-container">
-        <div id="top" class="button-container">
-          <button class="controller">上</button>
-          <div class="button-size"></div>
+      <div class="side-container">
+        <div style="position: absolute;top: 25px;right: 25px;">
+          <button onclick="lib.onChangeControllerPositionClicked(event)">配置変更</button>
         </div>
-        <div id="gamer-right" class="button-container hide">
-          <button class="controller">右</button>
-          <div class="button-size"></div>
+        <div class="buttons-container">
+          <div id="top" class="button-container">
+            <button class="controller">上</button>
+            <div class="button-size"></div>
+          </div>
+          <div id="gamer-right" class="button-container hide">
+            <button class="controller">右</button>
+            <div class="button-size"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  <script type="module" src="/src/main.ts"></script>
 </body>
-
 </html>
