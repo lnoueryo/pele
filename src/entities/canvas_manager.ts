@@ -1,7 +1,7 @@
+import { WebsocketIO } from '../plugins/websocket'
 import { Box } from './box'
 import { Maguma } from './maguma'
 import { Player } from './player'
-import socket from './plugins/websocket'
 const CANVAS_WIDTH_PIXEL = 800
 const CANVAS_HEIGHT_PIXEL = 800
 const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
@@ -12,6 +12,7 @@ type ICanvasManager = {
   ctx: CanvasRenderingContext2D
   maguma: Maguma
   boxes?: Box[]
+  socket?: WebsocketIO
 }
 
 export class CanvasManager {
@@ -23,6 +24,7 @@ export class CanvasManager {
   private currentTime = 0
   private lastTimestamp = 0
   private boxCreationProbability = 0.07
+  private socket: WebsocketIO | undefined
   constructor(params: ICanvasManager) {
     this.canvas = params.canvas
     this.ctx = params.ctx
@@ -30,13 +32,13 @@ export class CanvasManager {
     this.boxes = params.boxes || []
     this.canvas.width = CANVAS_WIDTH_PIXEL
     this.canvas.height = CANVAS_HEIGHT_PIXEL
+    this.socket = params.socket
   }
 
-  public loop = (timestamp: number, players: Player[]) => {
+  public loop = (timestamp: number, players: Player[], userId: string) => {
     this.updateCurrentTime(timestamp)
     this.resetCanvas()
-
-    if (this.isGameOver(players)) return this.endGame(players)
+    if (this.isGameOver(players)) return this.endGame()
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of players) {
         player.moveOnIdle()
@@ -64,7 +66,9 @@ export class CanvasManager {
     this.fillMaguma()
 
     requestAnimationFrame((timestamp) => {
-      this.loop(timestamp, players)
+      const user = players.find((player) => player.id === userId)!
+      this.socket && this.socket.emit('coordinate', {[userId]: user.convertToJson()})
+      this.loop(timestamp, players, userId)
     })
   }
 
@@ -82,14 +86,14 @@ export class CanvasManager {
   }
 
   isGameOver(players: Player[]) {
-    return players.find((player) => {
-      return player.y + player.height > this.canvas.height
+    return players.every((player) => {
+      return (player.y + player.height) > this.canvas.height
     })!
   }
 
-  endGame(players: Player[]) {
+  endGame() {
     this.fillEndText(
-      `${this.isGameOver(players).id === 1 ? '黒' : '白'}の勝ち。`,
+      `ゲームオーバー`,
       `頑張った時間: ${(this.currentTime - PLAYER_DELAY).toFixed(2)} 秒`,
     )
   }

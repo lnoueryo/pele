@@ -1,10 +1,7 @@
 import { CanvasManager } from './canvas_manager'
-import { Player } from './player'
+import { Player, PlayerArg } from './player'
 
-const KEYBOARDS = [
-  { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' },
-  { top: 'x', left: 'z', right: 'c' },
-]
+const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 
 type IGame = {
   top: HTMLDivElement
@@ -50,9 +47,10 @@ export class Game {
     }
   }
 
-  excute = () => {
+  execute = (id: string) => {
     if (this.players.length === 0) return
-    this.players[0].isJumping || this.players[0].jump()
+    const player = this.players.find(player => player.id === id)!
+    player.isJumping || player.jump()
   }
 
   updatePlayers(players: Player[]) {
@@ -79,62 +77,60 @@ export class Game {
     })
   }
 
-  startGame() {
-    this.players.forEach((player, i) => {
-      document.addEventListener('keydown', (event) => {
-        if (event.key === KEYBOARDS[i].left) player.moveToLeft()
-        else if (event.key === KEYBOARDS[i].right) player.moveToRight()
-        else if (event.key === KEYBOARDS[i].top && !player.isJumping)
-          player.jump()
-      })
-
-      document.addEventListener('keyup', (event) => {
-        if (event.key === KEYBOARDS[i].left || event.key === KEYBOARDS[i].right)
-          player.stopMovement()
-      })
+  startGame(userId: string) {
+    const player = this.players.find(player => player.id === userId)!
+    document.addEventListener('keydown', (event) => {
+      if (event.key === KEYBOARDS.left) player.moveToLeft()
+      else if (event.key === KEYBOARDS.right) player.moveToRight()
+      else if (event.key === KEYBOARDS.top && !player.isJumping)
+        player.jump()
     })
 
+    document.addEventListener('keyup', (event) => {
+      if (event.key === KEYBOARDS.left || event.key === KEYBOARDS.right)
+        player.stopMovement()
+    })
     this.right.addEventListener('touchstart', (e) => {
-      this.players[0].moveToRight()
+      player.moveToRight()
       e.stopPropagation()
       e.preventDefault()
     })
     this.right.addEventListener('touchend', (e) => {
-      this.players[0].stopMovement()
+      player.stopMovement()
       e.stopPropagation()
       e.preventDefault()
     })
     this.gamerRight.addEventListener('touchstart', (e) => {
-      this.players[0].moveToRight()
+      player.moveToRight()
       e.stopPropagation()
       e.preventDefault()
     })
     this.gamerRight.addEventListener('touchend', (e) => {
-      this.players[0].stopMovement()
+      player.stopMovement()
       e.stopPropagation()
       e.preventDefault()
     })
     this.left.addEventListener('touchstart', (e) => {
-      this.players[0].moveToLeft()
+      player.moveToLeft()
       e.stopPropagation()
       e.preventDefault()
     })
     this.left.addEventListener('touchend', (e) => {
-      this.players[0].stopMovement()
+      player.stopMovement()
       e.stopPropagation()
       e.preventDefault()
     })
     this.top.addEventListener('touchstart', (e) => {
-      this.players[0].isJumping || this.players[0].jump()
+      player.isJumping || player.jump()
       e.stopPropagation()
       e.preventDefault()
     })
 
-    document.removeEventListener('touchstart', this.excute)
+    document.removeEventListener('touchstart', () => this.execute(userId))
     if (this.controllerPosition == 'gamer') {
-      document.addEventListener('touchstart', this.excute)
+      document.addEventListener('touchstart',  () => this.execute(userId))
     }
-    this.cm.loop(0, this.players)
+    this.cm.loop(0, this.players, userId)
   }
 
   showController(wrapper: HTMLDivElement, warning: HTMLDivElement) {
@@ -174,4 +170,14 @@ export class Game {
   isGameOver() {
     return this.cm.isGameOver(this.players)
   }
+
+  updateOtherPlayers(players: {[key: string]: PlayerArg}) {
+    this.players.forEach((player) => {
+      if (player.id in players) {
+        console.log(player)
+        player.updateFromJson(players[player.id])
+      }
+    })
+  }
+
 }

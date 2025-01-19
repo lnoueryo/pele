@@ -1,0 +1,140 @@
+import { CanvasManager } from '../../entities/canvas_manager'
+import { Player, PlayerArg } from '../../entities/player'
+import { Maguma } from '../../entities/maguma'
+import { Game } from '../../entities/game'
+import domObject from './dom'
+import { WebsocketIO } from '../../plugins/websocket'
+const {
+  canvas,
+  ctx,
+  top,
+  left,
+  right,
+  gamerRight,
+  wrapper,
+  warning,
+  startButtons,
+} = domObject
+let timer: ReturnType<typeof setTimeout> | undefined = undefined
+let players: PlayerArg[] = []
+const socket = new WebsocketIO('wss://pele-server-prod-821127682746.asia-northeast1.run.app/player')
+let userId = ''
+socket.on('connect', () => {
+  socket.on('disconnect', () => {
+    console.log('user disconnected')
+  })
+  socket.on('login', (id) => {
+    userId = id
+    const player = Player.createPlayer(userId, canvas)
+    socket.emit('login', {
+      clientId: id,
+      player,
+    })
+  })
+  socket.on('join', (newPlayers: PlayerArg[]) => {
+    players = newPlayers
+    renderPlayers()
+  })
+  socket.on('coordinate', (data) => {
+    delete data[userId]
+    controller.updateOtherPlayers(data)
+  })
+  socket.on('start', () => {
+    startMultiPlayer()
+  })
+})
+const maguma = new Maguma({
+  x: 0,
+  y: canvas.height - 50,
+  width: 800,
+  height: 50,
+})
+
+const cm = new CanvasManager({
+  canvas,
+  ctx,
+  maguma,
+  socket,
+})
+let controller = new Game({
+  top,
+  left,
+  right,
+  gamerRight,
+  cm,
+})
+
+const startMultiPlayer = () => {
+  startButtons.classList.add('hide')
+  const cm = createCanvasManager()
+  controller = controller.resetGame(cm, players.map((player) => new Player(player)))
+  controller.startGame(userId)
+  timer = setInterval(() => {
+    if (controller.isGameOver()) {
+      clearInterval(timer)
+      startButtons.classList.remove('hide')
+    }
+  }, 100)
+}
+
+const main = () => {
+  controller.showController(wrapper, warning)
+  document.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+      if (controller.isGameOver()) onClickStartMultiPlayer()
+      e.stopPropagation()
+    }
+  })
+  window.addEventListener('resize', () => {
+    controller.showController(wrapper, warning)
+  })
+}
+
+const onClickStartMultiPlayer = () => {
+  socket.emit('start', { id: socket.id })
+  startMultiPlayer()
+}
+
+const onChangeControllerPositionClicked = (e: Event) => {
+  e.preventDefault()
+  e.stopPropagation()
+  controller.changeControllerPosition()
+}
+
+const createCanvasManager = () => {
+  const maguma = new Maguma({
+    x: 0,
+    y: canvas.height - 50,
+    width: 800,
+    height: 50,
+  })
+  return new CanvasManager({
+    canvas,
+    ctx,
+    maguma,
+    socket,
+  })
+}
+
+function renderPlayers(): void {
+  const startButtons = document.getElementById('start-buttons')
+  if (!startButtons) {
+    console.error('Element #start-buttons not found')
+    return
+  }
+
+  startButtons.innerHTML = ''
+  const fragment = document.createDocumentFragment()
+  players.forEach((player) => {
+    const playerDiv = document.createElement('div')
+    playerDiv.textContent = String(player.id)
+    fragment.appendChild(playerDiv)
+  })
+  const button = document.createElement('button')
+  button.innerText = 'start'
+  button.addEventListener('click', () => onClickStartMultiPlayer())
+  startButtons.appendChild(fragment)
+  startButtons.appendChild(button)
+}
+
+export { main, onClickStartMultiPlayer, onChangeControllerPositionClicked, }

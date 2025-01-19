@@ -1,6 +1,6 @@
 import { Box } from "./box"
-type PlayerArg = {
-  id: number
+export type PlayerArg = {
+  id: string
   x: number
   y: number
   width: number
@@ -78,5 +78,52 @@ export class Player {
       this.y < box.y + box.height &&
       this.vy >= 0
     )
+  }
+
+  convertToJson() {
+    return {
+      id: this.id,
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      vx: this.vx,
+      vy: this.vy,
+      vg: this.vg,
+      jumpStrength: this.jumpStrength,
+      isJumping: this.isJumping,
+      speed: this.speed,
+      color: this.color,
+    }
+  }
+
+  updateFromJson(params: PlayerArg) {
+    this.x = params.x
+    this.y = params.y
+    this.width = params.width
+    this.height = params.height
+    this.vx = params.vx
+    this.vy = params.vy
+    this.vg = params.vg
+    this.jumpStrength = params.jumpStrength
+    this.isJumping = params.isJumping
+    this.speed = params.speed
+  }
+
+  static createPlayer = (id: string, canvas: HTMLCanvasElement) => {
+    return new Player({
+      id,
+      x: canvas.width / 2,
+      y: 20,
+      width: 40,
+      height: 40,
+      vx: 0,
+      vy: 0,
+      vg: 0.5,
+      jumpStrength: -15,
+      isJumping: false,
+      speed: 8,
+      color: id ? `rgb(255,255,255)` : `rgb(0,0,0)`,
+    })
   }
 }

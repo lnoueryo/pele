@@ -28,9 +28,8 @@
           </div>
         </div>
         <div id="canvas-container">
-          <div id="start-buttons">
-            <button id="play1" class="button">1p start</button>
-            <button id="multiple-play" class="button" onclick="location.href='/multiple.html'">multiple start</button>
+          <div>
+            <div id="start-buttons"></div>
           </div>
           <div id="canvas-frame">
             <canvas id="game-canvas"></canvas>
@@ -38,7 +37,7 @@
         </div>
         <div class="side-container">
           <div style="position: absolute; top: 25px; right: 25px">
-            <button onclick="onChangeControllerPositionClicked(event)">
+            <button id="position-change-button">
               配置変更
             </button>
           </div>
@@ -57,14 +56,10 @@
     </div>
     <script type="module" src="/src/main.ts"></script>
     <script type="module">
-      import * as index from '/src/pages/index'
-      const play = document.getElementById("play1");
-      index.main()
-      const ChangePositionButton = document.getElementById("change-position-button")
-      play.addEventListener("click", (e) => {
-        index.onClickStartOnePlayer(1)
-      })
-      play.addEventListener("click", index.onClickChangeControllerPosition)
+      import * as multiple from '/src/pages/multiple'
+      multiple.main()
+      const positionChangeButton = document.getElementById('position-change-button')
+      positionChangeButton.addEventListener('click', (e) => multiple.onChangeControllerPositionClicked(e))
     </script>
   </body>
 </html>
