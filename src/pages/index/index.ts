@@ -15,18 +15,8 @@ const {
   startButtons,
 } = domObject
 let timer: ReturnType<typeof setTimeout> | undefined = undefined
-const maguma = new Maguma({
-  x: 0,
-  y: canvas.height - 50,
-  width: 800,
-  height: 50,
-})
 
-const cm = new CanvasManager({
-  canvas,
-  ctx,
-  maguma,
-})
+const cm = createCanvasManager()
 let controller = new Game({
   top,
   left,
@@ -71,12 +61,12 @@ const onChangeControllerPositionClicked = (e: Event) => {
   controller.changeControllerPosition()
 }
 
-const createCanvasManager = () => {
+function createCanvasManager() {
   const maguma = new Maguma({
     x: 0,
-    y: canvas.height - 50,
-    width: 800,
-    height: 50,
+    y: canvas.height - canvas.height * 0.05,
+    width: canvas.width,
+    height: canvas.height,
   })
   return new CanvasManager({
     canvas,

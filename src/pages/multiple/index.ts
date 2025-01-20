@@ -1,9 +1,9 @@
 import { CanvasManager } from '../../entities/canvas_manager'
 import { Player, PlayerArg } from '../../entities/player'
-import { Maguma } from '../../entities/maguma'
 import { Game } from '../../entities/game'
 import domObject from './dom'
 import { WebsocketIO } from '../../plugins/websocket'
+import config from '../../../config'
 const {
   canvas,
   ctx,
@@ -17,13 +17,15 @@ const {
 } = domObject
 let timer: ReturnType<typeof setTimeout> | undefined = undefined
 let players: PlayerArg[] = []
-const socket = new WebsocketIO('wss://pele-server-prod-821127682746.asia-northeast1.run.app/player')
+const socket = new WebsocketIO(`${config.websocketApiOrigin}/player`)
+
 let userId = ''
 socket.on('connect', () => {
   socket.on('disconnect', () => {
     console.log('user disconnected')
   })
   socket.on('login', (id) => {
+    console.log(id)
     userId = id
     const player = Player.createPlayer(userId, canvas)
     socket.emit('login', {
@@ -43,19 +45,7 @@ socket.on('connect', () => {
     startMultiPlayer()
   })
 })
-const maguma = new Maguma({
-  x: 0,
-  y: canvas.height - 50,
-  width: 800,
-  height: 50,
-})
-
-const cm = new CanvasManager({
-  canvas,
-  ctx,
-  maguma,
-  socket,
-})
+const cm = CanvasManager.createCanvasManager(canvas, ctx)
 let controller = new Game({
   top,
   left,
@@ -66,7 +56,7 @@ let controller = new Game({
 
 const startMultiPlayer = () => {
   startButtons.classList.add('hide')
-  const cm = createCanvasManager()
+  const cm = CanvasManager.createCanvasManager(canvas, ctx)
   controller = controller.resetGame(cm, players.map((player) => new Player(player)))
   controller.startGame(userId)
   timer = setInterval(() => {
@@ -99,21 +89,6 @@ const onChangeControllerPositionClicked = (e: Event) => {
   e.preventDefault()
   e.stopPropagation()
   controller.changeControllerPosition()
-}
-
-const createCanvasManager = () => {
-  const maguma = new Maguma({
-    x: 0,
-    y: canvas.height - 50,
-    width: 800,
-    height: 50,
-  })
-  return new CanvasManager({
-    canvas,
-    ctx,
-    maguma,
-    socket,
-  })
 }
 
 function renderPlayers(): void {

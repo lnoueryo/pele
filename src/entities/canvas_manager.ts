@@ -140,10 +140,10 @@ export class CanvasManager {
   }
 
   private createBox() {
-    const width = (Math.random() * this.canvas.width) / 4.2
-    const height = Math.random() * 50 + 20
     const x = this.canvas.width
-    const y = this.canvas.height - 100 - Math.random() * 100
+    const y = this.canvas.height - this.canvas.height * 0.12
+    const width = (Math.random() * this.canvas.width) / 4.2
+    const height = Math.random() * this.canvas.height * 0.1
     const speed = Math.random() * (15 - 3) + 3
     const box = new Box({
       width,
@@ -175,5 +175,19 @@ export class CanvasManager {
     const height = window.innerHeight
     this.canvas.style.width = (height - 20) * CANVAS_RATIO + 'px'
     this.canvas.style.height = height - 20 + 'px'
+  }
+
+  static createCanvasManager(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+    const maguma = new Maguma({
+      x: 0,
+      y: canvas.height - canvas.height * 0.05,
+      width: canvas.width,
+      height: canvas.height,
+    })
+    return new CanvasManager({
+      canvas,
+      ctx,
+      maguma,
+    })
   }
 }
