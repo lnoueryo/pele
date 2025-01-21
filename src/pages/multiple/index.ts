@@ -12,20 +12,21 @@ const {
   right,
   gamerRight,
   wrapper,
-  warning,
   startButtons,
+  verticalTop,
+  verticalLeft,
+  verticalRight,
 } = domObject
 let timer: ReturnType<typeof setTimeout> | undefined = undefined
 let players: PlayerArg[] = []
 const socket = new WebsocketIO(`${config.websocketApiOrigin}/player`)
-
+let isGameStarted = false
 let userId = ''
 socket.on('connect', () => {
   socket.on('disconnect', () => {
     console.log('user disconnected')
   })
   socket.on('login', (id) => {
-    console.log(id)
     userId = id
     const player = Player.createPlayer(userId, canvas)
     socket.emit('login', {
@@ -38,10 +39,12 @@ socket.on('connect', () => {
     renderPlayers()
   })
   socket.on('coordinate', (data) => {
-    delete data[userId]
-    controller.updateOtherPlayers(data)
+    if (data.id !== userId) {
+      controller.updateOtherPlayers(data)
+    }
   })
   socket.on('start', () => {
+    if (isGameStarted) return
     startMultiPlayer()
   })
 })
@@ -55,9 +58,22 @@ let controller = new Game({
   left,
   right,
   gamerRight,
+  verticalTop,
+  verticalLeft,
+  verticalRight,
 })
+function parseBox(buffer: ArrayBuffer) {
+  const view = new DataView(buffer)
+  const x = view.getFloat32(0)
+  const y = view.getFloat32(4)
+  const width = view.getFloat32(8)
+  const height = view.getFloat32(12)
+  const speed = view.getFloat32(16)
 
+  return { x, y, width, height, speed }
+}
 const startMultiPlayer = () => {
+  isGameStarted = true
   startButtons.classList.add('hide')
   const cm = new MultiPlayerCanvasManager({
     canvas,
@@ -65,22 +81,27 @@ const startMultiPlayer = () => {
     socket,
   })
   socket.on('stage', (data) => {
-    cm.updateBoxes(data.boxes)
+    const boxes = data.map(parseBox)
+    cm.updateBoxes(boxes)
   })
-  controller = controller.resetGame(players.map((player) => new Player(player)))
+  controller = controller.resetGame(players.map((player) => Player.createPlayer(player.id, canvas)))
   controller.startGame(userId)
   cm.loop(0, controller.players, userId)
   timer = setInterval(() => {
     if (cm.isGameOver(controller.players)) {
       clearInterval(timer)
+      isGameStarted = false
       startButtons.classList.remove('hide')
     }
   }, 100)
 }
 
 const main = () => {
-  controller.showController(wrapper, warning)
-  cm.adjustCanvasSize()
+  const width = window.innerWidth
+  const height = window.innerHeight
+  const length = width <= height ? width : height
+  cm.adjustCanvasSize(length)
+  controller.showController(wrapper)
   document.addEventListener('keyup', (e) => {
     if (e.key === 'Enter') {
       if (cm.isGameOver(controller.players)) onClickStartMultiPlayer()
@@ -88,13 +109,16 @@ const main = () => {
     }
   })
   window.addEventListener('resize', () => {
-    controller.showController(wrapper, warning)
+    const width = window.innerWidth
+    const height = window.innerHeight
+    const length = width <= height ? width : height
+    cm.adjustCanvasSize(length)
+    controller.showController(wrapper)
   })
 }
 
 const onClickStartMultiPlayer = () => {
   socket.emit('start', { id: socket.id })
-  socket.emit('a', '')
   startMultiPlayer()
 }
 

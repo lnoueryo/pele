@@ -7,6 +7,9 @@ type IGame = {
   left: HTMLDivElement
   right: HTMLDivElement
   gamerRight: HTMLDivElement
+  verticalTop: HTMLDivElement
+  verticalLeft: HTMLDivElement
+  verticalRight: HTMLDivElement
   players?: Player[]
   controllerPosition?: string
 }
@@ -16,6 +19,9 @@ export class Game {
   private left
   private right
   private gamerRight
+  private verticalTop
+  private verticalLeft
+  private verticalRight
   public players
   private controllerPosition
   constructor(params: IGame) {
@@ -23,6 +29,9 @@ export class Game {
     this.left = params.left
     this.right = params.right
     this.gamerRight = params.gamerRight
+    this.verticalTop = params.verticalTop
+    this.verticalLeft = params.verticalLeft
+    this.verticalRight = params.verticalRight
     this.players = params.players || []
     this.controllerPosition = params.controllerPosition || 'default'
   }
@@ -55,6 +64,9 @@ export class Game {
       left: this.left,
       right: this.right,
       gamerRight: this.gamerRight,
+      verticalTop: this.verticalTop,
+      verticalLeft: this.verticalLeft,
+      verticalRight: this.verticalRight,
       players,
       controllerPosition: this.controllerPosition,
     })
@@ -66,6 +78,9 @@ export class Game {
       left: this.left,
       right: this.right,
       gamerRight: this.gamerRight,
+      verticalTop: this.verticalTop,
+      verticalLeft: this.verticalLeft,
+      verticalRight: this.verticalRight,
       players,
       controllerPosition: this.controllerPosition,
     })
@@ -119,6 +134,31 @@ export class Game {
       e.stopPropagation()
       e.preventDefault()
     })
+    this.verticalRight.addEventListener('touchstart', (e) => {
+      player.moveToRight()
+      e.stopPropagation()
+      e.preventDefault()
+    })
+    this.verticalRight.addEventListener('touchend', (e) => {
+      player.stopMovement()
+      e.stopPropagation()
+      e.preventDefault()
+    })
+    this.verticalLeft.addEventListener('touchstart', (e) => {
+      player.moveToLeft()
+      e.stopPropagation()
+      e.preventDefault()
+    })
+    this.verticalLeft.addEventListener('touchend', (e) => {
+      player.stopMovement()
+      e.stopPropagation()
+      e.preventDefault()
+    })
+    this.verticalTop.addEventListener('touchstart', (e) => {
+      player.isJumping || player.jump()
+      e.stopPropagation()
+      e.preventDefault()
+    })
 
     document.removeEventListener('touchstart', () => this.execute(userId))
     if (this.controllerPosition == 'gamer') {
@@ -126,14 +166,20 @@ export class Game {
     }
   }
 
-  showController(wrapper: HTMLDivElement, warning: HTMLDivElement) {
+  showController(wrapper: HTMLDivElement) {
     const sideContainers = document.getElementsByClassName('side-container')
+    const bottomContainers = document.getElementsByClassName('bottom-container')
 
     if (this.isMobileDevice()) {
       if (window.innerWidth - 200 < window.innerHeight) {
         // 縦向きまたは十分な画面サイズではない端末
-        wrapper.classList.add('hide')
-        warning.classList.remove('hide')
+        // wrapper.classList.add('hide')
+        Array.from(sideContainers).forEach((element) => {
+          element.classList.add('hide')
+        })
+        Array.from(bottomContainers).forEach((element) => {
+          element.classList.remove('hide')
+        })
         return
       }
 
@@ -141,15 +187,20 @@ export class Game {
       Array.from(sideContainers).forEach((element) => {
         element.classList.remove('hide')
       })
+      Array.from(bottomContainers).forEach((element) => {
+        element.classList.add('hide')
+      })
     } else {
       // PCの場合
       Array.from(sideContainers).forEach((element) => {
         element.classList.add('hide')
       })
+      Array.from(bottomContainers).forEach((element) => {
+        element.classList.add('hide')
+      })
     }
 
     wrapper.classList.remove('hide')
-    warning.classList.add('hide')
   }
 
   isMobileDevice = () => {
@@ -159,10 +210,10 @@ export class Game {
     )
   }
 
-  updateOtherPlayers(players: {[key: string]: PlayerArg}) {
+  updateOtherPlayers(_player: PlayerArg) {
     this.players.forEach((player) => {
-      if (player.id in players) {
-        player.updateFromJson(players[player.id])
+      if (player.id === _player.id) {
+        player.updateFromJson(_player)
       }
     })
   }

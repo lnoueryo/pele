@@ -10,8 +10,8 @@ const configEnvs: { [K in STAGE]: ConfigEnv } = {
     websocketApiOrigin: 'ws://localhost:3001',
   },
   production: {
-    httpApiOrigin: 'https://pele.jounetsism.biz',
-    websocketApiOrigin: 'wss://pele.jounetsism.biz',
+    httpApiOrigin: 'https://pele-server.jounetsism.biz',
+    websocketApiOrigin: 'wss://pele-server.jounetsism.biz',
   }
 }
 const env = (process.env.NODE_ENV || 'development') as STAGE

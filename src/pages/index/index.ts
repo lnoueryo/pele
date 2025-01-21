@@ -10,8 +10,11 @@ const {
   right,
   gamerRight,
   wrapper,
-  warning,
+  // warning,
   startButtons,
+  verticalTop,
+  verticalLeft,
+  verticalRight,
 } = domObject
 let timer: ReturnType<typeof setTimeout> | undefined = undefined
 
@@ -21,6 +24,9 @@ let controller = new Game({
   left,
   right,
   gamerRight,
+  verticalTop,
+  verticalLeft,
+  verticalRight,
 })
 
 const startOnePlayer = () => {
@@ -40,8 +46,11 @@ const startOnePlayer = () => {
 }
 
 const main = () => {
-  controller.showController(wrapper, warning)
-  cm.adjustCanvasSize()
+  const width = window.innerWidth
+  const height = window.innerHeight
+  const length = width <= height ? width : height
+  cm.adjustCanvasSize(length)
+  controller.showController(wrapper)
   document.addEventListener('keyup', (e) => {
     if (e.key === 'Enter') {
       if (cm.isGameOver(controller.players)) onClickStartOnePlayer()
@@ -49,7 +58,11 @@ const main = () => {
     }
   })
   window.addEventListener('resize', () => {
-    controller.showController(wrapper, warning)
+    const width = window.innerWidth
+    const height = window.innerHeight
+    const length = width <= height ? width : height
+    cm.adjustCanvasSize(length)
+    controller.showController(wrapper)
   })
 }
 

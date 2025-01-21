@@ -13,7 +13,7 @@ type ICanvasManager = {
 }
 
 export abstract class BaseCanvasManager {
-  protected canvas: HTMLCanvasElement
+  public canvas: HTMLCanvasElement
   protected ctx: CanvasRenderingContext2D
   protected maguma: Maguma
   protected boxes: Box[] = []
@@ -46,7 +46,7 @@ export abstract class BaseCanvasManager {
 
   isGameOver(players: Player[]) {
     return players.every((player) => {
-      return (player.y + player.height) > this.canvas.height
+      return player.isOver
     })!
   }
 
@@ -109,10 +109,9 @@ export abstract class BaseCanvasManager {
     this.ctx.fillText(secondText, 180, this.canvas.height / 3)
   }
 
-  adjustCanvasSize = () => {
-    const height = window.innerHeight
-    this.canvas.style.width = (height - 20) * CANVAS_RATIO + 'px'
-    this.canvas.style.height = height - 20 + 'px'
+  adjustCanvasSize = (length: number) => {
+    this.canvas.style.width = (length - 20) * CANVAS_RATIO + 'px'
+    this.canvas.style.height = length - 20 + 'px'
   }
 
 }

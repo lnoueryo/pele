@@ -21,6 +21,7 @@ export class OnePlayerCanvasManager extends BaseCanvasManager {
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of players) {
         player.moveOnIdle()
+        player.isGameOver(this.canvas)
       }
     }
 

@@ -12,6 +12,7 @@ export type PlayerArg = {
   isJumping: boolean
   speed: number
   color: string
+  isOver: boolean
 }
 export class Player {
   public id
@@ -26,6 +27,7 @@ export class Player {
   public isJumping
   private speed
   public color
+  public isOver
   constructor(params: PlayerArg) {
     this.id = params.id
     this.x = params.x
@@ -39,6 +41,7 @@ export class Player {
     this.isJumping = params.isJumping
     this.speed = params.speed
     this.color = params.color
+    this.isOver = params.isOver
   }
 
   moveToLeft() {
@@ -94,6 +97,7 @@ export class Player {
       isJumping: this.isJumping,
       speed: this.speed,
       color: this.color,
+      isOver: this.isOver,
     }
   }
 
@@ -110,6 +114,10 @@ export class Player {
     this.speed = params.speed
   }
 
+  isGameOver(canvas: HTMLCanvasElement) {
+    this.isOver = this.y - this.height > canvas.height
+  }
+
   static createPlayer = (id: string, canvas: HTMLCanvasElement) => {
     return new Player({
       id,
@@ -124,6 +132,7 @@ export class Player {
       isJumping: false,
       speed: 8,
       color: id ? `rgb(255,255,255)` : `rgb(0,0,0)`,
+      isOver: false,
     })
   }
 }

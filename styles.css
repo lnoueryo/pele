@@ -170,6 +170,9 @@ body {
   overflow: hidden;
   background-color: whitesmoke;
 }
+#app {
+  height: 100vh;
+}
 #canvas-container {
   margin: 0;
   padding: 0;
@@ -220,13 +223,20 @@ canvas {
   justify-content: center;
   padding: 8px;
 }
-
-.buttons-container {
+.bottom-container .buttons-container {
+  position: absolute;
+  bottom: 10%;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 200px;
+}
+.buttons-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 .justify-center {
   justify-content: center;

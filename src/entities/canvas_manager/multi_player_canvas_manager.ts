@@ -18,13 +18,14 @@ export class MultiPlayerCanvasManager extends BaseCanvasManager {
     this.socket = params.socket
   }
 
-  public loop(timestamp: number, players: Player[], userId: string) {
+  public loop = (timestamp: number, players: Player[], userId: string) => {
     this.updateCurrentTime(timestamp)
     this.resetCanvas()
     if (this.isGameOver(players)) return this.endGame()
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of players) {
         player.moveOnIdle()
+        player.isGameOver(this.canvas)
       }
     }
     for (const box of this.boxes) {
@@ -42,7 +43,7 @@ export class MultiPlayerCanvasManager extends BaseCanvasManager {
 
     requestAnimationFrame((timestamp) => {
       const user = players.find((player) => player.id === userId)!
-      this.socket.emit('coordinate', {[userId]: user.convertToJson()})
+      this.socket.emit('coordinate', user.convertToJson())
       this.loop(timestamp, players, userId)
     })
   }
