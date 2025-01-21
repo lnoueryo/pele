@@ -1,6 +1,5 @@
-import { CanvasManager } from '../../entities/canvas_manager'
+import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
 import { Player } from '../../entities/player'
-import { Maguma } from '../../entities/maguma'
 import { Game } from '../../entities/game'
 import domObject from './dom'
 const {
@@ -22,7 +21,6 @@ let controller = new Game({
   left,
   right,
   gamerRight,
-  cm,
 })
 
 const startOnePlayer = () => {
@@ -30,10 +28,11 @@ const startOnePlayer = () => {
   const players = []
   players.push(Player.createPlayer('1', canvas))
   const cm = createCanvasManager()
-  controller = controller.resetGame(cm, players)
+  controller = controller.resetGame(players)
   controller.startGame('1')
+  cm.loop(0, controller.players, '1')
   timer = setInterval(() => {
-    if (controller.isGameOver()) {
+    if (cm.isGameOver(controller.players)) {
       clearInterval(timer)
       startButtons.classList.remove('hide')
     }
@@ -42,9 +41,10 @@ const startOnePlayer = () => {
 
 const main = () => {
   controller.showController(wrapper, warning)
+  cm.adjustCanvasSize()
   document.addEventListener('keyup', (e) => {
     if (e.key === 'Enter') {
-      if (controller.isGameOver()) onClickStartOnePlayer()
+      if (cm.isGameOver(controller.players)) onClickStartOnePlayer()
       e.stopPropagation()
     }
   })
@@ -62,16 +62,9 @@ const onChangeControllerPositionClicked = (e: Event) => {
 }
 
 function createCanvasManager() {
-  const maguma = new Maguma({
-    x: 0,
-    y: canvas.height - canvas.height * 0.05,
-    width: canvas.width,
-    height: canvas.height,
-  })
-  return new CanvasManager({
+  return new OnePlayerCanvasManager({
     canvas,
     ctx,
-    maguma,
   })
 }
 

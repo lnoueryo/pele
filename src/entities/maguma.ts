@@ -16,4 +16,12 @@ export class Maguma {
     this.width = params.width
     this.height = params.height
   }
+  static createMaguma(canvas: HTMLCanvasElement) {
+    return new Maguma({
+      x: 0,
+      y: canvas.height - canvas.height * 0.05,
+      width: canvas.width,
+      height: canvas.height,
+    })
+  }
 }

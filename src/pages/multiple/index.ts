@@ -1,4 +1,4 @@
-import { CanvasManager } from '../../entities/canvas_manager'
+import { MultiPlayerCanvasManager } from './../../entities/canvas_manager/multi_player_canvas_manager';
 import { Player, PlayerArg } from '../../entities/player'
 import { Game } from '../../entities/game'
 import domObject from './dom'
@@ -45,22 +45,33 @@ socket.on('connect', () => {
     startMultiPlayer()
   })
 })
-const cm = CanvasManager.createCanvasManager(canvas, ctx)
+const cm = new MultiPlayerCanvasManager({
+  canvas,
+  ctx,
+  socket,
+})
 let controller = new Game({
   top,
   left,
   right,
   gamerRight,
-  cm,
 })
 
 const startMultiPlayer = () => {
   startButtons.classList.add('hide')
-  const cm = CanvasManager.createCanvasManager(canvas, ctx)
-  controller = controller.resetGame(cm, players.map((player) => new Player(player)))
+  const cm = new MultiPlayerCanvasManager({
+    canvas,
+    ctx,
+    socket,
+  })
+  socket.on('stage', (data) => {
+    cm.updateBoxes(data.boxes)
+  })
+  controller = controller.resetGame(players.map((player) => new Player(player)))
   controller.startGame(userId)
+  cm.loop(0, controller.players, userId)
   timer = setInterval(() => {
-    if (controller.isGameOver()) {
+    if (cm.isGameOver(controller.players)) {
       clearInterval(timer)
       startButtons.classList.remove('hide')
     }
@@ -69,9 +80,10 @@ const startMultiPlayer = () => {
 
 const main = () => {
   controller.showController(wrapper, warning)
+  cm.adjustCanvasSize()
   document.addEventListener('keyup', (e) => {
     if (e.key === 'Enter') {
-      if (controller.isGameOver()) onClickStartMultiPlayer()
+      if (cm.isGameOver(controller.players)) onClickStartMultiPlayer()
       e.stopPropagation()
     }
   })
@@ -82,6 +94,7 @@ const main = () => {
 
 const onClickStartMultiPlayer = () => {
   socket.emit('start', { id: socket.id })
+  socket.emit('a', '')
   startMultiPlayer()
 }
 
@@ -111,5 +124,6 @@ function renderPlayers(): void {
   startButtons.appendChild(fragment)
   startButtons.appendChild(button)
 }
+
 
 export { main, onClickStartMultiPlayer, onChangeControllerPositionClicked, }

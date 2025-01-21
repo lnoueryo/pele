@@ -1,4 +1,3 @@
-import { CanvasManager } from './canvas_manager'
 import { Player, PlayerArg } from './player'
 
 const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
@@ -8,7 +7,6 @@ type IGame = {
   left: HTMLDivElement
   right: HTMLDivElement
   gamerRight: HTMLDivElement
-  cm: CanvasManager
   players?: Player[]
   controllerPosition?: string
 }
@@ -18,15 +16,13 @@ export class Game {
   private left
   private right
   private gamerRight
-  private cm
-  private players
+  public players
   private controllerPosition
   constructor(params: IGame) {
     this.top = params.top
     this.left = params.left
     this.right = params.right
     this.gamerRight = params.gamerRight
-    this.cm = params.cm
     this.players = params.players || []
     this.controllerPosition = params.controllerPosition || 'default'
   }
@@ -59,19 +55,17 @@ export class Game {
       left: this.left,
       right: this.right,
       gamerRight: this.gamerRight,
-      cm: this.cm,
       players,
       controllerPosition: this.controllerPosition,
     })
   }
 
-  resetGame(cm: CanvasManager, players: Player[]) {
+  resetGame(players: Player[]) {
     return new Game({
       top: this.top,
       left: this.left,
       right: this.right,
       gamerRight: this.gamerRight,
-      cm,
       players,
       controllerPosition: this.controllerPosition,
     })
@@ -130,7 +124,6 @@ export class Game {
     if (this.controllerPosition == 'gamer') {
       document.addEventListener('touchstart',  () => this.execute(userId))
     }
-    this.cm.loop(0, this.players, userId)
   }
 
   showController(wrapper: HTMLDivElement, warning: HTMLDivElement) {
@@ -157,7 +150,6 @@ export class Game {
 
     wrapper.classList.remove('hide')
     warning.classList.add('hide')
-    this.cm.adjustCanvasSize()
   }
 
   isMobileDevice = () => {
@@ -167,14 +159,9 @@ export class Game {
     )
   }
 
-  isGameOver() {
-    return this.cm.isGameOver(this.players)
-  }
-
   updateOtherPlayers(players: {[key: string]: PlayerArg}) {
     this.players.forEach((player) => {
       if (player.id in players) {
-        console.log(player)
         player.updateFromJson(players[player.id])
       }
     })
