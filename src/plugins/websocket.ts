@@ -13,6 +13,12 @@ export class WebsocketIO {
   emit(trigger: string, data: any) {
     this.socket.emit(trigger, data)
   }
+  connect() {
+    this.socket.connect()
+  }
+  disconnect() {
+    this.socket.disconnect()
+  }
   get id() {
     return this.socket.id
   }

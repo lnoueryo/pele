@@ -23,6 +23,7 @@ const socket = new WebsocketIO(`${config.websocketApiOrigin}/player`)
 let isGameStarted = false
 let userId = ''
 socket.on('connect', () => {
+  console.log('connected')
   socket.on('disconnect', () => {
     console.log('user disconnected')
   })
@@ -62,6 +63,20 @@ let controller = new Game({
   verticalLeft,
   verticalRight,
 })
+let ownPlayer: { x: number, y: number} | undefined | null = { x: 0, y: 0 }
+var connectionTimer: ReturnType<typeof setTimeout> | undefined = undefined
+const checkConnection = () => {
+  const currentPlayer = controller.players.find((player) => player.id === userId)
+  if (!currentPlayer || (ownPlayer?.x === currentPlayer.x && ownPlayer?.y === currentPlayer.y)) {
+    clearInterval(connectionTimer)
+    socket.disconnect()
+    window.alert('接続が切れました')
+    socket.connect()
+    connectionTimer = setInterval(checkConnection, 30000)
+  }
+  ownPlayer = currentPlayer?.convertToJson()
+}
+connectionTimer = setInterval(checkConnection, 30000)
 function parseBox(buffer: ArrayBuffer) {
   const view = new DataView(buffer)
   const x = view.getFloat32(0)
@@ -72,6 +87,7 @@ function parseBox(buffer: ArrayBuffer) {
 
   return { x, y, width, height, speed }
 }
+
 const startMultiPlayer = () => {
   isGameStarted = true
   startButtons.classList.add('hide')
