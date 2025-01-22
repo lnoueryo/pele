@@ -8,7 +8,6 @@
     />
     <title>P.L.Revolution</title>
     <meta name="description" content="オンラインゲーム。" />
-    <link rel="stylesheet" href="./styles.css" />
     <link rel="icon" href="./favicon.ico" sizes="any" />
   </head>
   <body>
@@ -16,15 +15,13 @@
       <game-controller></game-controller>
     </div>
     <script type="module" src="/src/main.ts"></script>
-    <script type="module">
+    <script type="module" defer>
       import * as index from '/src/pages/index'
       const play = document.getElementById("play1");
       index.main()
-      const ChangePositionButton = document.getElementById("change-position-button")
       play.addEventListener("click", (e) => {
         index.onClickStartOnePlayer(1)
       })
-      play.addEventListener("click", index.onClickChangeControllerPosition)
     </script>
   </body>
 </html>
