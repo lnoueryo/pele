@@ -1,12 +1,15 @@
 import { BaseCanvasManager } from './base_canvas_manager'
 import { Box } from '../box'
 import { Player } from '../player'
+import { Maguma } from '../maguma'
+import { Canvas } from '../canvas'
 const PLAYER_DELAY = 1
 
 export class OnePlayerCanvasManager extends BaseCanvasManager {
   constructor(params: {
-    canvas: HTMLCanvasElement
-    ctx: CanvasRenderingContext2D
+    canvas: Canvas
+    players: Player[]
+    maguma: Maguma
     boxes?: Box[]
   }) {
     super(
@@ -14,14 +17,14 @@ export class OnePlayerCanvasManager extends BaseCanvasManager {
     )
   }
 
-  public loop = (timestamp: number, players: Player[], userId: string) => {
+  public loop = async(timestamp: number) => {
     this.updateCurrentTime(timestamp)
     this.resetCanvas()
-    if (this.isGameOver(players)) return this.endGame()
+    if (this.isGameOver(this.players)) return this.endGame()
     if (this.currentTime > PLAYER_DELAY) {
-      for (const player of players) {
+      for (const player of this.players) {
         player.moveOnIdle()
-        player.isGameOver(this.canvas)
+        player.isGameOver()
       }
     }
 
@@ -30,40 +33,32 @@ export class OnePlayerCanvasManager extends BaseCanvasManager {
       if (box.isOutOfDisplay()) this.deleteBox(box)
 
       this.fillBox(box)
-      players.forEach((player) => {
+      this.players.forEach((player) => {
         if (player.isPlayerCollidingWithBox(box)) player.moveOnTopBox(box.y)
       })
     }
 
-    if (Math.random() < this.boxCreationProbability) {
+    if (this.shouldCreateBox()) {
       this.createBox()
     }
 
-    players.forEach((player) => {
+    this.players.forEach((player) => {
       this.fillPlayer(player)
     })
 
     this.fillMaguma()
 
-    requestAnimationFrame((timestamp) => {
-      this.loop(timestamp, players, userId)
-    })
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame((nextTimestamp) => {
+        this.loop(nextTimestamp).then(resolve)
+      })
+    )
   }
 
   private createBox() {
-    const x = this.canvas.width
-    const y = this.canvas.height - this.canvas.height * 0.12
-    const width = (Math.random() * this.canvas.width) / 4.2
-    const height = Math.random() * this.canvas.height * 0.1
-    const speed = Math.random() * (15 - 3) + 3
-    const box = new Box({
-      width,
-      height,
-      x,
-      y,
-      speed,
-    })
+    const box = Box.createBox(this.canvas)
     this.boxes.push(box)
+    return box
   }
 
   private deleteBox(box: Box) {

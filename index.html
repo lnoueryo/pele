@@ -11,17 +11,11 @@
     <link rel="icon" href="./favicon.ico" sizes="any" />
   </head>
   <body>
-    <div id="app">
-      <game-controller></game-controller>
-    </div>
+    <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
     <script type="module" defer>
       import * as index from '/src/pages/index'
-      const play = document.getElementById("play1");
-      index.main()
-      play.addEventListener("click", (e) => {
-        index.onClickStartOnePlayer(1)
-      })
+      index.onMounted()
     </script>
   </body>
 </html>

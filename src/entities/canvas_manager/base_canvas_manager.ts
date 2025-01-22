@@ -1,33 +1,31 @@
 import { Box } from '../box'
+import { Canvas } from '../canvas'
 import { Maguma } from '../maguma'
 import { Player } from '../player'
-const CANVAS_WIDTH_PIXEL = 800
-const CANVAS_HEIGHT_PIXEL = 800
-const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
 const PLAYER_DELAY = 1
 
 type ICanvasManager = {
-  canvas: HTMLCanvasElement
-  ctx: CanvasRenderingContext2D
+  canvas: Canvas
+  maguma: Maguma
+  players?: Player[]
   boxes?: Box[]
 }
 
 export abstract class BaseCanvasManager {
-  public canvas: HTMLCanvasElement
-  protected ctx: CanvasRenderingContext2D
+  protected canvas: Canvas
   protected maguma: Maguma
   protected boxes: Box[] = []
+  protected players: Player[] = []
+
   protected startTime = 0
   protected currentTime = 0
   protected lastTimestamp = 0
   protected boxCreationProbability = 0.07
   constructor(params: ICanvasManager) {
     this.canvas = params.canvas
-    this.ctx = params.ctx
-    this.maguma = Maguma.createMaguma(this.canvas)
+    this.maguma = params.maguma
+    this.players = params.players || []
     this.boxes = params.boxes || []
-    this.canvas.width = CANVAS_WIDTH_PIXEL
-    this.canvas.height = CANVAS_HEIGHT_PIXEL
   }
   abstract loop(timestamp: number, players: Player[], userId: string): void
 
@@ -44,7 +42,7 @@ export abstract class BaseCanvasManager {
     this.lastTimestamp = timestamp
   }
 
-  isGameOver(players: Player[]) {
+  protected isGameOver(players: Player[]) {
     return players.every((player) => {
       return player.isOver
     })!
@@ -63,30 +61,52 @@ export abstract class BaseCanvasManager {
   }
 
   protected fillPlayer(player: Player) {
+    // 外枠
     this.ctx.strokeStyle = 'blue'
+    this.ctx.strokeRect(player.x, player.y, player.width, player.height)
+  
+    // 背景
     this.ctx.fillStyle = player.color
     this.ctx.fillRect(player.x, player.y, player.width, player.height)
+  
+    // 赤いパーツ (目と口)
     this.ctx.fillStyle = 'red'
-    this.ctx.strokeRect(player.x, player.y, player.width, player.height)
+  
+    // 左目
+    const eyeWidth = player.width / 6 // 目の幅
+    const eyeHeight = player.height / 6 // 目の高さ
+    const eyeOffsetX = player.width / 5 // プレイヤーの左端から目までのオフセット
+    const eyeOffsetY = player.height / 4 // プレイヤーの上端から目までのオフセット
+  
     this.ctx.fillRect(
-      player.x + 10,
-      player.y + 5,
-      player.width / 5,
-      player.height / 5,
+      player.x + eyeOffsetX,
+      player.y + eyeOffsetY,
+      eyeWidth,
+      eyeHeight
     )
+  
+    // 右目
     this.ctx.fillRect(
-      player.x + player.width - 15,
-      player.y + 5,
-      player.width / 5,
-      player.height / 5,
+      player.x + player.width - eyeOffsetX - eyeWidth,
+      player.y + eyeOffsetY,
+      eyeWidth,
+      eyeHeight
     )
+  
+    // 口
+    const mouthWidth = player.width / 2 // 口の幅
+    const mouthHeight = player.height / 8 // 口の高さ
+    const mouthOffsetX = player.width / 5 // プレイヤーの中央に口を配置するためのオフセット
+    const mouthOffsetY = player.height / 1.5 // プレイヤーの上端から口までのオフセット
+  
     this.ctx.fillRect(
-      player.x + 10,
-      player.y + player.height - 15,
-      player.width - 20,
-      player.height / 5,
+      player.x + mouthOffsetX,
+      player.y + mouthOffsetY,
+      mouthWidth,
+      mouthHeight
     )
   }
+  
 
   protected fillMaguma() {
     this.ctx.fillStyle = `rgb(${Math.random() * (255 - 200) + 200},30, 20)`
@@ -103,15 +123,21 @@ export abstract class BaseCanvasManager {
   }
 
   protected fillEndText(firstText: string, secondText: string) {
+    const canvasWidth = this.canvas.width
+    const canvasHeight = this.canvas.height
+    const fontSize = Math.min(canvasWidth, canvasHeight) / 20
+    const textX = canvasWidth / 2
     this.ctx.fillStyle = 'black'
-    this.ctx.font = '48px Arial'
-    this.ctx.fillText(firstText, 180, this.canvas.height / 4)
-    this.ctx.fillText(secondText, 180, this.canvas.height / 3)
+    this.ctx.font = `${fontSize}px Arial`
+    this.ctx.textAlign = 'center'
+    this.ctx.textBaseline = 'middle'
+    this.ctx.fillText(firstText, textX, this.canvas.height / 4)
+    this.ctx.fillText(secondText, textX, this.canvas.height / 3)
   }
-
-  adjustCanvasSize = (length: number) => {
-    this.canvas.style.width = (length - 20) * CANVAS_RATIO + 'px'
-    this.canvas.style.height = length - 20 + 'px'
+  protected shouldCreateBox() {
+    return Math.random() < this.boxCreationProbability
   }
-
+  get ctx() {
+    return this.canvas.ctx
+  }
 }
