@@ -15,13 +15,9 @@
       <game-controller></game-controller>
     </div>
     <script type="module" src="/src/main.ts"></script>
-    <script type="module" defer>
-      import * as index from '/src/pages/index'
-      const play = document.getElementById("play1");
-      index.main()
-      play.addEventListener("click", (e) => {
-        index.onClickStartOnePlayer(1)
-      })
+    <script type="module">
+      import * as multiple from '/src/pages/multiple'
+      multiple.main()
     </script>
   </body>
 </html>
