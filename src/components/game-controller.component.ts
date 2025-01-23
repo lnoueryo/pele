@@ -1,9 +1,67 @@
 import { Player } from '../entities/player'
+import { BaseComponent } from './base.component';
 import GameCanvas from './game-canvas.component'
 customElements.define('game-canvas', GameCanvas)
 const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 
-export default class GameController extends HTMLElement {
+const sheet = new CSSStyleSheet();
+sheet.replaceSync(`
+#wrapper {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.side-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+.bottom-container .buttons-container {
+  position: absolute;
+  bottom: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.buttons-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.button-container {
+  width: 46%;
+  position: relative;
+}
+
+.button-size {
+  padding-top: 50%;
+}
+
+.controller {
+  -webkit-user-select: none; /* Chrome, Safari, Opera */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge */
+  user-select: none; /* Standard syntax */
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+`)
+
+export default class GameController extends BaseComponent {
   private _top: HTMLDivElement | null = null
   private _left: HTMLDivElement | null = null
   private _right: HTMLDivElement | null = null
@@ -12,9 +70,13 @@ export default class GameController extends HTMLElement {
   private _verticalLeft: HTMLDivElement | null = null
   private _verticalRight: HTMLDivElement | null = null
   private _gameCanvas: GameCanvas | null = null
-  connectedCallback() {
-    this.innerHTML = `
+  constructor() {
+    super()
+    // this.shadow = this.attachShadow({ mode: 'open' })
+    this.shadow.adoptedStyleSheets.push(sheet)
+    this.shadow.innerHTML = `
       <div id="wrapper">
+          <div class="hide">hhhh</div>
         <div class="side-container">
           <div class="buttons-container justify-between">
             <div id="left" class="button-container">
@@ -58,18 +120,20 @@ export default class GameController extends HTMLElement {
         </div>
       </div>
     `
-    this._top = document.getElementById('top') as HTMLDivElement
-    this._left = document.getElementById('left') as HTMLDivElement
-    this._right = document.getElementById('right') as HTMLDivElement
-    this._gamerRight = document.getElementById('gamer-right') as HTMLDivElement
-    this._verticalTop = document.getElementById('vertical-top') as HTMLDivElement
-    this._verticalLeft = document.getElementById('vertical-left') as HTMLDivElement
-    this._verticalRight = document.getElementById('vertical-right') as HTMLDivElement
+  }
+  connectedCallback() {
+    this._top = this.shadow.getElementById('top') as HTMLDivElement
+    this._left = this.shadow.getElementById('left') as HTMLDivElement
+    this._right = this.shadow.getElementById('right') as HTMLDivElement
+    this._gamerRight = this.shadow.getElementById('gamer-right') as HTMLDivElement
+    this._verticalTop = this.shadow.getElementById('vertical-top') as HTMLDivElement
+    this._verticalLeft = this.shadow.getElementById('vertical-left') as HTMLDivElement
+    this._verticalRight = this.shadow.getElementById('vertical-right') as HTMLDivElement
     if (!this._top || !this._left || !this._right || !this._gamerRight || !this._verticalTop || !this._verticalLeft || !this._verticalRight) {
       throw new Error('buttonがnullです')
     }
 
-    this._gameCanvas = this.querySelector('game-canvas')! as GameCanvas
+    this._gameCanvas = this.shadow.querySelector('game-canvas')! as GameCanvas
     this.showController()
     this.gameCanvas.addEventListener('startGame', (event) => {
       const customEvent = event as CustomEvent<Player>
@@ -152,9 +216,8 @@ export default class GameController extends HTMLElement {
     })
   }
   private showController() {
-    const sideContainers = document.getElementsByClassName('side-container')
-    const bottomContainers = document.getElementsByClassName('bottom-container')
-
+    const sideContainers = this.shadow.querySelectorAll('.side-container')
+    const bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     if (this.isMobileDevice()) {
       if (window.innerWidth - 200 < window.innerHeight) {
         // 縦向きまたは十分な画面サイズではない端末

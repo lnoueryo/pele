@@ -2,10 +2,40 @@ import { Canvas } from "../entities/canvas"
 import { OnePlayerCanvasManager } from "../entities/canvas_manager/one_player_canvas_manager"
 import { Maguma } from "../entities/maguma"
 import { Player } from "../entities/player"
+import { BaseComponent } from "./base.component"
 const CANVAS_WIDTH_PIXEL = 1600
 const CANVAS_HEIGHT_PIXEL = 1600
 const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
-export default class GameCanvas extends HTMLElement {
+
+const sheet = new CSSStyleSheet();
+sheet.replaceSync(`
+#canvas-container {
+  margin: 0;
+  padding: 0;
+}
+
+#start-buttons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#canvas-frame {
+  border: 8px solid black;
+}
+
+canvas {
+  height: 100vh;
+}
+
+.button {
+  padding: 14px;
+  margin: 0 7px;
+}
+`)
+
+export default class GameCanvas extends BaseComponent {
   private _player: Player | null = null
   private _players: Player[] = []
   private _canvas: Canvas | null = null
@@ -13,8 +43,10 @@ export default class GameCanvas extends HTMLElement {
   private startButtons: HTMLDivElement | null = null
   public isGameRunning: boolean = false
 
-  connectedCallback() {
-    this.innerHTML = `
+  constructor() {
+    super()
+    this.shadow.adoptedStyleSheets.push(sheet)
+    this.shadow.innerHTML = `
       <div id="canvas-container">
         <div id="start-buttons">
           <button id="one-player" class="button">1p start</button>
@@ -25,10 +57,13 @@ export default class GameCanvas extends HTMLElement {
         </div>
       </div>
     `
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement
+  }
+
+  connectedCallback() {
+    const canvas = this.shadow.getElementById('canvas') as HTMLCanvasElement
     this._canvas = new Canvas(canvas)
-    this.onePlayer = document.getElementById('one-player') as HTMLButtonElement
-    this.startButtons = document.getElementById('start-buttons') as HTMLDivElement
+    this.onePlayer = this.shadow.getElementById('one-player') as HTMLButtonElement
+    this.startButtons = this.shadow.getElementById('start-buttons') as HTMLDivElement
     this._player = Player.createPlayer(this.canvas)
     this.adjustCanvasSize()
     const player = this.player
