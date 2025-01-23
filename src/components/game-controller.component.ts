@@ -9,22 +9,6 @@ const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 
 const sheet = new CSSStyleSheet();
 sheet.replaceSync(`
-.button {
-  padding: 14px;
-  margin: 0 7px;
-}
-
-#warning {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 #wrapper {
   position: relative;
   display: flex;
@@ -54,42 +38,6 @@ sheet.replaceSync(`
   justify-content: center;
   width: 100%;
 }
-.justify-center {
-  justify-content: center;
-}
-.justify-between {
-  justify-content: space-between;
-}
-
-.button-container {
-  width: 46%;
-  position: relative;
-}
-
-.button-size {
-  padding-top: 50%;
-}
-
-.controller {
-  -webkit-user-select: none; /* Chrome, Safari, Opera */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE/Edge */
-  user-select: none; /* Standard syntax */
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hide {
-  display: none !important;
-}
-
 `)
 
 export default class GameController extends BaseComponent {
