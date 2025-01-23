@@ -31,4 +31,10 @@ export class Canvas {
   get ctx() {
     return this.canvas.getContext('2d')!
   }
+  get offsetLeft() {
+    return this.canvas.offsetLeft
+  }
+  get offsetTop() {
+    return this.canvas.offsetTop
+  }
 }

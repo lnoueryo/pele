@@ -4,7 +4,7 @@ const CANVAS_WIDTH_PIXEL = 1600
 const CANVAS_HEIGHT_PIXEL = 1600
 const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
 
-const sheet = new CSSStyleSheet();
+const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
 #canvas-frame {
   border: 8px solid black;
@@ -27,6 +27,8 @@ export default class BaseCanvasComponent extends BaseComponent {
     `
     const canvas = this.shadow.getElementById('canvas') as HTMLCanvasElement
     this._canvas = new Canvas(canvas)
+    this.adjustCanvasSize()
+    window.addEventListener('resize', this.adjustCanvasSize.bind(this))
   }
   adjustCanvasSize() {
     const width = window.innerWidth

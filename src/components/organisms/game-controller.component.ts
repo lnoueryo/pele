@@ -15,7 +15,6 @@ sheet.replaceSync(`
   justify-content: space-around;
   width: 100%;
 }
-
 .side-container {
   width: 100%;
   display: flex;
@@ -38,6 +37,10 @@ sheet.replaceSync(`
   justify-content: center;
   width: 100%;
 }
+  .button {
+  padding: 14px;
+  margin: 0 7px;
+}
 `)
 
 export default class GameController extends BaseComponent {
@@ -46,6 +49,9 @@ export default class GameController extends BaseComponent {
   private _leftController: LeftController
   private _rightController: RightController
   private _bottomController: BottomController
+  private _sideContainers: NodeListOf<HTMLDivElement>
+  private _bottomContainers: NodeListOf<HTMLDivElement>
+  private onePlayer: HTMLButtonElement
   constructor() {
     super()
     this.shadow.adoptedStyleSheets.push(sheet)
@@ -54,7 +60,10 @@ export default class GameController extends BaseComponent {
         <div class="side-container">
           <left-controller class="buttons-container justify-between" />
         </div>
-        <game-canvas id="game-canvas"></game-canvas>
+        <game-canvas id="game-canvas">
+          <button id="one-player" class="button">start</button>
+          <button class="button" onclick="location.href = '/'">back</button>
+        </game-canvas>
         <div class="side-container">
           <right-controller class="buttons-container" />
         </div>
@@ -63,18 +72,23 @@ export default class GameController extends BaseComponent {
         <bottom-controller class="buttons-container" />
       </div>
     `
-    this._gameCanvas = this.shadow.querySelector('game-canvas')! as GameCanvas
-    this._leftController = this.shadow.querySelector('left-controller')! as LeftController
-    this._rightController = this.shadow.querySelector('right-controller')! as RightController
+    this._gameCanvas = this.shadow.querySelector('game-canvas') as GameCanvas
+    this._leftController = this.shadow.querySelector('left-controller') as LeftController
+    this._rightController = this.shadow.querySelector('right-controller') as RightController
     this._bottomController = this.shadow.querySelector('bottom-controller')! as BottomController
+    this._sideContainers = this.shadow.querySelectorAll('.side-container')
+    this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
+    this.onePlayer = this.shadow.getElementById('one-player') as HTMLButtonElement
+    this.onePlayer.addEventListener('click', () => {
+      this.startGame(this.gameCanvas.player)
+      this.gameCanvas.onClickStart()
+    })
     this.showController()
     this.gameCanvas.addEventListener('startGame', (event) => {
       const customEvent = event as CustomEvent<Player>
       this.startGame(customEvent.detail)
-      this.leftController.startGame(customEvent.detail)
-      this.rightController.startGame(customEvent.detail)
-      this.bottomController.startGame(customEvent.detail)
     })
+    window.addEventListener('resize', this.showController.bind(this))
   }
 
   private startGame(player: Player) {
@@ -88,35 +102,36 @@ export default class GameController extends BaseComponent {
       if (event.key === KEYBOARDS.left || event.key === KEYBOARDS.right)
         player.stopMovement()
     })
+    this.leftController.startGame(player)
+    this.rightController.startGame(player)
+    this.bottomController.startGame(player)
   }
   private showController() {
-    const sideContainers = this.shadow.querySelectorAll('.side-container')
-    const bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     if (this.isMobileDevice()) {
       if (window.innerWidth - 200 < window.innerHeight) {
         // 縦向きまたは十分な画面サイズではない端末
-        Array.from(sideContainers).forEach((element) => {
+        Array.from(this.sideContainers).forEach((element) => {
           element.classList.add('hide')
         })
-        Array.from(bottomContainers).forEach((element) => {
+        Array.from(this.bottomContainers).forEach((element) => {
           element.classList.remove('hide')
         })
         return
       }
 
       // 横向き
-      Array.from(sideContainers).forEach((element) => {
+      Array.from(this.sideContainers).forEach((element) => {
         element.classList.remove('hide')
       })
-      Array.from(bottomContainers).forEach((element) => {
+      Array.from(this.bottomContainers).forEach((element) => {
         element.classList.add('hide')
       })
     } else {
       // PCの場合
-      Array.from(sideContainers).forEach((element) => {
+      Array.from(this.sideContainers).forEach((element) => {
         element.classList.add('hide')
       })
-      Array.from(bottomContainers).forEach((element) => {
+      Array.from(this.bottomContainers).forEach((element) => {
         element.classList.add('hide')
       })
     }
@@ -138,5 +153,11 @@ export default class GameController extends BaseComponent {
   }
   get bottomController() {
     return this._bottomController
+  }
+  get sideContainers() {
+    return this._sideContainers
+  }
+  get bottomContainers() {
+    return this._bottomContainers
   }
 }
