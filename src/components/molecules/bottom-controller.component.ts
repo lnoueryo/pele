@@ -1,4 +1,4 @@
-import { BaseComponent } from '../base.component'
+import { BaseComponent } from '../common/base.component'
 import { Player } from '../../entities/player'
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`

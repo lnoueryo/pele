@@ -1,13 +1,13 @@
-import { Player } from '../entities/player'
-import { BaseComponent } from './base.component';
-import GameCanvas from './game-canvas.component';
-import BottomController from './molecules/bottom-controller.component';
-import LeftController from './molecules/left-controller.component';
-import RightController from './molecules/right-controller.component';
+import { Player } from '../../entities/player'
+import { BaseComponent } from '../common/base.component'
+import GameCanvas from './game-canvas.component'
+import BottomController from '../molecules/bottom-controller.component'
+import LeftController from '../molecules/left-controller.component'
+import RightController from '../molecules/right-controller.component'
 
 const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 
-const sheet = new CSSStyleSheet();
+const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
 #wrapper {
   position: relative;
