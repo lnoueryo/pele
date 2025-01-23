@@ -2,6 +2,7 @@ import { Canvas } from "../entities/canvas"
 import { OnePlayerCanvasManager } from "../entities/canvas_manager/one_player_canvas_manager"
 import { Maguma } from "../entities/maguma"
 import { Player } from "../entities/player"
+import { createEvent } from "../utils"
 import { BaseComponent } from "./base.component"
 const CANVAS_WIDTH_PIXEL = 1600
 const CANVAS_HEIGHT_PIXEL = 1600
@@ -36,11 +37,11 @@ canvas {
 `)
 
 export default class GameCanvas extends BaseComponent {
-  private _player: Player | null = null
+  private _player: Player
   private _players: Player[] = []
-  private _canvas: Canvas | null = null
-  private onePlayer: HTMLButtonElement | null = null
-  private startButtons: HTMLDivElement | null = null
+  private _canvas: Canvas
+  private onePlayer: HTMLButtonElement
+  private startButtons: HTMLDivElement
   public isGameRunning: boolean = false
 
   constructor() {
@@ -57,9 +58,6 @@ export default class GameCanvas extends BaseComponent {
         </div>
       </div>
     `
-  }
-
-  connectedCallback() {
     const canvas = this.shadow.getElementById('canvas') as HTMLCanvasElement
     this._canvas = new Canvas(canvas)
     this.onePlayer = this.shadow.getElementById('one-player') as HTMLButtonElement
@@ -73,9 +71,8 @@ export default class GameCanvas extends BaseComponent {
         new CustomEvent<Player>('startGame', { detail: player })
       )
     })
-    document.addEventListener('keyup', (e) => {
+    createEvent<KeyboardEvent>(document, 'keyup', (e) => {
       if (e.key === 'Enter') {
-        console.log(this.isGameRunning)
         if (!this.isGameRunning) {
           this.onClickStartOnePlayer()
           this.dispatchEvent(

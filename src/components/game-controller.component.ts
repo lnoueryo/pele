@@ -1,11 +1,30 @@
 import { Player } from '../entities/player'
 import { BaseComponent } from './base.component';
-import GameCanvas from './game-canvas.component'
-customElements.define('game-canvas', GameCanvas)
+import GameCanvas from './game-canvas.component';
+import BottomController from './molecules/bottom-controller.component';
+import LeftController from './molecules/left-controller.component';
+import RightController from './molecules/right-controller.component';
+
 const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 
 const sheet = new CSSStyleSheet();
 sheet.replaceSync(`
+.button {
+  padding: 14px;
+  margin: 0 7px;
+}
+
+#warning {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #wrapper {
   position: relative;
   display: flex;
@@ -35,6 +54,13 @@ sheet.replaceSync(`
   justify-content: center;
   width: 100%;
 }
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+
 .button-container {
   width: 46%;
   position: relative;
@@ -59,85 +85,47 @@ sheet.replaceSync(`
   align-items: center;
   justify-content: center;
 }
+
+.hide {
+  display: none !important;
+}
+
 `)
 
 export default class GameController extends BaseComponent {
-  private _top: HTMLDivElement | null = null
-  private _left: HTMLDivElement | null = null
-  private _right: HTMLDivElement | null = null
-  private _gamerRight: HTMLDivElement | null = null
-  private _verticalTop: HTMLDivElement | null = null
-  private _verticalLeft: HTMLDivElement | null = null
-  private _verticalRight: HTMLDivElement | null = null
-  private _gameCanvas: GameCanvas | null = null
+
+  private _gameCanvas: GameCanvas
+  private _leftController: LeftController
+  private _rightController: RightController
+  private _bottomController: BottomController
   constructor() {
     super()
-    // this.shadow = this.attachShadow({ mode: 'open' })
     this.shadow.adoptedStyleSheets.push(sheet)
     this.shadow.innerHTML = `
       <div id="wrapper">
-          <div class="hide">hhhh</div>
         <div class="side-container">
-          <div class="buttons-container justify-between">
-            <div id="left" class="button-container">
-              <button class="controller">左</button>
-              <div class="button-size"></div>
-            </div>
-            <div id="right" class="button-container">
-              <button class="controller">右</button>
-              <div class="button-size"></div>
-            </div>
-          </div>
+          <left-controller class="buttons-container justify-between" />
         </div>
         <game-canvas id="game-canvas"></game-canvas>
         <div class="side-container">
-          <div class="buttons-container">
-            <div id="top" class="button-container">
-              <button class="controller">上</button>
-              <div class="button-size"></div>
-            </div>
-            <div id="gamer-right" class="button-container hide">
-              <button class="controller">右</button>
-              <div class="button-size"></div>
-            </div>
-          </div>
+          <right-controller class="buttons-container" />
         </div>
       </div>
       <div class="bottom-container">
-        <div class="buttons-container">
-          <div id="vertical-left" class="button-container">
-            <button class="controller">左</button>
-            <div class="button-size"></div>
-          </div>
-          <div id="vertical-right" class="button-container">
-            <button class="controller">右</button>
-            <div class="button-size"></div>
-          </div>
-          <div id="vertical-top" class="button-container">
-            <button class="controller">上</button>
-            <div class="button-size"></div>
-          </div>
-        </div>
+        <bottom-controller class="buttons-container" />
       </div>
     `
-  }
-  connectedCallback() {
-    this._top = this.shadow.getElementById('top') as HTMLDivElement
-    this._left = this.shadow.getElementById('left') as HTMLDivElement
-    this._right = this.shadow.getElementById('right') as HTMLDivElement
-    this._gamerRight = this.shadow.getElementById('gamer-right') as HTMLDivElement
-    this._verticalTop = this.shadow.getElementById('vertical-top') as HTMLDivElement
-    this._verticalLeft = this.shadow.getElementById('vertical-left') as HTMLDivElement
-    this._verticalRight = this.shadow.getElementById('vertical-right') as HTMLDivElement
-    if (!this._top || !this._left || !this._right || !this._gamerRight || !this._verticalTop || !this._verticalLeft || !this._verticalRight) {
-      throw new Error('buttonがnullです')
-    }
-
     this._gameCanvas = this.shadow.querySelector('game-canvas')! as GameCanvas
+    this._leftController = this.shadow.querySelector('left-controller')! as LeftController
+    this._rightController = this.shadow.querySelector('right-controller')! as RightController
+    this._bottomController = this.shadow.querySelector('bottom-controller')! as BottomController
     this.showController()
     this.gameCanvas.addEventListener('startGame', (event) => {
       const customEvent = event as CustomEvent<Player>
       this.startGame(customEvent.detail)
+      this.leftController.startGame(customEvent.detail)
+      this.rightController.startGame(customEvent.detail)
+      this.bottomController.startGame(customEvent.detail)
     })
   }
 
@@ -148,71 +136,9 @@ export default class GameController extends BaseComponent {
       else if (event.key === KEYBOARDS.top && !player.isJumping)
         player.jump()
     })
-
     document.addEventListener('keyup', (event) => {
       if (event.key === KEYBOARDS.left || event.key === KEYBOARDS.right)
         player.stopMovement()
-    })
-    this.right.addEventListener('touchstart', (e) => {
-      player.moveToRight()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.right.addEventListener('touchend', (e) => {
-      player.stopMovement()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.gamerRight.addEventListener('touchstart', (e) => {
-      player.moveToRight()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.gamerRight.addEventListener('touchend', (e) => {
-      player.stopMovement()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.left.addEventListener('touchstart', (e) => {
-      player.moveToLeft()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.left.addEventListener('touchend', (e) => {
-      player.stopMovement()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.top.addEventListener('touchstart', (e) => {
-      console.log(player)
-      player.isJumping || player.jump()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.verticalRight.addEventListener('touchstart', (e) => {
-      player.moveToRight()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.verticalRight.addEventListener('touchend', (e) => {
-      player.stopMovement()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.verticalLeft.addEventListener('touchstart', (e) => {
-      player.moveToLeft()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.verticalLeft.addEventListener('touchend', (e) => {
-      player.stopMovement()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.verticalTop.addEventListener('touchstart', (e) => {
-      player.isJumping || player.jump()
-      e.stopPropagation()
-      e.preventDefault()
     })
   }
   private showController() {
@@ -253,28 +179,16 @@ export default class GameController extends BaseComponent {
       navigator.userAgent.indexOf('IEMobile') !== -1
     )
   }
-  get top() {
-    return this._top!
-  }
-  get left() {
-    return this._left!
-  }
-  get right() {
-    return this._right!
-  }
-  get gamerRight() {
-    return this._gamerRight!
-  }
-  get verticalTop() {
-    return this._verticalTop!
-  }
-  get verticalLeft() {
-    return this._verticalLeft!
-  }
-  get verticalRight() {
-    return this._verticalRight!
-  }
   get gameCanvas() {
     return this._gameCanvas!
+  }
+  get leftController() {
+    return this._leftController
+  }
+  get rightController() {
+    return this._rightController
+  }
+  get bottomController() {
+    return this._bottomController
   }
 }
