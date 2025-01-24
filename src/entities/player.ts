@@ -1,7 +1,7 @@
 import { Box } from "./box"
 import { Canvas } from "./canvas"
 import { CanvasObject } from "./interfaces/canvas-object.interface"
-export type PlayerArg = {
+export type PlayerData = {
   id: string
   x: number
   y: number
@@ -17,7 +17,7 @@ export type PlayerArg = {
   isOver: boolean
 }
 export class Player implements CanvasObject {
-  private id
+  private _id
   private _x
   private _y
   private _width
@@ -30,8 +30,8 @@ export class Player implements CanvasObject {
   private _speed
   public color
   private _isOver
-  constructor(params: PlayerArg) {
-    this.id = params.id
+  constructor(params: PlayerData) {
+    this._id = params.id
     this._x = params.x
     this._y = params.y
     this._width = params.width
@@ -103,17 +103,9 @@ export class Player implements CanvasObject {
     }
   }
 
-  updateFromJson(params: PlayerArg) {
+  updateFromJson(params: { x: number, y: number}) {
     this._x = params.x
     this._y = params.y
-    this._width = params.width
-    this._height = params.height
-    this.vx = params.vx
-    this.vy = params.vy
-    this._vg = params.vg
-    this._jumpStrength = params.jumpStrength
-    this._isJumping = params.isJumping
-    this._speed = params.speed
   }
 
   isGameOver() {
@@ -136,6 +128,10 @@ export class Player implements CanvasObject {
       width: this.width * canvas.width,
       height: this.height * canvas.height,
     }
+  }
+
+  get id() {
+    return this._id
   }
 
   get x() {
@@ -188,6 +184,34 @@ export class Player implements CanvasObject {
       isJumping: false,
       speed: 0.02,
       color: `rgb(255,255,255)`,
+      isOver: false,
+    })
+  }
+
+  static createPlayerFromServer = (player: {
+    id: string
+    x: number
+    y: number
+    width: number
+    height: number
+    vg: number
+    speed: number
+    jumpStrength: number
+    color: string
+  }) => {
+    return new Player({
+      id: player.id,
+      x: player.x,
+      y: player.y,
+      width: player.width,
+      height: player.height,
+      vx: 0,
+      vy: 0,
+      vg: player.vg,
+      speed: player.speed,
+      jumpStrength: player.jumpStrength,
+      color: player.color,
+      isJumping: false,
       isOver: false,
     })
   }

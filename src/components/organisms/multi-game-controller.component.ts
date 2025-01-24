@@ -3,8 +3,10 @@ import GameCanvas from './game-canvas.component'
 import BottomController from '../molecules/bottom-controller.component'
 import LeftController from '../molecules/left-controller.component'
 import RightController from '../molecules/right-controller.component'
+import { WebsocketIO } from '../../plugins/websocket'
+import config from '../../../config'
 import BaseController from '../common/base-controller.component'
-import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
+import { MultiPlayerCanvasManager } from '../../entities/canvas_manager/multi_player_canvas_manager'
 
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
@@ -43,13 +45,14 @@ sheet.replaceSync(`
 `)
 
 export default class GameController extends BaseController {
-  private player: Player
+  private player: Player | null = null
   private _gameCanvas: GameCanvas
   private _leftController: LeftController
   private _rightController: RightController
   private _bottomController: BottomController
   private _sideContainers: NodeListOf<HTMLDivElement>
   private _bottomContainers: NodeListOf<HTMLDivElement>
+  private _socket: WebsocketIO
   constructor() {
     super()
     this.shadow.adoptedStyleSheets.push(sheet)
@@ -73,22 +76,96 @@ export default class GameController extends BaseController {
     this._bottomController = this.shadow.querySelector('bottom-controller') as BottomController
     this._sideContainers = this.shadow.querySelectorAll('.side-container')
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
-    this.gameCanvas.canvasManagerClass  = OnePlayerCanvasManager
     this.showController(this.sideContainers, this.bottomContainers)
-    this.player = Player.createPlayer('anonymous')
-    this.gameCanvas.addEventListener('setController', ()  => {
+    this.gameCanvas.canvasManagerClass = MultiPlayerCanvasManager
+    // TODO websocketのコネクション作成とイベント設定
+    // this.inputName()
+    this._socket = new WebsocketIO(`${config.websocketApiOrigin}/player`)
+    this.socket.on('connect', (e) => {
+      console.log('connected')
+      this.socket.on('disconnect', () => {
+        console.log('user disconnected')
+      })
+      this.socket.on('connected', async(id) => {
+        this.socket.emit('create-player', id);
+      })
+      this.socket.on('create-player', async(player) => {
+        this.player = Player.createPlayerFromServer(player)
+      })
+      this.socket.on('join', (newPlayers: {
+        id: string
+        x: number
+        y: number
+        width: number
+        height: number
+        vg: number
+        speed: number
+        jumpStrength: number
+        color: string
+      }[]) => {
+        if (!this.player) {
+          throw new Error('no player')
+        }
+        const filteredPlayer = newPlayers.filter(player => player.id !== this.player?.id)
+        this.gameCanvas.setPlayers([this.player, ...filteredPlayer.map(player => Player.createPlayerFromServer(player))])
+      })
+      this.socket.on('start', () => {
+        if (this.gameCanvas.isGameRunning) return
+        this.gameCanvas.onClickStart()
+      })
+      this.socket.on('coordinate', (data: { id: string, x: number, y: number, isOver: boolean }) => {
+        if (data.id !== this.player?.id) {
+          this.gameCanvas.updatePlayers(data)
+        }
+      })
+      this.socket.on('stage', (data) => {
+        const boxes = data.map(this.parseBox)
+        this.gameCanvas.canvasManager?.updateBoxes(boxes)
+        if (!this.gameCanvas.isGameRunning) {
+          console.log(data)
+        }
+      })
+    })
+    this.gameCanvas.addEventListener('setController', () => {
+      if (!this.player) {
+        throw new Error('no player')
+      }
+      this.socket.emit('start', this.player.convertToJson())
       this.setController(this.player)
       this.leftController.setController(this.player)
       this.rightController.setController(this.player)
       this.bottomController.setController(this.player)
-      this.gameCanvas.setPlayers([this.player])
       this.gameCanvas.onClickStart()
+    })
+    this.gameCanvas.addEventListener('updateObject', () => {
+      this.socket.emit('coordinate', this.player?.convertToJson())
     })
     window.addEventListener('resize', () => {
       this.showController.bind(this)(this.sideContainers, this.bottomContainers)
     })
   }
 
+  connectedCallback() {
+
+  }
+  private parseBox(buffer: ArrayBuffer) {
+    const view = new DataView(buffer)
+    const x = view.getFloat32(0)
+    const y = view.getFloat32(4)
+    const width = view.getFloat32(8)
+    const height = view.getFloat32(12)
+    const speed = view.getFloat32(16)
+    return { x, y, width, height, speed }
+  }
+  private inputName(): string {
+    const name = prompt('名前を入力してね')
+    if (name === null) {
+      return location.href = '/'
+    } else if(!name) {
+      return this.inputName()
+    }
+    return name
+  }
   get gameCanvas() {
     return this._gameCanvas!
   }
@@ -106,5 +183,8 @@ export default class GameController extends BaseController {
   }
   get bottomContainers() {
     return this._bottomContainers
+  }
+  get socket() {
+    return this._socket
   }
 }

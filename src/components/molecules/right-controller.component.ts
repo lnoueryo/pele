@@ -10,6 +10,7 @@ sheet.replaceSync(`
 `)
 
 export default class RightController extends BaseComponent {
+  private isControllerReady = false
   private _top: HTMLDivElement
   constructor() {
     super()
@@ -23,11 +24,15 @@ export default class RightController extends BaseComponent {
   }
 
   setController(player: Player) {
+    if (this.isControllerReady) {
+      return
+    }
     this.top.addEventListener('touchstart', (e) => {
       player.isJumping || player.jump()
       e.stopPropagation()
       e.preventDefault()
     })
+    this.isControllerReady = true
   }
   get top() {
     return this._top!

@@ -10,6 +10,7 @@ sheet.replaceSync(`
 `)
 
 export default class LeftController extends BaseComponent {
+  private isControllerReady = false
   private _left: HTMLDivElement
   private _right: HTMLDivElement
   constructor() {
@@ -28,6 +29,9 @@ export default class LeftController extends BaseComponent {
   }
 
   setController(player: Player) {
+    if (this.isControllerReady) {
+      return
+    }
     this.right.addEventListener('touchstart', (e) => {
       player.moveToRight()
       e.stopPropagation()
@@ -48,6 +52,7 @@ export default class LeftController extends BaseComponent {
       e.stopPropagation()
       e.preventDefault()
     })
+    this.isControllerReady = true
   }
   get left() {
     return this._left!

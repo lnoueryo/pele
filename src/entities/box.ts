@@ -14,7 +14,6 @@ type IBox = {
   y: number
   width: number
   height: number
-  canvas: Canvas
   speed: number
 }
 
@@ -54,7 +53,7 @@ export class Box implements CanvasObject {
     }
   }
 
-  static createBox(canvas: Canvas) {
+  static createBox() {
     const x = 1
     const y = 1 * START_POSITION
     const width = Math.random() * 0.25
@@ -66,7 +65,6 @@ export class Box implements CanvasObject {
       height,
       x,
       y,
-      canvas,
       speed,
     })
   }

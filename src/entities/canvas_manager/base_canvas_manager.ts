@@ -1,5 +1,6 @@
 import { Box } from '../box'
 import { Canvas } from '../canvas'
+import { CanvasManager } from '../interfaces/canvas-manager.interface'
 import { Maguma } from '../maguma'
 import { Player } from '../player'
 const PLAYER_DELAY = 1
@@ -27,7 +28,6 @@ export abstract class BaseCanvasManager {
     this.players = params.players || []
     this.boxes = params.boxes || []
   }
-  abstract loop(timestamp: number, players: Player[], userId: string): void
 
   protected updateCurrentTime(timestamp: number) {
     if (this.startTime === 0) {
@@ -42,13 +42,13 @@ export abstract class BaseCanvasManager {
     this.lastTimestamp = timestamp
   }
 
-  protected isGameOver(players: Player[]) {
+  isGameOver(players: Player[]) {
     return players.every((player) => {
       return player.isOver
     })!
   }
 
-  protected endGame() {
+  endGame() {
     this.fillEndText(
       `ゲームオーバー`,
       `頑張った時間: ${(this.currentTime - PLAYER_DELAY).toFixed(2)} 秒`,

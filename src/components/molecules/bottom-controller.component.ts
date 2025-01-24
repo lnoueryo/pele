@@ -9,6 +9,7 @@ sheet.replaceSync(`
 `)
 
 export default class BottomController extends BaseComponent {
+  private isControllerReady = false
   private _verticalTop: HTMLDivElement
   private _verticalLeft: HTMLDivElement
   private _verticalRight: HTMLDivElement
@@ -31,6 +32,9 @@ export default class BottomController extends BaseComponent {
     this._verticalRight = this.shadow.getElementById('vertical-right') as HTMLDivElement
   }
   setController(player: Player) {
+    if (this.isControllerReady) {
+      return
+    }
     this.verticalRight.addEventListener('touchstart', (e) => {
       player.moveToRight()
       e.stopPropagation()
@@ -56,6 +60,7 @@ export default class BottomController extends BaseComponent {
       e.stopPropagation()
       e.preventDefault()
     })
+    this.isControllerReady = true
   }
   get verticalTop() {
     return this._verticalTop!

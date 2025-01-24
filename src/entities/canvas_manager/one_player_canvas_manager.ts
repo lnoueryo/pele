@@ -3,9 +3,10 @@ import { Box } from '../box'
 import { Player } from '../player'
 import { Maguma } from '../maguma'
 import { Canvas } from '../canvas'
+import { CanvasManager } from '../interfaces/canvas-manager.interface'
 const PLAYER_DELAY = 1
 
-export class OnePlayerCanvasManager extends BaseCanvasManager {
+export class OnePlayerCanvasManager extends BaseCanvasManager implements CanvasManager {
   constructor(params: {
     canvas: Canvas
     players: Player[]
@@ -17,17 +18,15 @@ export class OnePlayerCanvasManager extends BaseCanvasManager {
     )
   }
 
-  public loop = async(timestamp: number) => {
+  public loop(timestamp: number): Box[] {
     this.updateCurrentTime(timestamp)
     this.resetCanvas()
-    if (this.isGameOver(this.players)) return this.endGame()
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {
         player.moveOnIdle()
         player.isGameOver()
       }
     }
-
     for (const box of this.boxes) {
       box.moveOnIdle()
       if (box.isOutOfDisplay()) this.deleteBox(box)
@@ -47,16 +46,11 @@ export class OnePlayerCanvasManager extends BaseCanvasManager {
     })
 
     this.fillMaguma()
-
-    await new Promise<void>((resolve) =>
-      requestAnimationFrame((nextTimestamp) => {
-        this.loop(nextTimestamp).then(resolve)
-      })
-    )
+    return this.boxes
   }
 
   private createBox() {
-    const box = Box.createBox(this.canvas)
+    const box = Box.createBox()
     this.boxes.push(box)
     return box
   }
@@ -65,4 +59,11 @@ export class OnePlayerCanvasManager extends BaseCanvasManager {
     const index = this.boxes.indexOf(box)
     this.boxes.splice(index, 1)
   }
+  updateBoxes(boxesJson: {
+    x: number
+    y: number
+    width: number
+    height: number
+    speed: number
+  }[]) {}
 }

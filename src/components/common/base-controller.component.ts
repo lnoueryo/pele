@@ -3,11 +3,16 @@ import { BaseComponent } from '../common/base.component'
 
 const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 export default class BaseController extends BaseComponent {
+  private isControllerReady = false
+
   constructor() {
     super()
   }
 
   protected setController(player: Player) {
+    if (this.isControllerReady) {
+      return
+    }
     document.addEventListener('keydown', (event) => {
       if (event.key === KEYBOARDS.left) player.moveToLeft()
       else if (event.key === KEYBOARDS.right) player.moveToRight()
@@ -18,6 +23,7 @@ export default class BaseController extends BaseComponent {
       if (event.key === KEYBOARDS.left || event.key === KEYBOARDS.right)
         player.stopMovement()
     })
+    this.isControllerReady = true
   }
   protected showController(
     sideContainers: NodeListOf<HTMLElement>,
