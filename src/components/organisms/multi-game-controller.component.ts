@@ -81,7 +81,7 @@ export default class GameController extends BaseController {
     // TODO websocketのコネクション作成とイベント設定
     // this.inputName()
     this._socket = new WebsocketIO(`${config.websocketApiOrigin}/player`)
-    this.socket.on('connect', (e) => {
+    this.socket.on('connect', () => {
       console.log('connected')
       this.socket.on('disconnect', () => {
         console.log('user disconnected')
@@ -157,15 +157,15 @@ export default class GameController extends BaseController {
     const speed = view.getFloat32(16)
     return { x, y, width, height, speed }
   }
-  private inputName(): string {
-    const name = prompt('名前を入力してね')
-    if (name === null) {
-      return location.href = '/'
-    } else if(!name) {
-      return this.inputName()
-    }
-    return name
-  }
+  // private inputName(): string {
+  //   const name = prompt('名前を入力してね')
+  //   if (name === null) {
+  //     return location.href = '/'
+  //   } else if(!name) {
+  //     return this.inputName()
+  //   }
+  //   return name
+  // }
   get gameCanvas() {
     return this._gameCanvas!
   }

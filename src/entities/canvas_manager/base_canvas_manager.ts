@@ -1,6 +1,5 @@
 import { Box } from '../box'
 import { Canvas } from '../canvas'
-import { CanvasManager } from '../interfaces/canvas-manager.interface'
 import { Maguma } from '../maguma'
 import { Player } from '../player'
 const PLAYER_DELAY = 1

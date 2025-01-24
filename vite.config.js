@@ -9,7 +9,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        multiple: resolve(__dirname, 'multiple.html'),
+        multiple: resolve(__dirname, 'multi.html'),
         '404': resolve(__dirname, '404.html'),
       },
     },

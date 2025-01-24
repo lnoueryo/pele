@@ -65,5 +65,5 @@ export class OnePlayerCanvasManager extends BaseCanvasManager implements CanvasM
     width: number
     height: number
     speed: number
-  }[]) {}
+  }[]) {console.log(boxesJson)}
 }

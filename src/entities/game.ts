@@ -1,4 +1,4 @@
-import { Player, PlayerArg } from './player'
+import { Player, PlayerData } from './player'
 
 const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 
@@ -210,7 +210,7 @@ export class Game {
     )
   }
 
-  updateOtherPlayers(_player: PlayerArg) {
+  updateOtherPlayers(_player: PlayerData) {
     this.players.forEach((player) => {
       if (player.id === _player.id) {
         player.updateFromJson(_player)
