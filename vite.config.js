@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         multiple: resolve(__dirname, 'multi.html'),
+        solo: resolve(__dirname, 'solo.html'),
         '404': resolve(__dirname, '404.html'),
       },
     },
