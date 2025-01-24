@@ -18,7 +18,7 @@ export type PlayerArg = {
   isOver: boolean
 }
 export class Player implements CanvasObject {
-  public id
+  private id: string = 'anonymous'
   private _x
   private _y
   private _width
@@ -33,7 +33,6 @@ export class Player implements CanvasObject {
   public color
   private _isOver
   constructor(params: PlayerArg) {
-    this.id = params.id
     this._x = params.x
     this._y = params.y
     this._width = params.width
@@ -50,15 +49,15 @@ export class Player implements CanvasObject {
   }
 
   moveToLeft() {
-    this.vx = -this.speed
+    this.vx = -this._speed
   }
 
   moveToRight() {
-    this.vx = this.speed
+    this.vx = this._speed
   }
 
   jump() {
-    this.vy = this.jumpStrength
+    this.vy = this._jumpStrength
     this._isJumping = true
   }
 
@@ -67,13 +66,13 @@ export class Player implements CanvasObject {
   }
 
   moveOnIdle() {
-    this.vy += this.vg
+    this.vy += this._vg
     this._x += this.vx
     this._y += this.vy
   }
 
   moveOnTopBox(boxY: number) {
-    this._y = boxY - this.height
+    this._y = (boxY - this.height) / this.canvas.height
     this.vy = 0
     this._isJumping = false
   }
@@ -124,20 +123,24 @@ export class Player implements CanvasObject {
   }
 
   reset() {
-    this._x = this.canvas.width / 2
-    this._y = 20
+    this._x = 0.5
+    this._y = 0.1
     this.vx = 0
     this.vy = 0
     this._isJumping = false
     this._isOver = false
   }
 
+  setId(id: string) {
+    this.id = id
+  }
+
   get x() {
-    return this._x
+    return this.canvas.width * this._x
   }
 
   get y() {
-    return this._y
+    return this.canvas.height * this._y
   }
 
   get width() {
@@ -165,7 +168,7 @@ export class Player implements CanvasObject {
   }
 
   get speed() {
-    return this.canvas.width * this._speed
+    return this._speed * this.canvas.width
   }
 
   get isOver() {
@@ -174,15 +177,15 @@ export class Player implements CanvasObject {
 
   static createPlayer = (canvas: Canvas) => {
     return new Player({
-      x: canvas.width * 0.5,
-      y: 20,
+      x: 0.5,
+      y: 0.1,
       width: 0.05,
       height: 0.05,
       canvas,
       vx: 0,
       vy: 0,
       vg: 0.0009,
-      jumpStrength: 0.03,
+      jumpStrength: -0.03,
       isJumping: false,
       speed: 0.02,
       color: `rgb(255,255,255)`,

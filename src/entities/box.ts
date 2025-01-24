@@ -3,11 +3,11 @@ import type { CanvasObject } from "./interfaces/canvas-object.interface"
 const LEFT_LIMT = 0
 const TOP_LIMIT = 0
 const MOVE_Y_PROBABILITY = 0.1
-const Y_MOVE_SCALE = 0.05
-const START_POSITION = 4
-const SPEED_SALT = 28
-const MIN_SPEED = 0.08
-const MAX_SPEED = 0.9
+const Y_MOVE_SCALE = 0.1
+const START_POSITION = 0.75
+const SPEED_SALT = 25
+const MIN_SPEED = 0.3
+const MAX_SPEED = 0.6
 
 type IBox = {
   x: number
@@ -25,6 +25,7 @@ export class Box implements CanvasObject {
   private _height
   private _speed
   private _canvas
+  private ySalt = (Math.random() - 0.5)
   constructor(params: IBox) {
     this._width = params.width
     this._height = params.height
@@ -35,23 +36,23 @@ export class Box implements CanvasObject {
   }
 
   moveOnIdle() {
-    this._x -= this.speed
+    this._x -= this._speed
     this._y +=
       Math.random() < MOVE_Y_PROBABILITY
-        ? Math.sin(this.speed) * this.canvas.height * Y_MOVE_SCALE
+        ? this.ySalt * this._speed / Y_MOVE_SCALE
         : 0
   }
 
   isOutOfDisplay() {
-    return this.x + this.width < LEFT_LIMT || this.y + this.height < TOP_LIMIT
+    return this._x + this._width < LEFT_LIMT || this._y + this._height < TOP_LIMIT
   }
 
   get x() {
-    return this._x
+    return this.canvas.width * this._x
   }
 
   get y() {
-    return this._y
+    return this.canvas.height * this._y
   }
 
   get width() {
@@ -71,8 +72,8 @@ export class Box implements CanvasObject {
   }
 
   static createBox(canvas: Canvas) {
-    const x = canvas.width
-    const y = canvas.height - canvas.height / START_POSITION
+    const x = 1
+    const y = 1 * START_POSITION
     const width = Math.random() / 4.2
     const height = Math.random() * 0.1
     const randomSpeed = Math.random()

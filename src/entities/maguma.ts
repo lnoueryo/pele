@@ -10,14 +10,14 @@ type IMagma = {
 }
 
 export class Maguma implements CanvasObject {
-  public x
-  public y
+  public _x
+  public _y
   public _width
   public _height
   public canvas
   constructor(params: IMagma) {
-    this.x = params.x
-    this.y = params.y
+    this._x = params.x
+    this._y = params.y
     this._width = params.width
     this._height = params.height
     this.canvas = params.canvas
@@ -28,10 +28,16 @@ export class Maguma implements CanvasObject {
   get height() {
     return this.canvas.height * this._height
   }
+  get x() {
+    return this.canvas.width * this._x
+  }
+  get y() {
+    return this.canvas.height * this._y
+  }
   static createMaguma(canvas: Canvas) {
     return new Maguma({
       x: 0,
-      y: canvas.height - canvas.height * 0.05,
+      y: 0.95,
       width: 1,
       height: 1,
       canvas,
