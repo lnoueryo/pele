@@ -12,7 +12,7 @@ sheet.replaceSync(`
   padding: 0;
 }
 
-#start-buttons {
+#center-buttons {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -27,9 +27,9 @@ sheet.replaceSync(`
 
 export default class GameCanvas extends BaseComponent {
   private _baseCanvas: BaseCanvasComponent
-  public player: Player
   private players: Player[] = []
-  private startButtons: HTMLDivElement
+  private centerButtons: HTMLDivElement
+  private start: HTMLButtonElement
   public isGameRunning: boolean = false
 
   constructor() {
@@ -37,8 +37,9 @@ export default class GameCanvas extends BaseComponent {
     this.shadow.adoptedStyleSheets.push(sheet)
     this.shadow.innerHTML = `
       <div id="canvas-container">
-        <div id="start-buttons">
-          <slot />
+        <div id="center-buttons">
+          <button id="start" class="button">start</button>
+          <button class="button" onclick="location.href = '/'">back</button>
         </div>
         <div id="canvas-frame">
           <base-canvas id="canvas"></base-canvas>
@@ -46,13 +47,18 @@ export default class GameCanvas extends BaseComponent {
       </div>
     `
     this._baseCanvas = this.shadow.getElementById('canvas') as BaseCanvasComponent
-    this.startButtons = this.shadow.getElementById('start-buttons') as HTMLDivElement
-    this.player = Player.createPlayer('anonymous')
+    this.centerButtons = this.shadow.getElementById('center-buttons') as HTMLDivElement
+    this.start = this.shadow.getElementById('start') as HTMLButtonElement
+    createEvent<Event>(this.start, 'click', () => {
+      this.dispatchEvent(
+        new CustomEvent<Player>('setController')
+      )
+    })
     createEvent<KeyboardEvent>(document, 'keyup', (e) => {
       if (e.key === 'Enter') {
         if (!this.isGameRunning) {
           this.dispatchEvent(
-            new CustomEvent<Player>('startGame')
+            new CustomEvent<Player>('setController')
           )
         }
         e.stopPropagation()
@@ -60,8 +66,8 @@ export default class GameCanvas extends BaseComponent {
     })
   }
   onClickStart = async() => {
-    const startButtons = this.startButtons
-    startButtons.classList.add('hide')
+    const centerButtons = this.centerButtons
+    centerButtons.classList.add('hide')
     const canvasManager = new OnePlayerCanvasManager({
       canvas: this.canvas,
       players: this.players,
@@ -70,7 +76,7 @@ export default class GameCanvas extends BaseComponent {
     this.isGameRunning = true
     await canvasManager.loop(0)
     this.isGameRunning = false
-    startButtons.classList.remove('hide')
+    centerButtons.classList.remove('hide')
   }
   setPlayers(players: Player[]) {
     this.players = players
