@@ -2,7 +2,7 @@ import { Box } from "./box"
 import { Canvas } from "./canvas"
 import { CanvasObject } from "./interfaces/canvas-object.interface"
 export type PlayerArg = {
-  id?: string | null
+  id: string
   x: number
   y: number
   width: number
@@ -17,7 +17,7 @@ export type PlayerArg = {
   isOver: boolean
 }
 export class Player implements CanvasObject {
-  private id: string = 'anonymous'
+  private id
   private _x
   private _y
   private _width
@@ -31,6 +31,7 @@ export class Player implements CanvasObject {
   public color
   private _isOver
   constructor(params: PlayerArg) {
+    this.id = params.id
     this._x = params.x
     this._y = params.y
     this._width = params.width
@@ -137,10 +138,6 @@ export class Player implements CanvasObject {
     }
   }
 
-  setId(id: string) {
-    this.id = id
-  }
-
   get x() {
     return this._x
   }
@@ -177,8 +174,9 @@ export class Player implements CanvasObject {
     return this._isOver
   }
 
-  static createPlayer = () => {
+  static createPlayer = (id: string) => {
     return new Player({
+      id,
       x: 0.5,
       y: 0.1,
       width: 0.05,

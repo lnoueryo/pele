@@ -30,7 +30,7 @@ export default class BottomController extends BaseComponent {
     this._verticalLeft = this.shadow.getElementById('vertical-left') as HTMLDivElement
     this._verticalRight = this.shadow.getElementById('vertical-right') as HTMLDivElement
   }
-  startGame(player: Player) {
+  setController(player: Player) {
     this.verticalRight.addEventListener('touchstart', (e) => {
       player.moveToRight()
       e.stopPropagation()

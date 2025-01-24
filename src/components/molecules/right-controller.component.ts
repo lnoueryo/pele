@@ -22,7 +22,7 @@ export default class RightController extends BaseComponent {
     this._top = this.shadow.getElementById('top') as HTMLDivElement
   }
 
-  startGame(player: Player) {
+  setController(player: Player) {
     this.top.addEventListener('touchstart', (e) => {
       player.isJumping || player.jump()
       e.stopPropagation()

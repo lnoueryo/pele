@@ -27,7 +27,7 @@ export default class LeftController extends BaseComponent {
     this._right = this.shadow.getElementById('right') as HTMLDivElement
   }
 
-  startGame(player: Player) {
+  setController(player: Player) {
     this.right.addEventListener('touchstart', (e) => {
       player.moveToRight()
       e.stopPropagation()

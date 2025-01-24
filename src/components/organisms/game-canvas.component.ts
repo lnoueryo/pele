@@ -27,8 +27,8 @@ sheet.replaceSync(`
 
 export default class GameCanvas extends BaseComponent {
   private _baseCanvas: BaseCanvasComponent
-  private _player: Player
-  private _players: Player[] = []
+  public player: Player
+  private players: Player[] = []
   private startButtons: HTMLDivElement
   public isGameRunning: boolean = false
 
@@ -47,15 +47,13 @@ export default class GameCanvas extends BaseComponent {
     `
     this._baseCanvas = this.shadow.getElementById('canvas') as BaseCanvasComponent
     this.startButtons = this.shadow.getElementById('start-buttons') as HTMLDivElement
-    this._player = Player.createPlayer(this.canvas)
-    const player = this.player
+    this.player = Player.createPlayer('anonymous')
     createEvent<KeyboardEvent>(document, 'keyup', (e) => {
       if (e.key === 'Enter') {
         if (!this.isGameRunning) {
           this.dispatchEvent(
-            new CustomEvent<Player>('startGame', { detail: player })
+            new CustomEvent<Player>('startGame')
           )
-          this.onClickStart()
         }
         e.stopPropagation()
       }
@@ -64,26 +62,18 @@ export default class GameCanvas extends BaseComponent {
   onClickStart = async() => {
     const startButtons = this.startButtons
     startButtons.classList.add('hide')
-    this.player.reset()
-    this._players = [this.player]
     const canvasManager = new OnePlayerCanvasManager({
       canvas: this.canvas,
       players: this.players,
-      maguma: Maguma.createMaguma(this.canvas),
+      maguma: Maguma.createMaguma(),
     })
     this.isGameRunning = true
     await canvasManager.loop(0)
     this.isGameRunning = false
     startButtons.classList.remove('hide')
   }
-  set player(player: Player) {
-    this._player = player
-  }
-  get player() {
-    return this._player!
-  }
-  get players() {
-    return this._players
+  setPlayers(players: Player[]) {
+    this.players = players
   }
   get baseCanvas() {
     return this._baseCanvas

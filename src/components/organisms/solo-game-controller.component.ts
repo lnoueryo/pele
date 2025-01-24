@@ -1,11 +1,9 @@
 import { Player } from '../../entities/player'
-import { BaseComponent } from '../common/base.component'
 import GameCanvas from './game-canvas.component'
 import BottomController from '../molecules/bottom-controller.component'
 import LeftController from '../molecules/left-controller.component'
 import RightController from '../molecules/right-controller.component'
-
-const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
+import BaseController from '../common/base-controller.component'
 
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
@@ -43,7 +41,7 @@ sheet.replaceSync(`
 }
 `)
 
-export default class GameController extends BaseComponent {
+export default class GameController extends BaseController {
 
   private _gameCanvas: GameCanvas
   private _leftController: LeftController
@@ -75,73 +73,34 @@ export default class GameController extends BaseComponent {
     this._gameCanvas = this.shadow.querySelector('game-canvas') as GameCanvas
     this._leftController = this.shadow.querySelector('left-controller') as LeftController
     this._rightController = this.shadow.querySelector('right-controller') as RightController
-    this._bottomController = this.shadow.querySelector('bottom-controller')! as BottomController
+    this._bottomController = this.shadow.querySelector('bottom-controller') as BottomController
     this._sideContainers = this.shadow.querySelectorAll('.side-container')
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.onePlayer = this.shadow.getElementById('one-player') as HTMLButtonElement
     this.onePlayer.addEventListener('click', () => {
-      this.startGame(this.gameCanvas.player)
+      const player = Player.createPlayer('anonymous')
+      this.setController(player)
+      this.leftController.setController(player)
+      this.rightController.setController(player)
+      this.bottomController.setController(player)
+      this.gameCanvas.setPlayers([player])
       this.gameCanvas.onClickStart()
     })
-    this.showController()
-    this.gameCanvas.addEventListener('startGame', (event) => {
-      const customEvent = event as CustomEvent<Player>
-      this.startGame(customEvent.detail)
+    this.showController(this.sideContainers, this.bottomContainers)
+    this.gameCanvas.addEventListener('startGame', ()  => {
+      const player = Player.createPlayer('anonymous')
+      this.setController(player)
+      this.leftController.setController(player)
+      this.rightController.setController(player)
+      this.bottomController.setController(player)
+      this.gameCanvas.setPlayers([player])
+      this.gameCanvas.onClickStart()
     })
-    window.addEventListener('resize', this.showController.bind(this))
+    window.addEventListener('resize', () => {
+      this.showController.bind(this)(this.sideContainers, this.bottomContainers)
+    })
   }
 
-  private startGame(player: Player) {
-    document.addEventListener('keydown', (event) => {
-      if (event.key === KEYBOARDS.left) player.moveToLeft()
-      else if (event.key === KEYBOARDS.right) player.moveToRight()
-      else if (event.key === KEYBOARDS.top && !player.isJumping)
-        player.jump()
-    })
-    document.addEventListener('keyup', (event) => {
-      if (event.key === KEYBOARDS.left || event.key === KEYBOARDS.right)
-        player.stopMovement()
-    })
-    this.leftController.startGame(player)
-    this.rightController.startGame(player)
-    this.bottomController.startGame(player)
-  }
-  private showController() {
-    if (this.isMobileDevice()) {
-      if (window.innerWidth - 200 < window.innerHeight) {
-        // 縦向きまたは十分な画面サイズではない端末
-        Array.from(this.sideContainers).forEach((element) => {
-          element.classList.add('hide')
-        })
-        Array.from(this.bottomContainers).forEach((element) => {
-          element.classList.remove('hide')
-        })
-        return
-      }
-
-      // 横向き
-      Array.from(this.sideContainers).forEach((element) => {
-        element.classList.remove('hide')
-      })
-      Array.from(this.bottomContainers).forEach((element) => {
-        element.classList.add('hide')
-      })
-    } else {
-      // PCの場合
-      Array.from(this.sideContainers).forEach((element) => {
-        element.classList.add('hide')
-      })
-      Array.from(this.bottomContainers).forEach((element) => {
-        element.classList.add('hide')
-      })
-    }
-  }
-  private isMobileDevice = () => {
-    return (
-      typeof window.orientation !== 'undefined' ||
-      navigator.userAgent.indexOf('IEMobile') !== -1
-    )
-  }
   get gameCanvas() {
     return this._gameCanvas!
   }
