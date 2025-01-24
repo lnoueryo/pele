@@ -5,5 +5,10 @@ export type CanvasObject = {
   y: number
   width: number
   height: number
-  canvas: Canvas
+  getCanvasSize(canvas: Canvas): {
+    x: number
+    y: number
+    width: number
+    height: number
+  }
 }

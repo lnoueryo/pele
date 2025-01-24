@@ -56,65 +56,67 @@ export abstract class BaseCanvasManager {
   }
 
   protected fillBox(box: Box) {
+    const { x, y, width, height } = box.getCanvasSize(this.canvas)
     this.ctx.fillStyle = 'brown'
-    this.ctx.fillRect(box.x, box.y, box.width, box.height)
+    this.ctx.fillRect(x, y, width, height)
   }
 
   protected fillPlayer(player: Player) {
+    const { x, y, width, height } = player.getCanvasSize(this.canvas)
     // 外枠
     this.ctx.strokeStyle = 'blue'
-    this.ctx.strokeRect(player.x, player.y, player.width, player.height)
+    this.ctx.strokeRect(x, y, width, height)
   
     // 背景
     this.ctx.fillStyle = player.color
-    this.ctx.fillRect(player.x, player.y, player.width, player.height)
+    this.ctx.fillRect(x, y, width, height)
   
     // 赤いパーツ (目と口)
     this.ctx.fillStyle = 'red'
   
     // 左目
-    const eyeWidth = player.width / 6 // 目の幅
-    const eyeHeight = player.height / 6 // 目の高さ
-    const eyeOffsetX = player.width / 5 // プレイヤーの左端から目までのオフセット
-    const eyeOffsetY = player.height / 4 // プレイヤーの上端から目までのオフセット
+    const eyeWidth = width / 6 // 目の幅
+    const eyeHeight = height / 6 // 目の高さ
+    const eyeOffsetX = width / 5 // プレイヤーの左端から目までのオフセット
+    const eyeOffsetY = height / 4 // プレイヤーの上端から目までのオフセット
   
     this.ctx.fillRect(
-      player.x + eyeOffsetX,
-      player.y + eyeOffsetY,
+      x + eyeOffsetX,
+      y + eyeOffsetY,
       eyeWidth,
       eyeHeight
     )
   
     // 右目
     this.ctx.fillRect(
-      player.x + player.width - eyeOffsetX - eyeWidth,
-      player.y + eyeOffsetY,
+      x + width - eyeOffsetX - eyeWidth,
+      y + eyeOffsetY,
       eyeWidth,
       eyeHeight
     )
   
     // 口
-    const mouthWidth = player.width / 2 // 口の幅
-    const mouthHeight = player.height / 8 // 口の高さ
-    const mouthOffsetX = player.width / 5 // プレイヤーの中央に口を配置するためのオフセット
-    const mouthOffsetY = player.height / 1.5 // プレイヤーの上端から口までのオフセット
+    const mouthWidth = width / 2 // 口の幅
+    const mouthHeight = height / 8 // 口の高さ
+    const mouthOffsetX = width / 5 // プレイヤーの中央に口を配置するためのオフセット
+    const mouthOffsetY = height / 1.5 // プレイヤーの上端から口までのオフセット
   
     this.ctx.fillRect(
-      player.x + mouthOffsetX,
-      player.y + mouthOffsetY,
+      x + mouthOffsetX,
+      y + mouthOffsetY,
       mouthWidth,
       mouthHeight
     )
   }
-  
 
   protected fillMaguma() {
+    const { x, y, width, height } = this.maguma.getCanvasSize(this.canvas)
     this.ctx.fillStyle = `rgb(${Math.random() * (255 - 200) + 200},30, 20)`
     this.ctx.fillRect(
-      this.maguma.x,
-      this.maguma.y,
-      this.maguma.width,
-      this.maguma.height,
+      x,
+      y,
+      width,
+      height,
     )
   }
 

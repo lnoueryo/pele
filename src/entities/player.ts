@@ -7,7 +7,6 @@ export type PlayerArg = {
   y: number
   width: number
   height: number
-  canvas: Canvas
   vx: number
   vy: number
   vg: number
@@ -23,7 +22,6 @@ export class Player implements CanvasObject {
   private _y
   private _width
   private _height
-  private _canvas
   private vx
   private vy
   private _vg
@@ -37,7 +35,6 @@ export class Player implements CanvasObject {
     this._y = params.y
     this._width = params.width
     this._height = params.height
-    this._canvas = params.canvas
     this.vx = params.vx
     this.vy = params.vy
     this._vg = params.vg
@@ -72,7 +69,7 @@ export class Player implements CanvasObject {
   }
 
   moveOnTopBox(boxY: number) {
-    this._y = (boxY - this.height) / this.canvas.height
+    this._y = boxY - this.height
     this.vy = 0
     this._isJumping = false
   }
@@ -119,7 +116,7 @@ export class Player implements CanvasObject {
   }
 
   isGameOver() {
-    this._isOver = this.y - this.height > this.canvas.height
+    this._isOver = this.y - this.height > 1
   }
 
   reset() {
@@ -131,32 +128,37 @@ export class Player implements CanvasObject {
     this._isOver = false
   }
 
+  getCanvasSize(canvas: Canvas) {
+    return {
+      x: this.x * canvas.width,
+      y: this.y * canvas.height,
+      width: this.width * canvas.width,
+      height: this.height * canvas.height,
+    }
+  }
+
   setId(id: string) {
     this.id = id
   }
 
   get x() {
-    return this.canvas.width * this._x
+    return this._x
   }
 
   get y() {
-    return this.canvas.height * this._y
+    return this._y
   }
 
   get width() {
-    return this.canvas.width * this._width
+    return this._width
   }
 
   get height() {
-    return this.canvas.height * this._height
-  }
-
-  get canvas() {
-    return this._canvas
+    return this._height
   }
 
   get jumpStrength() {
-    return -this.canvas.height * this._jumpStrength
+    return-this._jumpStrength
   }
 
   get isJumping() {
@@ -164,24 +166,23 @@ export class Player implements CanvasObject {
   }
 
   get vg() {
-    return this.canvas.height * this._vg
+    return this._vg
   }
 
   get speed() {
-    return this._speed * this.canvas.width
+    return this._speed
   }
 
   get isOver() {
     return this._isOver
   }
 
-  static createPlayer = (canvas: Canvas) => {
+  static createPlayer = () => {
     return new Player({
       x: 0.5,
       y: 0.1,
       width: 0.05,
       height: 0.05,
-      canvas,
       vx: 0,
       vy: 0,
       vg: 0.0009,
