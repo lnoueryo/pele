@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
+    "ci": "rm -rf node_modules && npm install --no-audit --no-fund --production=false && npm run build",
     "deploy": "tsc && vite build && firebase deploy",
     "deploy-stg": "tsc && vite build && firebase hosting:channel:deploy",
     "preview": "vite preview"
