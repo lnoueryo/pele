@@ -15,6 +15,9 @@ importers:
         specifier: ^8.18.0
         version: 8.18.0
     devDependencies:
+      '@types/node':
+        specifier: ^22.10.10
+        version: 22.10.10
       firebase:
         specifier: ^10.14.1
         version: 10.14.1
@@ -23,7 +26,7 @@ importers:
         version: 5.6.3
       vite:
         specifier: ^6.0.5
-        version: 6.0.7(@types/node@22.10.7)
+        version: 6.0.7(@types/node@22.10.10)
 
 packages:
 
@@ -511,8 +514,8 @@ packages:
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
-  '@types/node@22.10.7':
-    resolution: {integrity: sha512-V09KvXxFiutGp6B7XkpaDXlNadZxrzajcY50EuoLIpQ6WWYCSvf19lVIazzfIzQvhUN2HjX12spLojTnhuKlGg==}
+  '@types/node@22.10.10':
+    resolution: {integrity: sha512-X47y/mPNzxviAGY5TcYPtYL8JsY3kAq2n8fMmKoRCxq/c4v4pyGNCzM2R6+M5/umG4ZfHuT+sgqDYqWc9rJ6ww==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -1153,7 +1156,7 @@ snapshots:
   '@grpc/grpc-js@1.9.15':
     dependencies:
       '@grpc/proto-loader': 0.7.13
-      '@types/node': 22.10.7
+      '@types/node': 22.10.10
 
   '@grpc/proto-loader@0.7.13':
     dependencies:
@@ -1246,7 +1249,7 @@ snapshots:
 
   '@types/estree@1.0.6': {}
 
-  '@types/node@22.10.7':
+  '@types/node@22.10.10':
     dependencies:
       undici-types: 6.20.0
 
@@ -1394,7 +1397,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.10.7
+      '@types/node': 22.10.10
       long: 5.2.4
 
   require-directory@2.1.1: {}
@@ -1464,13 +1467,13 @@ snapshots:
 
   undici@6.19.7: {}
 
-  vite@6.0.7(@types/node@22.10.7):
+  vite@6.0.7(@types/node@22.10.10):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.5.1
       rollup: 4.30.1
     optionalDependencies:
-      '@types/node': 22.10.7
+      '@types/node': 22.10.10
       fsevents: 2.3.3
 
   websocket-driver@0.7.4:

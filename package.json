@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@types/node": "^22.10.10",
     "firebase": "^10.14.1",
     "typescript": "~5.6.2",
     "vite": "^6.0.5"
@@ -7,6 +8,8 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
+    "deploy": "tsc && vite build && firebase deploy",
+    "deploy-stg": "tsc && vite build && firebase hosting:channel:deploy",
     "preview": "vite preview"
   },
   "dependencies": {
