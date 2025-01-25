@@ -80,16 +80,19 @@ export default class GameController extends BaseController {
     this.gameCanvas.canvasManagerClass = MultiPlayerCanvasManager
     // TODO websocketのコネクション作成とイベント設定
     // this.inputName()
-    this._socket = new WebsocketIO(`${config.websocketApiOrigin}/player`)
+    this._socket = new WebsocketIO(`${config.websocketApiOrigin}/game`)
     this.socket.on('connect', () => {
       console.log('connected')
       this.socket.on('disconnect', () => {
         console.log('user disconnected')
       })
       this.socket.on('connected', async(id) => {
-        this.socket.emit('create-player', id);
+        this.socket.emit('player', id);
       })
-      this.socket.on('create-player', async(player) => {
+      this.socket.on('player', async(player) => {
+        if (!player) {
+          alert('予期せぬエラーが発生しました。時間を置いてから再度アクセスしてください')
+        }
         this.player = Player.createPlayerFromServer(player)
       })
       this.socket.on('join', (newPlayers: {
@@ -113,17 +116,12 @@ export default class GameController extends BaseController {
         if (this.gameCanvas.isGameRunning) return
         this.gameCanvas.onClickStart()
       })
-      this.socket.on('coordinate', (data: { id: string, x: number, y: number, isOver: boolean }) => {
-        if (data.id !== this.player?.id) {
-          this.gameCanvas.updatePlayers(data)
-        }
+      this.socket.on('position', (data: { id: string, x: number, y: number, isOver: boolean }) => {
+        this.gameCanvas.updatePlayers(data)
       })
-      this.socket.on('stage', (data) => {
-        const boxes = data.map(this.parseBox)
+      this.socket.on('stage', ({ boxes: BoxesArrayBuffer }) => {
+        const boxes = BoxesArrayBuffer.map(this.parseBox)
         this.gameCanvas.canvasManager?.updateBoxes(boxes)
-        if (!this.gameCanvas.isGameRunning) {
-          console.log(data)
-        }
       })
     })
     this.gameCanvas.addEventListener('setController', () => {
@@ -138,7 +136,7 @@ export default class GameController extends BaseController {
       this.gameCanvas.onClickStart()
     })
     this.gameCanvas.addEventListener('updateObject', () => {
-      this.socket.emit('coordinate', this.player?.convertToJson())
+      this.socket.emit('position', this.player?.convertToJson())
     })
     window.addEventListener('resize', () => {
       this.showController.bind(this)(this.sideContainers, this.bottomContainers)
