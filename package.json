@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@types/node": "^22.10.10",
+    "cross-env": "^7.0.3",
     "firebase": "^10.14.1",
     "typescript": "~5.6.2",
     "vite": "^6.0.5"
@@ -10,7 +11,7 @@
     "build": "tsc && vite build",
     "ci": "rm -rf node_modules && npm install --no-audit --no-fund --production=false && npm run build",
     "deploy": "tsc && vite build && firebase deploy",
-    "deploy-stg": "tsc && vite build && firebase hosting:channel:deploy",
+    "deploy-stg": "cross-env NODE_ENV=staging tsc && vite build && firebase hosting:channel:deploy",
     "preview": "vite preview"
   },
   "dependencies": {
