@@ -21,10 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install and Build
-        run: |
-          npm install --no-audit --no-fund
-          cross-env NODE_ENV=staging npm run build
+      - name: Install Dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build with Staging Environment
+        run: npx cross-env NODE_ENV=staging npm run build
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
