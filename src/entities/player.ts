@@ -112,6 +112,10 @@ export class Player implements CanvasObject {
     this._isOver = this.y - this.height > 1
   }
 
+  isMovingToRight() {
+    return 0 <= this.vx
+  }
+
   reset() {
     this._x = 0.5
     this._y = 0.1
@@ -170,19 +174,21 @@ export class Player implements CanvasObject {
     return this._isOver
   }
 
-  static createPlayer = (id: string) => {
+  static createPlayer = (id: string, playerSetting: {
+    x: number
+    y: number
+    width: number
+    height: number
+    vg: number
+    jumpStrength: number
+    speed: number
+  }) => {
     return new Player({
       id,
-      x: 0.5,
-      y: 0.1,
-      width: 0.05,
-      height: 0.05,
+      ...playerSetting,
       vx: 0,
       vy: 0,
-      vg: 0.0009,
-      jumpStrength: -0.03,
       isJumping: false,
-      speed: 0.02,
       color: `rgb(255,255,255)`,
       isOver: false,
     })

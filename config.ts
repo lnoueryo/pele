@@ -20,8 +20,8 @@ if (!envList.includes(env)) {
   throw new Error('invalid STAGE')
 }
 const configEnv = configEnvs[env]
-const config = {
+const output = {
   ...configEnv,
   env,
 }
-export default config
+export default output

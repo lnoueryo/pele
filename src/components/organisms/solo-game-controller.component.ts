@@ -1,3 +1,4 @@
+import config from '../../../config'
 import { Player } from '../../entities/player'
 import GameCanvas from './game-canvas.component'
 import BottomController from '../molecules/bottom-controller.component'
@@ -41,7 +42,22 @@ sheet.replaceSync(`
   margin: 0 7px;
 }
 `)
-
+let playerSetting: {
+  x: number
+  y: number
+  width: number
+  height: number
+  vg: number
+  jumpStrength: number
+  speed: number
+}
+await (async() => {
+  const response = await fetch(`${config.httpApiOrigin}/players`)
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+  playerSetting = await response.json()
+})()
 export default class GameController extends BaseController {
   private player: Player
   private _gameCanvas: GameCanvas
@@ -75,7 +91,7 @@ export default class GameController extends BaseController {
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.gameCanvas.canvasManagerClass  = OnePlayerCanvasManager
     this.showController(this.sideContainers, this.bottomContainers)
-    this.player = Player.createPlayer('anonymous')
+    this.player = Player.createPlayer('anonymous', playerSetting)
     this.gameCanvas.addEventListener('setController', ()  => {
       this.setController(this.player)
       this.leftController.setController(this.player)
