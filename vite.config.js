@@ -5,10 +5,8 @@ import { defineConfig } from 'vite'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
-  esbuild: {
-    target: 'esnext',
-  },
   build: {
+    target: 'esnext',
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
