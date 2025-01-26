@@ -51,13 +51,14 @@ let playerSetting: {
   jumpStrength: number
   speed: number
 }
-await (async() => {
+async function loadPlayerSetting() {
   const response = await fetch(`${config.httpApiOrigin}/players`)
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
+    throw new Error('Failed to fetch player settings')
   }
-  playerSetting = await response.json()
-})()
+  return await response.json()
+}
+playerSetting = await loadPlayerSetting()
 export default class GameController extends BaseController {
   private player: Player
   private _gameCanvas: GameCanvas
