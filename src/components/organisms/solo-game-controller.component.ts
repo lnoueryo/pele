@@ -73,7 +73,7 @@ export default class GameController extends BaseController {
     this.shadow.innerHTML = `
       <div id="wrapper">
         <div class="side-container">
-          <left-controller class="buttons-container justify-between" />
+          <left-controller class="buttons-container" />
         </div>
         <game-canvas id="game-canvas"></game-canvas>
         <div class="side-container">

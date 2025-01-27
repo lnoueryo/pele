@@ -178,6 +178,12 @@ body {
   min-height: 100vh;
 }
 
+.d-flex {
+  display: flex;
+}
+  .w-100 {
+  width: 100%;
+  }
 .justify-center {
   justify-content: center;
 }
@@ -186,7 +192,7 @@ body {
 }
 
 .hide {
-  display: none !important;
+  display: none!important;
 }
 `);
 
