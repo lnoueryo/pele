@@ -1,6 +1,7 @@
-import { Box } from "./box"
-import { Canvas } from "./canvas"
-import { CanvasObject } from "./interfaces/canvas-object.interface"
+import { Logger } from '../plugins/logger'
+import { Box } from './box'
+import { Canvas } from './canvas'
+import { CanvasObject } from './interfaces/canvas-object.interface'
 export type PlayerData = {
   id: string
   x: number
@@ -103,13 +104,17 @@ export class Player implements CanvasObject {
     }
   }
 
-  updateFromJson(params: { x: number, y: number}) {
+  updateFromJson(params: { x: number; y: number }) {
     this._x = params.x
     this._y = params.y
   }
 
   isGameOver() {
     this._isOver = this.y - this.height > 1
+  }
+
+  isMovingToRight() {
+    return 0 <= this.vx
   }
 
   reset() {
@@ -151,7 +156,7 @@ export class Player implements CanvasObject {
   }
 
   get jumpStrength() {
-    return-this._jumpStrength
+    return -this._jumpStrength
   }
 
   get isJumping() {
@@ -170,19 +175,25 @@ export class Player implements CanvasObject {
     return this._isOver
   }
 
-  static createPlayer = (id: string) => {
+  static createPlayer = (
+    id: string,
+    playerSetting: {
+      x: number
+      y: number
+      width: number
+      height: number
+      vg: number
+      jumpStrength: number
+      speed: number
+    },
+  ) => {
+    Logger.log('create player')
     return new Player({
       id,
-      x: 0.5,
-      y: 0.1,
-      width: 0.05,
-      height: 0.05,
+      ...playerSetting,
       vx: 0,
       vy: 0,
-      vg: 0.0009,
-      jumpStrength: -0.03,
       isJumping: false,
-      speed: 0.02,
       color: `rgb(255,255,255)`,
       isOver: false,
     })
@@ -199,6 +210,7 @@ export class Player implements CanvasObject {
     jumpStrength: number
     color: string
   }) => {
+    Logger.log('create player from server')
     return new Player({
       id: player.id,
       x: player.x,

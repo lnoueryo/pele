@@ -1,5 +1,5 @@
 // BaseComponent.ts
-const resetStyles = new CSSStyleSheet();
+const resetStyles = new CSSStyleSheet()
 resetStyles.replaceSync(`
 html,
 body,
@@ -178,6 +178,12 @@ body {
   min-height: 100vh;
 }
 
+.d-flex {
+  display: flex;
+}
+  .w-100 {
+  width: 100%;
+  }
 .justify-center {
   justify-content: center;
 }
@@ -186,9 +192,9 @@ body {
 }
 
 .hide {
-  display: none !important;
+  display: none!important;
 }
-`);
+`)
 
 export class BaseComponent extends HTMLElement {
   protected shadow: ShadowRoot

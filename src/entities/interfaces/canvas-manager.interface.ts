@@ -1,15 +1,17 @@
-import { Box } from "../box"
-import { Player } from "../player"
+import { Box } from '../box'
+import { Player } from '../player'
 
 export type CanvasManager = {
   loop: (timestamp: number) => Box[]
   isGameOver: (players: Player[]) => boolean
   endGame: () => void
-  updateBoxes: (boxesJson: {
-    x: number
-    y: number
-    width: number
-    height: number
-    speed: number
-  }[]) => void
+  updateBoxes: (
+    boxesJson: {
+      x: number
+      y: number
+      width: number
+      height: number
+      speed: number
+    }[],
+  ) => void
 }

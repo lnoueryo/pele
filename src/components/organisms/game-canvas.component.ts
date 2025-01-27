@@ -1,11 +1,12 @@
-import { CanvasManager } from './../../entities/interfaces/canvas-manager.interface';
-import { Box } from "../../entities/box"
-import { Canvas } from "../../entities/canvas"
-import { Maguma } from "../../entities/maguma"
-import { Player } from "../../entities/player"
-import { createEvent } from "../../utils"
-import BaseCanvasComponent from "../atoms/base-canvas.component"
-import { BaseComponent } from "../common/base.component"
+import { CanvasManager } from './../../entities/interfaces/canvas-manager.interface'
+import { Box } from '../../entities/box'
+import { Canvas } from '../../entities/canvas'
+import { Maguma } from '../../entities/maguma'
+import { Player } from '../../entities/player'
+import { createEvent } from '../../utils'
+import BaseCanvasComponent from '../atoms/base-canvas.component'
+import { BaseComponent } from '../common/base.component'
+import { Logger } from '../../plugins/logger'
 
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
@@ -33,12 +34,22 @@ export default class GameCanvas extends BaseComponent {
   private players: Player[] = []
   private centerButtons: HTMLDivElement
   private start: HTMLButtonElement
-  public isGameRunning: boolean = false
-  private _canvasManagerClass: (new (config: { canvas: Canvas; players: Player[]; maguma: Maguma }) => CanvasManager) | null = null;
+  public isGameRunning = false
+  private _canvasManagerClass:
+    | (new (config: {
+        canvas: Canvas
+        players: Player[]
+        maguma: Maguma
+      }) => CanvasManager)
+    | null = null
 
   // セッターを使って親からクラスを受け取る
   set canvasManagerClass(
-    value: new (config: { canvas: Canvas; players: Player[]; maguma: Maguma }) => CanvasManager
+    value: new (config: {
+      canvas: Canvas
+      players: Player[]
+      maguma: Maguma
+    }) => CanvasManager,
   ) {
     this._canvasManagerClass = value
   }
@@ -56,26 +67,26 @@ export default class GameCanvas extends BaseComponent {
         </div>
       </div>
     `
-    this._baseCanvas = this.shadow.getElementById('canvas') as BaseCanvasComponent
-    this.centerButtons = this.shadow.getElementById('center-buttons') as HTMLDivElement
+    this._baseCanvas = this.shadow.getElementById(
+      'canvas',
+    ) as BaseCanvasComponent
+    this.centerButtons = this.shadow.getElementById(
+      'center-buttons',
+    ) as HTMLDivElement
     this.start = this.shadow.getElementById('start') as HTMLButtonElement
     createEvent<Event>(this.start, 'click', () => {
-      this.dispatchEvent(
-        new CustomEvent<Player>('setController')
-      )
+      this.dispatchEvent(new CustomEvent<Player>('setController'))
     })
     createEvent<KeyboardEvent>(document, 'keyup', (e) => {
       if (e.key === 'Enter') {
         if (!this.isGameRunning) {
-          this.dispatchEvent(
-            new CustomEvent<Player>('setController')
-          )
+          this.dispatchEvent(new CustomEvent<Player>('setController'))
         }
         e.stopPropagation()
       }
     })
   }
-  onClickStart = async() => {
+  onClickStart = async () => {
     const centerButtons = this.centerButtons
     centerButtons.classList.add('hide')
     if (!this._canvasManagerClass) {
@@ -83,47 +94,55 @@ export default class GameCanvas extends BaseComponent {
     }
     this.canvasManager = new this._canvasManagerClass({
       canvas: this.canvas,
-      players: this.players.map(player => {
+      players: this.players.map((player) => {
         player.reset()
         return player
       }),
       maguma: Maguma.createMaguma(),
     })
-    this.isGameRunning = true
-    const requestAnimationFrameAsync = (): Promise<number> => {
-      return new Promise((resolve) => requestAnimationFrame(resolve))
-    }
+    this.changeGameStatus(true)
     const canvasManager = this.canvasManager
-    const gameLoop = async () => {
-      let lastTimestamp = 0
-      while (true) {
-        const timestamp = await requestAnimationFrameAsync()
-        if (canvasManager.isGameOver(this.players)) {
-          canvasManager.endGame()
-          break
-        }
-        if (lastTimestamp === 0) {
-          lastTimestamp = timestamp
-        }
-        canvasManager.loop(timestamp)
-        this.dispatchEvent(
-          new CustomEvent<Box[]>('updateObject')
-        )
-      }
-    }
-    await gameLoop()
-    this.isGameRunning = false
+    Logger.group()
+    Logger.log('ゲーム開始')
+    await this.gameLoop(canvasManager)
+    Logger.log('ゲーム終了')
+    Logger.groupEnd()
+    this.changeGameStatus(false)
     centerButtons.classList.remove('hide')
+  }
+  changeGameStatus(status: boolean) {
+    this.isGameRunning = status
+    this.dispatchEvent(
+      new CustomEvent<boolean>('changeGameStatus', { detail: status }),
+    )
   }
   setPlayers(players: Player[]) {
     this.players = players
     this.fillPlayers()
   }
-  updatePlayers(coordinate: { id: string, x: number, y: number }) {
+  updatePlayers(coordinate: { id: string; x: number; y: number }) {
     for (const player of this.players) {
       if (player.id === coordinate.id) {
         player.updateFromJson(coordinate)
       }
+    }
+  }
+  private async gameLoop(canvasManager: CanvasManager) {
+    const requestAnimationFrameAsync = (): Promise<number> => {
+      return new Promise((resolve) => requestAnimationFrame(resolve))
+    }
+    let lastTimestamp = 0
+    while (true) {
+      const timestamp = await requestAnimationFrameAsync()
+      if (canvasManager.isGameOver(this.players)) {
+        canvasManager.endGame()
+        break
+      }
+      if (lastTimestamp === 0) {
+        lastTimestamp = timestamp
+      }
+      canvasManager.loop(timestamp)
+      this.dispatchEvent(new CustomEvent<Box[]>('updateObject'))
     }
   }
   fillPlayers() {
@@ -131,12 +150,16 @@ export default class GameCanvas extends BaseComponent {
     canvas.ctx.clearRect(0, 0, canvas.width, canvas.height)
     const ctx = canvas.ctx
     const playerCount = this.players.length
-    const playerSize = Math.min(canvas.width / (playerCount * 1.5), canvas.height / 4)
+    const playerSize = Math.min(
+      canvas.width / (playerCount * 1.5),
+      canvas.height / 4,
+    )
     const playerY = 20
     for (let i = 0; i < this.players.length; i++) {
       const player = this.players[i]
       // 各プレイヤーの `x` 座標を計算
-      const playerSpacing = (canvas.width - playerSize * playerCount) / (playerCount + 1)
+      const playerSpacing =
+        (canvas.width - playerSize * playerCount) / (playerCount + 1)
       const playerX = i * (playerSize + playerSpacing) + playerSpacing
       // プレイヤーの描画
       ctx.fillStyle = player.color
@@ -150,13 +173,18 @@ export default class GameCanvas extends BaseComponent {
       const eyeOffsetY = playerSize / 4
       // 左目
       ctx.fillStyle = 'red'
-      ctx.fillRect(playerX + eyeOffsetX, playerY + eyeOffsetY, eyeWidth, eyeHeight)
+      ctx.fillRect(
+        playerX + eyeOffsetX,
+        playerY + eyeOffsetY,
+        eyeWidth,
+        eyeHeight,
+      )
       // 右目
       ctx.fillRect(
         playerX + playerSize - eyeOffsetX - eyeWidth,
         playerY + eyeOffsetY,
         eyeWidth,
-        eyeHeight
+        eyeHeight,
       )
       const mouthWidth = playerSize / 2
       const mouthHeight = playerSize / 8
@@ -166,7 +194,7 @@ export default class GameCanvas extends BaseComponent {
         playerX + mouthOffsetX,
         playerY + mouthOffsetY,
         mouthWidth,
-        mouthHeight
+        mouthHeight,
       )
     }
   }
@@ -177,4 +205,3 @@ export default class GameCanvas extends BaseComponent {
     return this._baseCanvas.canvas
   }
 }
-

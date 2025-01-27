@@ -1,6 +1,10 @@
 {
   "devDependencies": {
     "@types/node": "^22.10.10",
+    "@typescript-eslint/eslint-plugin": "5.62.0",
+    "@typescript-eslint/parser": "5.62.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.0.0",
     "firebase": "^10.14.1",
     "typescript": "~5.6.2",
     "vite": "^6.0.5"
@@ -8,12 +12,17 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "ci": "rm -rf node_modules && npm install --no-audit --no-fund --production=false && npm run build",
     "deploy": "tsc && vite build && firebase deploy",
-    "deploy-stg": "tsc && vite build && firebase hosting:channel:deploy",
+    "deploy-stg": "cross-env NODE_ENV=staging tsc && vite build && firebase hosting:channel:deploy",
     "preview": "vite preview"
   },
   "dependencies": {
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "prettier": "^3.4.2",
     "socket.io-client": "^4.8.1",
     "ws": "^8.18.0"
   }
