@@ -54,7 +54,7 @@ export class Game {
 
   execute = (id: string) => {
     if (this.players.length === 0) return
-    const player = this.players.find(player => player.id === id)!
+    const player = this.players.find((player) => player.id === id)!
     player.isJumping || player.jump()
   }
 
@@ -87,12 +87,11 @@ export class Game {
   }
 
   startGame(userId: string) {
-    const player = this.players.find(player => player.id === userId)!
+    const player = this.players.find((player) => player.id === userId)!
     document.addEventListener('keydown', (event) => {
       if (event.key === KEYBOARDS.left) player.moveToLeft()
       else if (event.key === KEYBOARDS.right) player.moveToRight()
-      else if (event.key === KEYBOARDS.top && !player.isJumping)
-        player.jump()
+      else if (event.key === KEYBOARDS.top && !player.isJumping) player.jump()
     })
 
     document.addEventListener('keyup', (event) => {
@@ -162,7 +161,7 @@ export class Game {
 
     document.removeEventListener('touchstart', () => this.execute(userId))
     if (this.controllerPosition == 'gamer') {
-      document.addEventListener('touchstart',  () => this.execute(userId))
+      document.addEventListener('touchstart', () => this.execute(userId))
     }
   }
 
@@ -217,5 +216,4 @@ export class Game {
       }
     })
   }
-
 }

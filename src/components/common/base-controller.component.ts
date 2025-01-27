@@ -18,8 +18,7 @@ export default class BaseController extends BaseComponent {
     document.addEventListener('keydown', (event) => {
       if (event.key === KEYBOARDS.left) player.moveToLeft()
       else if (event.key === KEYBOARDS.right) player.moveToRight()
-      else if (event.key === KEYBOARDS.top && !player.isJumping)
-        player.jump()
+      else if (event.key === KEYBOARDS.top && !player.isJumping) player.jump()
     })
     document.addEventListener('keyup', (event) => {
       if (event.key === KEYBOARDS.left || event.key === KEYBOARDS.right)
@@ -29,7 +28,7 @@ export default class BaseController extends BaseComponent {
   }
   protected showController(
     sideContainers: NodeListOf<HTMLElement>,
-    bottomContainers: NodeListOf<HTMLElement>
+    bottomContainers: NodeListOf<HTMLElement>,
   ) {
     if (this.isMobileDevice()) {
       if (window.innerWidth - 200 < window.innerHeight) {
@@ -51,7 +50,10 @@ export default class BaseController extends BaseComponent {
   private isMobileDevice = () => {
     const isSmallScreen = window.matchMedia('(max-width: 768px)').matches
     const userAgent = navigator.userAgent || navigator.vendor
-    const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent)
+    const isMobileUA =
+      /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+        userAgent,
+      )
     return isSmallScreen || isMobileUA
   }
 }

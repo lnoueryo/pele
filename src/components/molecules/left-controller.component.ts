@@ -1,4 +1,3 @@
-
 import { BaseComponent } from '../common/base.component'
 import { Player } from '../../entities/player'
 const sheet = new CSSStyleSheet()

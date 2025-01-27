@@ -1,4 +1,4 @@
-import { io } from "socket.io-client"
+import { io } from 'socket.io-client'
 export class WebsocketIO {
   private socket
   constructor(url: string) {

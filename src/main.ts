@@ -32,7 +32,7 @@ const routes = new Map<string, string>([
   ['/solo.html', 'solo-page'],
 ])
 
-const path = location.pathname;
+const path = location.pathname
 if (routes.has(path)) {
   const renderingComponent = routes.get(path)!
   const app = document.getElementById('app')!

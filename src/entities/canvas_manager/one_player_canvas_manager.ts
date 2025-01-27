@@ -6,16 +6,17 @@ import { Canvas } from '../canvas'
 import { CanvasManager } from '../interfaces/canvas-manager.interface'
 const PLAYER_DELAY = 1
 
-export class OnePlayerCanvasManager extends BaseCanvasManager implements CanvasManager {
+export class OnePlayerCanvasManager
+  extends BaseCanvasManager
+  implements CanvasManager
+{
   constructor(params: {
     canvas: Canvas
     players: Player[]
     maguma: Maguma
     boxes?: Box[]
   }) {
-    super(
-      params,
-    )
+    super(params)
   }
 
   public loop(timestamp: number): Box[] {
@@ -59,11 +60,15 @@ export class OnePlayerCanvasManager extends BaseCanvasManager implements CanvasM
     const index = this.boxes.indexOf(box)
     this.boxes.splice(index, 1)
   }
-  updateBoxes(boxesJson: {
-    x: number
-    y: number
-    width: number
-    height: number
-    speed: number
-  }[]) {console.log(boxesJson)}
+  updateBoxes(
+    boxesJson: {
+      x: number
+      y: number
+      width: number
+      height: number
+      speed: number
+    }[],
+  ) {
+    console.log(boxesJson)
+  }
 }

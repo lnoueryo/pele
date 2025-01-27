@@ -73,9 +73,15 @@ export default class GameController extends BaseController {
       </div>
     `
     this._gameCanvas = this.shadow.querySelector('game-canvas') as GameCanvas
-    this._leftController = this.shadow.querySelector('left-controller') as LeftController
-    this._rightController = this.shadow.querySelector('right-controller') as RightController
-    this._bottomController = this.shadow.querySelector('bottom-controller') as BottomController
+    this._leftController = this.shadow.querySelector(
+      'left-controller',
+    ) as LeftController
+    this._rightController = this.shadow.querySelector(
+      'right-controller',
+    ) as RightController
+    this._bottomController = this.shadow.querySelector(
+      'bottom-controller',
+    ) as BottomController
     this._sideContainers = this.shadow.querySelectorAll('.side-container')
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.showController(this.sideContainers, this.bottomContainers)
@@ -89,46 +95,65 @@ export default class GameController extends BaseController {
       this.socket.on('disconnect', () => {
         console.log('user disconnected')
       })
-      this.socket.on('connected', async(id) => {
-        this.socket.emit('player', id);
+      this.socket.on('connected', async (id) => {
+        this.socket.emit('player', id)
       })
-      this.socket.on('player', async(player) => {
+      this.socket.on('player', async (player) => {
         if (!player) {
-          alert('予期せぬエラーが発生しました。時間を置いてから再度アクセスしてください')
+          alert(
+            '予期せぬエラーが発生しました。時間を置いてから再度アクセスしてください',
+          )
         }
         this.player = Player.createPlayerFromServer(player)
       })
-      this.socket.on('join', (newPlayers: {
-        id: string
-        x: number
-        y: number
-        width: number
-        height: number
-        vg: number
-        speed: number
-        jumpStrength: number
-        color: string
-      }[]) => {
-        if (!this.player) {
-          throw new Error('no player')
-        }
-        const filteredPlayer = newPlayers.filter(player => player.id !== this.player?.id)
-        this.gameCanvas.setPlayers([this.player, ...filteredPlayer.map(player => Player.createPlayerFromServer(player))])
-      })
+      this.socket.on(
+        'join',
+        (
+          newPlayers: {
+            id: string
+            x: number
+            y: number
+            width: number
+            height: number
+            vg: number
+            speed: number
+            jumpStrength: number
+            color: string
+          }[],
+        ) => {
+          if (!this.player) {
+            throw new Error('no player')
+          }
+          const filteredPlayer = newPlayers.filter(
+            (player) => player.id !== this.player?.id,
+          )
+          this.gameCanvas.setPlayers([
+            this.player,
+            ...filteredPlayer.map((player) =>
+              Player.createPlayerFromServer(player),
+            ),
+          ])
+        },
+      )
       this.socket.on('start', () => {
         if (this.gameCanvas.isGameRunning) return
         this.startGame()
       })
-      this.socket.on('position', (data: { id: string, x: number, y: number, isOver: boolean }) => {
-        this.gameCanvas.updatePlayers(data)
-      })
+      this.socket.on(
+        'position',
+        (data: { id: string; x: number; y: number; isOver: boolean }) => {
+          this.gameCanvas.updatePlayers(data)
+        },
+      )
       this.socket.on('stage', ({ boxes: BoxesArrayBuffer }) => {
         const boxes = BoxesArrayBuffer.map(this.parseBox)
         this.gameCanvas.canvasManager?.updateBoxes(boxes)
       })
     })
     this.gameCanvas.addEventListener('setController', () => this.startGame())
-    this.bottomController.addEventListener('setController', () => this.startGame())
+    this.bottomController.addEventListener('setController', () =>
+      this.startGame(),
+    )
     this.gameCanvas.addEventListener('changeGameStatus', (e: Event) => {
       const event = e as CustomEvent<boolean>
       this.bottomController.changeGameStatus(event.detail)
@@ -137,7 +162,15 @@ export default class GameController extends BaseController {
       this.socket.emit('position', this.player?.convertToJson())
     })
     Logger.log(this.player)
-    Logger.log(this.gameCanvas, this.leftController, this.rightController, this.bottomController, this.sideContainers, this.bottomContainers, this.gameCanvas)
+    Logger.log(
+      this.gameCanvas,
+      this.leftController,
+      this.rightController,
+      this.bottomController,
+      this.sideContainers,
+      this.bottomContainers,
+      this.gameCanvas,
+    )
     Logger.groupEnd()
   }
 

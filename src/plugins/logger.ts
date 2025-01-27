@@ -1,7 +1,7 @@
 export class Logger {
   static log(...args: any[]) {
     if (process.env.NODE_ENV !== 'production') {
-      console.log(Logger.outputContent(), ...args);
+      console.log(Logger.outputContent(), ...args)
     }
   }
   static info(...args: any[]) {
@@ -65,13 +65,13 @@ export class Logger {
   }
 
   static outputContent() {
-    const timestamp = new Date().toISOString();
-    const stack = new Error().stack || '';
-    const callerLine = stack.split('\n')[2] || ''; // 呼び出し元のスタックを取得
-    const fileInfo = callerLine.match(/\((.*):(\d+):(\d+)\)/); // ファイル名と行番号を取得
+    const timestamp = new Date().toISOString()
+    const stack = new Error().stack || ''
+    const callerLine = stack.split('\n')[2] || '' // 呼び出し元のスタックを取得
+    const fileInfo = callerLine.match(/\((.*):(\d+):(\d+)\)/) // ファイル名と行番号を取得
     const location = fileInfo
       ? `${fileInfo[1]}:${fileInfo[2]}:${fileInfo[3]}`
-      : 'unknown location';
+      : 'unknown location'
     return `[${timestamp}] [${location}]`
   }
 }

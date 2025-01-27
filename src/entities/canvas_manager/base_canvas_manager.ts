@@ -79,28 +79,28 @@ export abstract class BaseCanvasManager {
     const eyeOffsetX = width / 5 // プレイヤーの左端から目までのオフセット
     const eyeOffsetY = height / 4 // プレイヤーの上端から目までのオフセット
 
-    this.ctx.fillRect(
-      x + eyeOffsetX,
-      y + eyeOffsetY,
-      eyeWidth,
-      eyeHeight
-    )
+    this.ctx.fillRect(x + eyeOffsetX, y + eyeOffsetY, eyeWidth, eyeHeight)
 
     // 右目
     this.ctx.fillRect(
       x + width - eyeOffsetX - eyeWidth,
       y + eyeOffsetY,
       eyeWidth,
-      eyeHeight
+      eyeHeight,
     )
-  
+
     // 口
     const MOUTH_OFFSET_RIGHT = 5 // プレイヤーが右に移動しているときのオフセット
-    const MOUTH_OFFSET_LEFT = 3  // プレイヤーが左に移動しているときのオフセット
+    const MOUTH_OFFSET_LEFT = 3 // プレイヤーが左に移動しているときのオフセット
     const BASE_MOUTH_DIVISOR = 4 // 分母の基本値
     const mouthWidth = width / 2 // 口の幅
     const mouthHeight = height / 8 // 口の高さ
-    const mouthOffsetX = width / (BASE_MOUTH_DIVISOR + (player.isMovingToRight() ? MOUTH_OFFSET_RIGHT - BASE_MOUTH_DIVISOR : MOUTH_OFFSET_LEFT - BASE_MOUTH_DIVISOR))
+    const mouthOffsetX =
+      width /
+      (BASE_MOUTH_DIVISOR +
+        (player.isMovingToRight()
+          ? MOUTH_OFFSET_RIGHT - BASE_MOUTH_DIVISOR
+          : MOUTH_OFFSET_LEFT - BASE_MOUTH_DIVISOR))
     const mouthOffsetY = height / 1.5 // プレイヤーの上端から口までのオフセット
 
     // 修正後のコード
@@ -108,19 +108,14 @@ export abstract class BaseCanvasManager {
       x + mouthOffsetX,
       y + mouthOffsetY,
       mouthWidth,
-      mouthHeight
+      mouthHeight,
     )
   }
 
   protected fillMaguma() {
     const { x, y, width, height } = this.maguma.getCanvasSize(this.canvas)
     this.ctx.fillStyle = `rgb(${Math.random() * (255 - 200) + 200},30, 20)`
-    this.ctx.fillRect(
-      x,
-      y,
-      width,
-      height,
-    )
+    this.ctx.fillRect(x, y, width, height)
   }
 
   protected resetCanvas() {

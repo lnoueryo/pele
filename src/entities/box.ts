@@ -1,5 +1,5 @@
-import { Canvas } from "./canvas"
-import type { CanvasObject } from "./interfaces/canvas-object.interface"
+import { Canvas } from './canvas'
+import type { CanvasObject } from './interfaces/canvas-object.interface'
 const LEFT_LIMT = 0
 const TOP_LIMIT = 0
 const MOVE_Y_PROBABILITY = 0.1
@@ -23,7 +23,7 @@ export class Box implements CanvasObject {
   private _width
   private _height
   private speed
-  private ySalt = (Math.random() - 0.5)
+  private ySalt = Math.random() - 0.5
   constructor(params: IBox) {
     this._width = params.width
     this._height = params.height
@@ -36,7 +36,7 @@ export class Box implements CanvasObject {
     this._x -= this.speed
     this._y +=
       Math.random() < MOVE_Y_PROBABILITY
-        ? this.ySalt * this.speed / Y_MOVE_SCALE
+        ? (this.ySalt * this.speed) / Y_MOVE_SCALE
         : 0
   }
 
@@ -59,7 +59,12 @@ export class Box implements CanvasObject {
     const width = Math.random() * 0.25
     const height = Math.random() * 0.1
     const randomSpeed = Math.random()
-    const speed = randomSpeed < MIN_SPEED ? MIN_SPEED / SPEED_SALT : MAX_SPEED < randomSpeed ? MAX_SPEED / SPEED_SALT : randomSpeed / SPEED_SALT
+    const speed =
+      randomSpeed < MIN_SPEED
+        ? MIN_SPEED / SPEED_SALT
+        : MAX_SPEED < randomSpeed
+          ? MAX_SPEED / SPEED_SALT
+          : randomSpeed / SPEED_SALT
     return new Box({
       width,
       height,
@@ -81,4 +86,4 @@ export class Box implements CanvasObject {
   get height() {
     return this._height
   }
- }
+}

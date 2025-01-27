@@ -50,17 +50,27 @@ export default class BottomController extends BaseComponent {
     `
     this.controller = this.shadow.getElementById('controller') as HTMLDivElement
     this.start = this.shadow.getElementById('start') as HTMLDivElement
-    this.startButton = this.shadow.getElementById('start-button') as HTMLDivElement
-    this._verticalTop = this.shadow.getElementById('vertical-top') as HTMLDivElement
-    this._verticalLefts = this.shadow.querySelectorAll('controller-button.vertical-left') as NodeListOf<Element>
-    this._verticalRights = this.shadow.querySelectorAll('controller-button.vertical-right') as NodeListOf<Element>
-    this.startButton.addEventListener('click', () => this.dispatchEvent(new CustomEvent<undefined>('setController')))
+    this.startButton = this.shadow.getElementById(
+      'start-button',
+    ) as HTMLDivElement
+    this._verticalTop = this.shadow.getElementById(
+      'vertical-top',
+    ) as HTMLDivElement
+    this._verticalLefts = this.shadow.querySelectorAll(
+      'controller-button.vertical-left',
+    ) as NodeListOf<Element>
+    this._verticalRights = this.shadow.querySelectorAll(
+      'controller-button.vertical-right',
+    ) as NodeListOf<Element>
+    this.startButton.addEventListener('click', () =>
+      this.dispatchEvent(new CustomEvent<undefined>('setController')),
+    )
   }
   setController(player: Player) {
     if (this.isControllerReady) {
       return
     }
-    [ ...this.verticalRights ].forEach((verticalRight) => {
+    Array.from(this.verticalRights).forEach((verticalRight) => {
       verticalRight.addEventListener('touchstart', (e) => {
         player.moveToRight()
         e.stopPropagation()
@@ -71,9 +81,8 @@ export default class BottomController extends BaseComponent {
         e.stopPropagation()
         e.preventDefault()
       })
-    });
-
-    [ ...this.verticalLefts ].forEach((verticalLeft) => {
+    })
+    Array.from(this.verticalLefts).forEach((verticalLeft) => {
       verticalLeft.addEventListener('touchstart', (e) => {
         player.moveToLeft()
         e.stopPropagation()
@@ -84,7 +93,7 @@ export default class BottomController extends BaseComponent {
         e.stopPropagation()
         e.preventDefault()
       })
-    });
+    })
 
     this.verticalTop.addEventListener('touchstart', (e) => {
       player.isJumping || player.jump()

@@ -1,7 +1,7 @@
-import { Logger } from "../plugins/logger"
-import { Box } from "./box"
-import { Canvas } from "./canvas"
-import { CanvasObject } from "./interfaces/canvas-object.interface"
+import { Logger } from '../plugins/logger'
+import { Box } from './box'
+import { Canvas } from './canvas'
+import { CanvasObject } from './interfaces/canvas-object.interface'
 export type PlayerData = {
   id: string
   x: number
@@ -104,7 +104,7 @@ export class Player implements CanvasObject {
     }
   }
 
-  updateFromJson(params: { x: number, y: number}) {
+  updateFromJson(params: { x: number; y: number }) {
     this._x = params.x
     this._y = params.y
   }
@@ -156,7 +156,7 @@ export class Player implements CanvasObject {
   }
 
   get jumpStrength() {
-    return-this._jumpStrength
+    return -this._jumpStrength
   }
 
   get isJumping() {
@@ -175,15 +175,18 @@ export class Player implements CanvasObject {
     return this._isOver
   }
 
-  static createPlayer = (id: string, playerSetting: {
-    x: number
-    y: number
-    width: number
-    height: number
-    vg: number
-    jumpStrength: number
-    speed: number
-  }) => {
+  static createPlayer = (
+    id: string,
+    playerSetting: {
+      x: number
+      y: number
+      width: number
+      height: number
+      vg: number
+      jumpStrength: number
+      speed: number
+    },
+  ) => {
     Logger.log('create player')
     return new Player({
       id,

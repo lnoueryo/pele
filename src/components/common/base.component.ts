@@ -1,5 +1,5 @@
 // BaseComponent.ts
-const resetStyles = new CSSStyleSheet();
+const resetStyles = new CSSStyleSheet()
 resetStyles.replaceSync(`
 html,
 body,
@@ -194,7 +194,7 @@ body {
 .hide {
   display: none!important;
 }
-`);
+`)
 
 export class BaseComponent extends HTMLElement {
   protected shadow: ShadowRoot

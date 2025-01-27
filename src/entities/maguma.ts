@@ -1,5 +1,5 @@
-import { Canvas } from "./canvas"
-import { CanvasObject } from "./interfaces/canvas-object.interface"
+import { Canvas } from './canvas'
+import { CanvasObject } from './interfaces/canvas-object.interface'
 
 type IMagma = {
   x: number

@@ -6,16 +6,17 @@ import { Canvas } from '../canvas'
 import { Maguma } from '../maguma'
 const PLAYER_DELAY = 1
 
-export class MultiPlayerCanvasManager extends BaseCanvasManager implements CanvasManager {
+export class MultiPlayerCanvasManager
+  extends BaseCanvasManager
+  implements CanvasManager
+{
   constructor(params: {
     canvas: Canvas
     players: Player[]
     maguma: Maguma
     boxes?: Box[]
   }) {
-    super(
-      params,
-    )
+    super(params)
   }
 
   public loop(timestamp: number): Box[] {
@@ -42,19 +43,24 @@ export class MultiPlayerCanvasManager extends BaseCanvasManager implements Canva
     return this.boxes
   }
 
-  public updateBoxes(boxesJson: {
-    x: number
-    y: number
-    width: number
-    height: number
-    speed: number
-  }[]) {
-    this.boxes = boxesJson.map(box => new Box({
-      x: box.x,
-      y: box.y,
-      width: box.width,
-      height: box.height,
-      speed: box.speed,
-    }))
+  public updateBoxes(
+    boxesJson: {
+      x: number
+      y: number
+      width: number
+      height: number
+      speed: number
+    }[],
+  ) {
+    this.boxes = boxesJson.map(
+      (box) =>
+        new Box({
+          x: box.x,
+          y: box.y,
+          width: box.width,
+          height: box.height,
+          speed: box.speed,
+        }),
+    )
   }
 }

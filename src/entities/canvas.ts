@@ -1,7 +1,8 @@
 export class Canvas {
   constructor(private canvas: HTMLCanvasElement) {}
   private getLength(length: 'width' | 'height') {
-    const lengthString = this.canvas.style[length] || getComputedStyle(this.canvas)[length]
+    const lengthString =
+      this.canvas.style[length] || getComputedStyle(this.canvas)[length]
     return parseInt(lengthString, 10)
   }
   get width(): number {

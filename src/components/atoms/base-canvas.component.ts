@@ -1,5 +1,5 @@
-import { Canvas } from "../../entities/canvas";
-import { BaseComponent } from "../common/base.component"
+import { Canvas } from '../../entities/canvas'
+import { BaseComponent } from '../common/base.component'
 const CANVAS_WIDTH_PIXEL = 1600
 const CANVAS_HEIGHT_PIXEL = 1600
 const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
@@ -45,4 +45,3 @@ export default class BaseCanvasComponent extends BaseComponent {
     return this._canvas!
   }
 }
-

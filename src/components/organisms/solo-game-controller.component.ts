@@ -43,15 +43,6 @@ sheet.replaceSync(`
   margin: 0 7px;
 }
 `)
-let playerSetting: {
-  x: number
-  y: number
-  width: number
-  height: number
-  vg: number
-  jumpStrength: number
-  speed: number
-}
 async function loadPlayerSetting() {
   const response = await fetch(`${config.httpApiOrigin}/players`)
   if (!response.ok) {
@@ -59,7 +50,15 @@ async function loadPlayerSetting() {
   }
   return await response.json()
 }
-playerSetting = await loadPlayerSetting()
+const playerSetting: {
+  x: number
+  y: number
+  width: number
+  height: number
+  vg: number
+  jumpStrength: number
+  speed: number
+} = await loadPlayerSetting()
 Logger.log(playerSetting)
 export default class GameController extends BaseController {
   private player: Player
@@ -91,16 +90,24 @@ export default class GameController extends BaseController {
       </div>
     `
     this._gameCanvas = this.shadow.querySelector('game-canvas') as GameCanvas
-    this._leftController = this.shadow.querySelector('left-controller') as LeftController
-    this._rightController = this.shadow.querySelector('right-controller') as RightController
-    this._bottomController = this.shadow.querySelector('bottom-controller') as BottomController
+    this._leftController = this.shadow.querySelector(
+      'left-controller',
+    ) as LeftController
+    this._rightController = this.shadow.querySelector(
+      'right-controller',
+    ) as RightController
+    this._bottomController = this.shadow.querySelector(
+      'bottom-controller',
+    ) as BottomController
     this._sideContainers = this.shadow.querySelectorAll('.side-container')
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
-    this.gameCanvas.canvasManagerClass  = OnePlayerCanvasManager
+    this.gameCanvas.canvasManagerClass = OnePlayerCanvasManager
     this.showController(this.sideContainers, this.bottomContainers)
     this.player = Player.createPlayer('anonymous', playerSetting)
     this.gameCanvas.addEventListener('setController', () => this.startGame())
-    this.bottomController.addEventListener('setController', () => this.startGame())
+    this.bottomController.addEventListener('setController', () =>
+      this.startGame(),
+    )
     this.gameCanvas.addEventListener('changeGameStatus', (e: Event) => {
       const event = e as CustomEvent<boolean>
       this.bottomController.changeGameStatus(event.detail)
@@ -109,7 +116,15 @@ export default class GameController extends BaseController {
       this.showController.bind(this)(this.sideContainers, this.bottomContainers)
     })
     Logger.log(this.player)
-    Logger.log(this.gameCanvas, this.leftController, this.rightController, this.bottomController, this.sideContainers, this.bottomContainers, this.gameCanvas)
+    Logger.log(
+      this.gameCanvas,
+      this.leftController,
+      this.rightController,
+      this.bottomController,
+      this.sideContainers,
+      this.bottomContainers,
+      this.gameCanvas,
+    )
     Logger.groupEnd()
   }
 
