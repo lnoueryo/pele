@@ -6,9 +6,7 @@ import LeftController from '../molecules/left-controller.component'
 import RightController from '../molecules/right-controller.component'
 import BaseController from '../common/base-controller.component'
 import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
-interface ChangeGameStatusEvent extends CustomEvent<boolean> {
-  detail: boolean;
-}
+
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
 #wrapper {

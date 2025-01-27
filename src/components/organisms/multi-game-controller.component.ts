@@ -124,28 +124,29 @@ export default class GameController extends BaseController {
         this.gameCanvas.canvasManager?.updateBoxes(boxes)
       })
     })
-    this.gameCanvas.addEventListener('setController', () => {
-      if (!this.player) {
-        throw new Error('no player')
-      }
-      this.socket.emit('start', this.player.convertToJson())
-      this.setController(this.player)
-      this.leftController.setController(this.player)
-      this.rightController.setController(this.player)
-      this.bottomController.setController(this.player)
-      this.gameCanvas.onClickStart()
+    this.gameCanvas.addEventListener('setController', () => this.startGame())
+    this.bottomController.addEventListener('setController', () => this.startGame())
+    this.gameCanvas.addEventListener('changeGameStatus', (e: Event) => {
+      const event = e as CustomEvent<boolean>
+      this.bottomController.changeGameStatus(event.detail)
     })
     this.gameCanvas.addEventListener('updateObject', () => {
       this.socket.emit('position', this.player?.convertToJson())
     })
-    window.addEventListener('resize', () => {
-      this.showController.bind(this)(this.sideContainers, this.bottomContainers)
-    })
   }
 
-  connectedCallback() {
-
+  startGame() {
+    if (!this.player) {
+      throw new Error('no player')
+    }
+    this.socket.emit('start', this.player.convertToJson())
+    this.setController(this.player)
+    this.leftController.setController(this.player)
+    this.rightController.setController(this.player)
+    this.bottomController.setController(this.player)
+    this.gameCanvas.onClickStart()
   }
+
   private parseBox(buffer: ArrayBuffer) {
     const view = new DataView(buffer)
     const x = view.getFloat32(0)
