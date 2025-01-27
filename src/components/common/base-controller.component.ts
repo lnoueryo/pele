@@ -1,5 +1,6 @@
 import { Player } from '../../entities/player'
 import { BaseComponent } from '../common/base.component'
+import { hideElements, showElements } from '../../utils'
 
 const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 export default class BaseController extends BaseComponent {
@@ -32,26 +33,16 @@ export default class BaseController extends BaseComponent {
     if (this.isMobileDevice()) {
       if (window.innerWidth - 200 < window.innerHeight) {
         // 縦向きまたは十分な画面サイズではない端末
-        this.hideElements(sideContainers)
-        return this.showElements(bottomContainers)
+        hideElements(sideContainers)
+        return showElements(bottomContainers)
       }
       // 横向き
-      this.showElements(sideContainers)
-      return this.hideElements(bottomContainers)
+      showElements(sideContainers)
+      return hideElements(bottomContainers)
     }
     // PCの場合
-    this.hideElements(sideContainers)
-    this.hideElements(bottomContainers)
-  }
-  private hideElements(elements: NodeListOf<HTMLElement>) {
-    Array.from(elements).forEach((element) => {
-      element.classList.add('hide')
-    })
-  }
-  private showElements(elements: NodeListOf<HTMLElement>) {
-    Array.from(elements).forEach((element) => {
-      element.classList.remove('hide')
-    })
+    hideElements(sideContainers)
+    hideElements(bottomContainers)
   }
   private isMobileDevice = () => {
     return (

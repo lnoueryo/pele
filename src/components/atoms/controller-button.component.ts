@@ -2,12 +2,9 @@ import { BaseComponent } from '../common/base.component'
 
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
-.button-size {
-  padding-top: 50%;
-}
-
 .button-wrapper {
   padding: 4px;
+    width: 100%;
 }
 
 .controller {

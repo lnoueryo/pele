@@ -89,31 +89,17 @@ export default class GameCanvas extends BaseComponent {
       }),
       maguma: Maguma.createMaguma(),
     })
-    this.isGameRunning = true
-    const requestAnimationFrameAsync = (): Promise<number> => {
-      return new Promise((resolve) => requestAnimationFrame(resolve))
-    }
+    this.changeGameStatus(true)
     const canvasManager = this.canvasManager
-    const gameLoop = async () => {
-      let lastTimestamp = 0
-      while (true) {
-        const timestamp = await requestAnimationFrameAsync()
-        if (canvasManager.isGameOver(this.players)) {
-          canvasManager.endGame()
-          break
-        }
-        if (lastTimestamp === 0) {
-          lastTimestamp = timestamp
-        }
-        canvasManager.loop(timestamp)
-        this.dispatchEvent(
-          new CustomEvent<Box[]>('updateObject')
-        )
-      }
-    }
-    await gameLoop()
-    this.isGameRunning = false
+    await this.gameLoop(canvasManager)
+    this.changeGameStatus(false)
     centerButtons.classList.remove('hide')
+  }
+  changeGameStatus(status: boolean) {
+    this.isGameRunning = status
+    this.dispatchEvent(
+      new CustomEvent<boolean>('changeGameStatus', { detail: status })
+    )
   }
   setPlayers(players: Player[]) {
     this.players = players
@@ -124,6 +110,26 @@ export default class GameCanvas extends BaseComponent {
       if (player.id === coordinate.id) {
         player.updateFromJson(coordinate)
       }
+    }
+  }
+  private async gameLoop(canvasManager: CanvasManager) {
+    const requestAnimationFrameAsync = (): Promise<number> => {
+      return new Promise((resolve) => requestAnimationFrame(resolve))
+    }
+    let lastTimestamp = 0
+    while (true) {
+      const timestamp = await requestAnimationFrameAsync()
+      if (canvasManager.isGameOver(this.players)) {
+        canvasManager.endGame()
+        break
+      }
+      if (lastTimestamp === 0) {
+        lastTimestamp = timestamp
+      }
+      canvasManager.loop(timestamp)
+      this.dispatchEvent(
+        new CustomEvent<Box[]>('updateObject')
+      )
     }
   }
   fillPlayers() {

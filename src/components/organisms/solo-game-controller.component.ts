@@ -6,7 +6,9 @@ import LeftController from '../molecules/left-controller.component'
 import RightController from '../molecules/right-controller.component'
 import BaseController from '../common/base-controller.component'
 import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
-
+interface ChangeGameStatusEvent extends CustomEvent<boolean> {
+  detail: boolean;
+}
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
 #wrapper {
@@ -81,7 +83,9 @@ export default class GameController extends BaseController {
         </div>
       </div>
       <div class="bottom-container">
-        <bottom-controller class="buttons-container" />
+        <bottom-controller class="buttons-container">
+          <button>start</button>
+        </bottom-controller>
       </div>
     `
     this._gameCanvas = this.shadow.querySelector('game-canvas') as GameCanvas
@@ -93,17 +97,24 @@ export default class GameController extends BaseController {
     this.gameCanvas.canvasManagerClass  = OnePlayerCanvasManager
     this.showController(this.sideContainers, this.bottomContainers)
     this.player = Player.createPlayer('anonymous', playerSetting)
-    this.gameCanvas.addEventListener('setController', ()  => {
-      this.setController(this.player)
-      this.leftController.setController(this.player)
-      this.rightController.setController(this.player)
-      this.bottomController.setController(this.player)
-      this.gameCanvas.setPlayers([this.player])
-      this.gameCanvas.onClickStart()
+    this.gameCanvas.addEventListener('setController', () => this.startGame())
+    this.bottomController.addEventListener('setController', () => this.startGame())
+    this.gameCanvas.addEventListener('changeGameStatus', (e: Event) => {
+      const event = e as CustomEvent<boolean>
+      this.bottomController.changeGameStatus(event.detail)
     })
     window.addEventListener('resize', () => {
       this.showController.bind(this)(this.sideContainers, this.bottomContainers)
     })
+  }
+
+  startGame() {
+    this.setController(this.player)
+    this.leftController.setController(this.player)
+    this.rightController.setController(this.player)
+    this.bottomController.setController(this.player)
+    this.gameCanvas.setPlayers([this.player])
+    this.gameCanvas.onClickStart()
   }
 
   get gameCanvas() {
