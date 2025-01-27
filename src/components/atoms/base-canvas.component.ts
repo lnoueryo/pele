@@ -28,7 +28,9 @@ export default class BaseCanvasComponent extends BaseComponent {
     const canvas = this.shadow.getElementById('canvas') as HTMLCanvasElement
     this._canvas = new Canvas(canvas)
     this.adjustCanvasSize()
-    window.addEventListener('resize', this.adjustCanvasSize.bind(this))
+    window.addEventListener('resize', () => {
+      this.adjustCanvasSize()
+    })
   }
   adjustCanvasSize() {
     const width = window.innerWidth

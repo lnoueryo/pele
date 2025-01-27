@@ -6,6 +6,7 @@ import { Player } from "../../entities/player"
 import { createEvent } from "../../utils"
 import BaseCanvasComponent from "../atoms/base-canvas.component"
 import { BaseComponent } from "../common/base.component"
+import { Logger } from '../../plugins/logger'
 
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
@@ -91,7 +92,11 @@ export default class GameCanvas extends BaseComponent {
     })
     this.changeGameStatus(true)
     const canvasManager = this.canvasManager
+    Logger.group()
+    Logger.log('ゲーム開始')
     await this.gameLoop(canvasManager)
+    Logger.log('ゲーム終了')
+    Logger.groupEnd()
     this.changeGameStatus(false)
     centerButtons.classList.remove('hide')
   }

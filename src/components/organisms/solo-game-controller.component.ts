@@ -6,6 +6,7 @@ import LeftController from '../molecules/left-controller.component'
 import RightController from '../molecules/right-controller.component'
 import BaseController from '../common/base-controller.component'
 import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
+import { Logger } from '../../plugins/logger'
 
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
@@ -59,6 +60,7 @@ async function loadPlayerSetting() {
   return await response.json()
 }
 playerSetting = await loadPlayerSetting()
+Logger.log(playerSetting)
 export default class GameController extends BaseController {
   private player: Player
   private _gameCanvas: GameCanvas
@@ -68,6 +70,8 @@ export default class GameController extends BaseController {
   private _sideContainers: NodeListOf<HTMLDivElement>
   private _bottomContainers: NodeListOf<HTMLDivElement>
   constructor() {
+    Logger.group()
+    Logger.log('初期処理')
     super()
     this.shadow.adoptedStyleSheets.push(sheet)
     this.shadow.innerHTML = `
@@ -104,15 +108,19 @@ export default class GameController extends BaseController {
     window.addEventListener('resize', () => {
       this.showController.bind(this)(this.sideContainers, this.bottomContainers)
     })
+    Logger.log(this.player)
+    Logger.log(this.gameCanvas, this.leftController, this.rightController, this.bottomController, this.sideContainers, this.bottomContainers, this.gameCanvas)
+    Logger.groupEnd()
   }
 
-  startGame() {
+  async startGame() {
+    Logger.clear()
     this.setController(this.player)
     this.leftController.setController(this.player)
     this.rightController.setController(this.player)
     this.bottomController.setController(this.player)
     this.gameCanvas.setPlayers([this.player])
-    this.gameCanvas.onClickStart()
+    await this.gameCanvas.onClickStart()
   }
 
   get gameCanvas() {

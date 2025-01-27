@@ -7,6 +7,7 @@ import { WebsocketIO } from '../../plugins/websocket'
 import config from '../../../config'
 import BaseController from '../common/base-controller.component'
 import { MultiPlayerCanvasManager } from '../../entities/canvas_manager/multi_player_canvas_manager'
+import { Logger } from '../../plugins/logger'
 
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
@@ -54,6 +55,7 @@ export default class GameController extends BaseController {
   private _bottomContainers: NodeListOf<HTMLDivElement>
   private _socket: WebsocketIO
   constructor() {
+    Logger.group()
     super()
     this.shadow.adoptedStyleSheets.push(sheet)
     this.shadow.innerHTML = `
@@ -82,7 +84,8 @@ export default class GameController extends BaseController {
     // this.inputName()
     this._socket = new WebsocketIO(`${config.websocketApiOrigin}/game`)
     this.socket.on('connect', () => {
-      console.log('connected')
+      Logger.group()
+      Logger.log('connected')
       this.socket.on('disconnect', () => {
         console.log('user disconnected')
       })
@@ -114,7 +117,7 @@ export default class GameController extends BaseController {
       })
       this.socket.on('start', () => {
         if (this.gameCanvas.isGameRunning) return
-        this.gameCanvas.onClickStart()
+        this.startGame()
       })
       this.socket.on('position', (data: { id: string, x: number, y: number, isOver: boolean }) => {
         this.gameCanvas.updatePlayers(data)
@@ -133,9 +136,14 @@ export default class GameController extends BaseController {
     this.gameCanvas.addEventListener('updateObject', () => {
       this.socket.emit('position', this.player?.convertToJson())
     })
+    Logger.log(this.player)
+    Logger.log(this.gameCanvas, this.leftController, this.rightController, this.bottomController, this.sideContainers, this.bottomContainers, this.gameCanvas)
+    Logger.groupEnd()
   }
 
-  startGame() {
+  async startGame() {
+    Logger.groupEnd()
+    Logger.clear()
     if (!this.player) {
       throw new Error('no player')
     }
@@ -144,7 +152,8 @@ export default class GameController extends BaseController {
     this.leftController.setController(this.player)
     this.rightController.setController(this.player)
     this.bottomController.setController(this.player)
-    this.gameCanvas.onClickStart()
+    await this.gameCanvas.onClickStart()
+    Logger.groupEnd()
   }
 
   private parseBox(buffer: ArrayBuffer) {

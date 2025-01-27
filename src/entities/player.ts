@@ -1,3 +1,4 @@
+import { Logger } from "../plugins/logger"
 import { Box } from "./box"
 import { Canvas } from "./canvas"
 import { CanvasObject } from "./interfaces/canvas-object.interface"
@@ -183,6 +184,7 @@ export class Player implements CanvasObject {
     jumpStrength: number
     speed: number
   }) => {
+    Logger.log('create player')
     return new Player({
       id,
       ...playerSetting,
@@ -205,6 +207,7 @@ export class Player implements CanvasObject {
     jumpStrength: number
     color: string
   }) => {
+    Logger.log('create player from server')
     return new Player({
       id: player.id,
       x: player.x,

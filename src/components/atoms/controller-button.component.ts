@@ -4,7 +4,6 @@ const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
 .button-wrapper {
   padding: 4px;
-    width: 100%;
 }
 
 .controller {
