@@ -1,5 +1,5 @@
 import config from '../../../config'
-import { Player } from '../../entities/player'
+import { Player } from '../../entities/player/player'
 import GameCanvas from './game-canvas.component'
 import BottomController from '../molecules/bottom-controller.component'
 import LeftController from '../molecules/left-controller.component'
@@ -8,41 +8,6 @@ import BaseController from '../common/base-controller.component'
 import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
 import { Logger } from '../../plugins/logger'
 
-const sheet = new CSSStyleSheet()
-sheet.replaceSync(`
-#wrapper {
-  position: relative;
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-}
-.side-container {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-}
-.bottom-container .buttons-container {
-  position: absolute;
-  bottom: 10%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-.buttons-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-  .button {
-  padding: 14px;
-  margin: 0 7px;
-}
-`)
 async function loadPlayerSetting() {
   const response = await fetch(`${config.httpApiOrigin}/players`)
   if (!response.ok) {
@@ -104,10 +69,8 @@ export default class GameController extends BaseController {
     this.gameCanvas.canvasManagerClass = OnePlayerCanvasManager
     this.showController(this.sideContainers, this.bottomContainers)
     this.player = Player.createPlayer('anonymous', playerSetting)
-    this.gameCanvas.addEventListener('setController', () => this.startGame())
-    this.bottomController.addEventListener('setController', () =>
-      this.startGame(),
-    )
+    this.gameCanvas.addEventListener('setController', this.startGame)
+    this.bottomController.addEventListener('setController', this.startGame)
     this.gameCanvas.addEventListener('changeGameStatus', (e: Event) => {
       const event = e as CustomEvent<boolean>
       this.bottomController.changeGameStatus(event.detail)
@@ -128,14 +91,14 @@ export default class GameController extends BaseController {
     Logger.groupEnd()
   }
 
-  async startGame() {
+  startGame = async() => {
     Logger.clear()
+    this.player = Player.createPlayer('anonymous', playerSetting)
     this.setController(this.player)
     this.leftController.setController(this.player)
     this.rightController.setController(this.player)
     this.bottomController.setController(this.player)
-    this.gameCanvas.setPlayers([this.player])
-    await this.gameCanvas.onClickStart()
+    await this.gameCanvas.onClickStart([this.player])
   }
 
   get gameCanvas() {
@@ -157,3 +120,39 @@ export default class GameController extends BaseController {
     return this._bottomContainers
   }
 }
+
+const sheet = new CSSStyleSheet()
+sheet.replaceSync(`
+#wrapper {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+.side-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+.bottom-container .buttons-container {
+  position: absolute;
+  bottom: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.buttons-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+  .button {
+  padding: 14px;
+  margin: 0 7px;
+}
+`)

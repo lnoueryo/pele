@@ -5,9 +5,7 @@ import { Canvas } from '../canvas'
 import { Maguma } from '../maguma'
 const PLAYER_DELAY = 1
 
-export class MultiPlayerCanvasManager
-  extends BaseCanvasManager
-{
+export class MultiPlayerCanvasManager extends BaseCanvasManager {
   constructor(params: {
     canvas: Canvas
     players: Player[]

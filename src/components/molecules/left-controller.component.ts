@@ -1,15 +1,7 @@
 import { BaseComponent } from '../common/base.component'
 import { Player } from '../../entities/player/player'
-const sheet = new CSSStyleSheet()
-sheet.replaceSync(`
-  .button-container {
-    width: 47%;
-    position: relative;
-  }
-`)
 
 export default class LeftController extends BaseComponent {
-  private isControllerReady = false
   private _left: HTMLDivElement
   private _right: HTMLDivElement
   constructor() {
@@ -28,9 +20,7 @@ export default class LeftController extends BaseComponent {
   }
 
   setController(player: Player) {
-    if (this.isControllerReady) {
-      return
-    }
+    console.log(player)
     this.right.addEventListener('touchstart', (e) => {
       player.moveToRight()
       e.stopPropagation()
@@ -51,7 +41,6 @@ export default class LeftController extends BaseComponent {
       e.stopPropagation()
       e.preventDefault()
     })
-    this.isControllerReady = true
   }
   get left() {
     return this._left!
@@ -60,3 +49,11 @@ export default class LeftController extends BaseComponent {
     return this._right!
   }
 }
+
+const sheet = new CSSStyleSheet()
+sheet.replaceSync(`
+  .button-container {
+    width: 47%;
+    position: relative;
+  }
+`)

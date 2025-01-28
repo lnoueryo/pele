@@ -30,7 +30,15 @@ export abstract class BaseCanvasManager implements CanvasManager {
   }
 
   abstract loop(timestamp: number): Box[]
-  abstract updateBoxes(boxesJson: { x: number; y: number; width: number; height: number; speed: number; }[]): void
+  abstract updateBoxes(
+    boxesJson: {
+      x: number
+      y: number
+      width: number
+      height: number
+      speed: number
+    }[],
+  ): void
 
   protected updateCurrentTime(timestamp: number) {
     if (this.startTime === 0) {

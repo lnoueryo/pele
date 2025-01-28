@@ -1,4 +1,13 @@
-// BaseComponent.ts
+
+export class BaseComponent extends HTMLElement {
+  protected shadow: ShadowRoot
+  constructor() {
+    super()
+    this.shadow = this.attachShadow({ mode: 'open' })
+    this.shadow.adoptedStyleSheets = [resetStyles]
+  }
+}
+
 const resetStyles = new CSSStyleSheet()
 resetStyles.replaceSync(`
 html,
@@ -195,12 +204,3 @@ body {
   display: none!important;
 }
 `)
-
-export class BaseComponent extends HTMLElement {
-  protected shadow: ShadowRoot
-  constructor() {
-    super()
-    this.shadow = this.attachShadow({ mode: 'open' })
-    this.shadow.adoptedStyleSheets = [resetStyles]
-  }
-}
