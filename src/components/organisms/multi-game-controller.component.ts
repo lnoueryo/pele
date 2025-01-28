@@ -8,6 +8,8 @@ import config from '../../../config'
 import BaseController from '../common/base-controller.component'
 import { MultiPlayerCanvasManager } from '../../entities/canvas_manager/multi_player_canvas_manager'
 import { Logger } from '../../plugins/logger'
+import { onAuthStateChanged, User } from 'firebase/auth'
+import auth from '../../plugins/firebase/firebase-auth'
 
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
@@ -46,6 +48,7 @@ sheet.replaceSync(`
 `)
 
 export default class GameController extends BaseController {
+  private user: User | null = null
   private player: Player | null = null
   private _gameCanvas: GameCanvas
   private _leftController: LeftController
@@ -59,7 +62,7 @@ export default class GameController extends BaseController {
     super()
     this.shadow.adoptedStyleSheets.push(sheet)
     this.shadow.innerHTML = `
-      <div id="wrapper">
+      <div id="wrapper" class="hide">
         <div class="side-container">
           <left-controller class="buttons-container" />
         </div>
@@ -72,6 +75,15 @@ export default class GameController extends BaseController {
         <bottom-controller class="buttons-container" />
       </div>
     `
+    const wrapper = this.shadow.getElementById('wrapper')!
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        this.user = user
+        wrapper.classList.remove('hide')
+      } else {
+        location.href = '/login.html'
+      }
+    });
     this._gameCanvas = this.shadow.querySelector('game-canvas') as GameCanvas
     this._leftController = this.shadow.querySelector(
       'left-controller',
