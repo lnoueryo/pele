@@ -1,14 +1,12 @@
 import { BaseCanvasManager } from './base_canvas_manager'
 import { Box } from '../box'
-import { Player } from '../player'
-import { CanvasManager } from '../interfaces/canvas-manager.interface'
+import { Player } from '../player/player'
 import { Canvas } from '../canvas'
 import { Maguma } from '../maguma'
 const PLAYER_DELAY = 1
 
 export class MultiPlayerCanvasManager
   extends BaseCanvasManager
-  implements CanvasManager
 {
   constructor(params: {
     canvas: Canvas

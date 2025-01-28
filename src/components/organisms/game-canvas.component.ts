@@ -2,7 +2,7 @@ import { CanvasManager } from './../../entities/interfaces/canvas-manager.interf
 import { Box } from '../../entities/box'
 import { Canvas } from '../../entities/canvas'
 import { Maguma } from '../../entities/maguma'
-import { Player } from '../../entities/player'
+import { Player } from '../../entities/player/player'
 import { createEvent } from '../../utils'
 import BaseCanvasComponent from '../atoms/base-canvas.component'
 import { BaseComponent } from '../common/base.component'
