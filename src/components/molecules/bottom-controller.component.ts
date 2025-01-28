@@ -77,7 +77,7 @@ export default class BottomController extends BaseComponent {
     this.touchStartLeftHandler = this.createTouchStartLeftHandler(player)
     this.touchEndLeftHandler = this.createTouchEndLeftHandler(player)
     this.touchStartRightHandler = this.createTouchStartRightHandler(player)
-    this.touchEndRightHandler = this.createTouchStartRightHandler(player)
+    this.touchEndRightHandler = this.createTouchEndRightHandler(player)
     this.touchStartTopHandler = this.createTouchStartTopHandler(player)
 
     this.verticalLeft.addEventListener('touchstart', this.touchStartLeftHandler)

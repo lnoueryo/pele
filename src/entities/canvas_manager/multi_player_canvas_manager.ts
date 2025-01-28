@@ -3,7 +3,6 @@ import { Box } from '../box'
 import { Canvas } from '../canvas'
 import { Maguma } from '../maguma'
 import { IPlayer } from '../interfaces/player.interface'
-import { Logger } from '../../plugins/logger'
 const PLAYER_DELAY = 1
 
 export class MultiPlayerCanvasManager<
