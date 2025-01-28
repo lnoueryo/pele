@@ -111,7 +111,7 @@ export default class GameController extends BaseController {
       Logger.group()
       Logger.log('connected')
       Logger.log(this.user)
-      this.socket.emit('player', this.user.uid)
+      this.socket.emit('player', this.user)
       this.socket.on('disconnect', () => {
         Logger.log('user disconnected')
       })
