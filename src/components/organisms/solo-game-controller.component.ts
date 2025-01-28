@@ -8,23 +8,6 @@ import BaseController from '../common/base-controller.component'
 import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
 import { Logger } from '../../plugins/logger'
 
-async function loadPlayerSetting() {
-  const response = await fetch(`${config.httpApiOrigin}/players`)
-  if (!response.ok) {
-    throw new Error('Failed to fetch player settings')
-  }
-  return await response.json()
-}
-const playerSetting: {
-  x: number
-  y: number
-  width: number
-  height: number
-  vg: number
-  jumpStrength: number
-  speed: number
-} = await loadPlayerSetting()
-Logger.log(playerSetting)
 export default class GameController extends BaseController {
   private player: SoloPlayer
   private _gameCanvas: GameCanvas<SoloPlayer>
@@ -72,7 +55,7 @@ export default class GameController extends BaseController {
     this.showController(this.sideContainers, this.bottomContainers)
     this.player = new SoloPlayer({
       id: 'anonymous',
-      ...playerSetting,
+      ...config.playerSetting,
       vx: 0,
       vy: 0,
       color: `rgb(255,255,255)`,
@@ -105,7 +88,7 @@ export default class GameController extends BaseController {
     Logger.clear()
     this.player = new SoloPlayer({
       id: 'anonymous',
-      ...playerSetting,
+      ...config.playerSetting,
       vx: 0,
       vy: 0,
       color: `rgb(255,255,255)`,
