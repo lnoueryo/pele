@@ -1,4 +1,3 @@
-
 export class BaseComponent extends HTMLElement {
   protected shadow: ShadowRoot
   constructor() {

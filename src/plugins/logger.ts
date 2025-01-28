@@ -65,7 +65,6 @@ export class Logger {
   }
 
   static outputContent() {
-    const timestamp = new Date().toISOString()
     const error = new Error()
     const stack = error.stack || ''
 
@@ -78,6 +77,6 @@ export class Logger {
       ? `${fileInfo[1]}:${fileInfo[2]}:${fileInfo[3]}`
       : 'unknown location'
 
-    return `[${timestamp}] [${location}]`
+    return `${location}`
   }
 }

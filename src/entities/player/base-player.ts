@@ -1,7 +1,5 @@
-import { Logger } from '../../plugins/logger'
 import { Box } from '../box'
 import { Canvas } from '../canvas'
-import { CanvasObject } from '../interfaces/canvas-object.interface'
 export type PlayerData = {
   x: number
   y: number
@@ -16,26 +14,26 @@ export type PlayerData = {
   color: string
   isOver: boolean
 }
-export abstract class BasePlayer implements CanvasObject {
-  private _x
-  private _y
-  private _width
-  private _height
-  private vx
-  private vy
-  private _vg
-  private _jumpStrength
-  private _isJumping
-  private _speed
+export abstract class BasePlayer {
+  protected _x
+  protected _y
+  protected _width
+  protected _height
+  protected _vx
+  protected _vy
+  protected _vg
+  protected _jumpStrength
+  protected _isJumping
+  protected _speed
   public color
-  private _isOver
+  protected _isOver
   constructor(params: PlayerData) {
     this._x = params.x
     this._y = params.y
     this._width = params.width
     this._height = params.height
-    this.vx = params.vx
-    this.vy = params.vy
+    this._vx = params.vx
+    this._vy = params.vy
     this._vg = params.vg
     this._jumpStrength = params.jumpStrength
     this._isJumping = params.isJumping
@@ -45,31 +43,31 @@ export abstract class BasePlayer implements CanvasObject {
   }
 
   moveToLeft() {
-    this.vx = -this._speed
+    this._vx = -this._speed
   }
 
   moveToRight() {
-    this.vx = this._speed
+    this._vx = this._speed
   }
 
   jump() {
-    this.vy = this._jumpStrength
+    this._vy = this._jumpStrength
     this._isJumping = true
   }
 
   stopMovement() {
-    this.vx = 0
+    this._vx = 0
   }
 
-  moveOnIdle() {
-    this.vy += this._vg
-    this._x += this.vx
-    this._y += this.vy
+  moveOnIdle(deltaTime: number) {
+    this._vy += this._vg * deltaTime
+    this._x += this.vx * deltaTime
+    this._y += this.vy * deltaTime
   }
 
   moveOnTopBox(boxY: number) {
     this._y = boxY - this.height
-    this.vy = 0
+    this._vy = 0
     this._isJumping = false
   }
 
@@ -83,23 +81,6 @@ export abstract class BasePlayer implements CanvasObject {
     )
   }
 
-  convertToJson() {
-    return {
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-      vx: this.vx,
-      vy: this.vy,
-      vg: this.vg,
-      jumpStrength: this.jumpStrength,
-      isJumping: this.isJumping,
-      speed: this.speed,
-      color: this.color,
-      isOver: this.isOver,
-    }
-  }
-
   updateFromJson(params: { x: number; y: number }) {
     this._x = params.x
     this._y = params.y
@@ -111,15 +92,6 @@ export abstract class BasePlayer implements CanvasObject {
 
   isMovingToRight() {
     return 0 <= this.vx
-  }
-
-  reset() {
-    this._x = 0.5
-    this._y = 0.1
-    this.vx = 0
-    this.vy = 0
-    this._isJumping = false
-    this._isOver = false
   }
 
   getCanvasSize(canvas: Canvas) {
@@ -153,6 +125,14 @@ export abstract class BasePlayer implements CanvasObject {
 
   get isJumping() {
     return this._isJumping
+  }
+
+  get vx() {
+    return this._vx
+  }
+
+  get vy() {
+    return this._vy
   }
 
   get vg() {

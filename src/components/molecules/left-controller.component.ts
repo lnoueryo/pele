@@ -1,5 +1,5 @@
+import { IPlayer } from '../../entities/interfaces/player.interface'
 import { BaseComponent } from '../common/base.component'
-import { Player } from '../../entities/player/player'
 
 export default class LeftController extends BaseComponent {
   private _left: HTMLDivElement
@@ -19,7 +19,7 @@ export default class LeftController extends BaseComponent {
     this._right = this.shadow.getElementById('right') as HTMLDivElement
   }
 
-  setController(player: Player) {
+  setController(player: IPlayer) {
     console.log(player)
     this.right.addEventListener('touchstart', (e) => {
       player.moveToRight()

@@ -1,14 +1,17 @@
 import { BaseCanvasManager } from './base_canvas_manager'
 import { Box } from '../box'
-import { Player } from '../player/player'
 import { Canvas } from '../canvas'
 import { Maguma } from '../maguma'
+import { IPlayer } from '../interfaces/player.interface'
+import { Logger } from '../../plugins/logger'
 const PLAYER_DELAY = 1
 
-export class MultiPlayerCanvasManager extends BaseCanvasManager {
+export class MultiPlayerCanvasManager<
+  T extends IPlayer,
+> extends BaseCanvasManager<T> {
   constructor(params: {
     canvas: Canvas
-    players: Player[]
+    players: T[]
     maguma: Maguma
     boxes?: Box[]
   }) {
@@ -16,11 +19,14 @@ export class MultiPlayerCanvasManager extends BaseCanvasManager {
   }
 
   public loop(timestamp: number): Box[] {
-    this.updateCurrentTime(timestamp)
+    const deltaTime = (timestamp - this.lastTimestamp) / 1000 // フレーム間の経過時間を秒単位で計算
+    this.updateCurrentTime(timestamp) // ゲーム全体の時間を更新
+
     this.resetCanvas()
+
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {
-        player.moveOnIdle()
+        player.moveOnIdle(deltaTime)
         player.isGameOver()
       }
     }

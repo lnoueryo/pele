@@ -1,9 +1,9 @@
 import { Box } from '../box'
-import { Player } from '../player/player'
+import { IPlayer } from './player.interface'
 
-export type CanvasManager = {
+export type CanvasManager<T extends IPlayer> = {
   loop: (timestamp: number) => Box[]
-  isGameOver: (players: Player[]) => boolean
+  isGameOver: () => boolean
   endGame: () => void
   updateBoxes: (
     boxesJson: {

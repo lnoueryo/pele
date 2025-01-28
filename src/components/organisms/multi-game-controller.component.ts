@@ -1,4 +1,4 @@
-import { Player } from '../../entities/player/player'
+import { OnlinePlayer } from '../../entities/player/online-player'
 import GameCanvas from './game-canvas.component'
 import BottomController from '../molecules/bottom-controller.component'
 import LeftController from '../molecules/left-controller.component'
@@ -13,8 +13,8 @@ import auth from '../../plugins/firebase/firebase-auth'
 
 export default class GameController extends BaseController {
   private _user: User | null = null
-  private players: Player[] = []
-  private _gameCanvas: GameCanvas
+  private players: OnlinePlayer[] = []
+  private _gameCanvas: GameCanvas<OnlinePlayer>
   private _leftController: LeftController
   private _rightController: RightController
   private _bottomController: BottomController
@@ -39,7 +39,9 @@ export default class GameController extends BaseController {
         <bottom-controller class="buttons-container" />
       </div>
     `
-    this._gameCanvas = this.shadow.querySelector('game-canvas') as GameCanvas
+    this._gameCanvas = this.shadow.querySelector(
+      'game-canvas',
+    ) as GameCanvas<OnlinePlayer>
     this._leftController = this.shadow.querySelector(
       'left-controller',
     ) as LeftController
@@ -117,6 +119,7 @@ export default class GameController extends BaseController {
       })
       this.socket.on('join', this.getPlayers)
       this.socket.on('start', (players) => {
+        Logger.log('start', players)
         if (this.gameCanvas.isGameRunning) return
         this.getPlayers(players)
         this.startGame()
@@ -146,6 +149,7 @@ export default class GameController extends BaseController {
   private getPlayers = (
     newPlayers: {
       id: string
+      name: string
       x: number
       y: number
       width: number
@@ -156,11 +160,18 @@ export default class GameController extends BaseController {
       color: string
     }[],
   ) => {
-    this.players = newPlayers.map((player) =>
-      Player.createPlayerFromServer(player),
-    )
+    this.players = []
+    this.players = newPlayers.map((player) => {
+      return new OnlinePlayer({
+        ...player,
+        vx: 0,
+        vy: 0,
+        isJumping: false,
+        isOver: false,
+      })
+    })
     this.gameCanvas.fillPlayers(this.players)
-    Logger.log(this.players)
+    Logger.log('newPlayers', this.players)
   }
   updatePlayers(coordinate: { id: string; x: number; y: number }) {
     for (const player of this.players) {

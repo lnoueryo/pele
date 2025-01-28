@@ -1,5 +1,5 @@
+import { IPlayer } from '../../entities/interfaces/player.interface'
 import { BaseComponent } from '../common/base.component'
-import { Player } from '../../entities/player/player'
 
 export default class BottomController extends BaseComponent {
   private controller: HTMLDivElement
@@ -55,13 +55,24 @@ export default class BottomController extends BaseComponent {
       this.dispatchEvent(new CustomEvent<undefined>('setController')),
     )
   }
-  setController(player: Player) {
-
-    this.verticalLeft.removeEventListener('touchstart', this.touchStartLeftHandler)
+  setController(player: IPlayer) {
+    this.verticalLeft.removeEventListener(
+      'touchstart',
+      this.touchStartLeftHandler,
+    )
     this.verticalLeft.removeEventListener('touchend', this.touchEndLeftHandler)
-    this.verticalRight.removeEventListener('touchstart', this.touchStartRightHandler)
-    this.verticalRight.removeEventListener('touchend', this.touchEndRightHandler)
-    this.verticalTop.removeEventListener('touchstart', this.touchStartTopHandler)
+    this.verticalRight.removeEventListener(
+      'touchstart',
+      this.touchStartRightHandler,
+    )
+    this.verticalRight.removeEventListener(
+      'touchend',
+      this.touchEndRightHandler,
+    )
+    this.verticalTop.removeEventListener(
+      'touchstart',
+      this.touchStartTopHandler,
+    )
 
     this.touchStartLeftHandler = this.createTouchStartLeftHandler(player)
     this.touchEndLeftHandler = this.createTouchEndLeftHandler(player)
@@ -71,7 +82,10 @@ export default class BottomController extends BaseComponent {
 
     this.verticalLeft.addEventListener('touchstart', this.touchStartLeftHandler)
     this.verticalLeft.addEventListener('touchend', this.touchEndLeftHandler)
-    this.verticalRight.addEventListener('touchstart', this.touchStartRightHandler)
+    this.verticalRight.addEventListener(
+      'touchstart',
+      this.touchStartRightHandler,
+    )
     this.verticalRight.addEventListener('touchend', this.touchEndRightHandler)
     this.verticalTop.addEventListener('touchstart', this.touchStartTopHandler)
   }
@@ -81,7 +95,7 @@ export default class BottomController extends BaseComponent {
   private touchEndRightHandler!: (event: TouchEvent) => void
   private touchStartTopHandler!: (event: TouchEvent) => void
 
-  private createTouchStartLeftHandler = (player: Player) => {
+  private createTouchStartLeftHandler = (player: IPlayer) => {
     return (event: TouchEvent) => {
       player.moveToLeft()
       event.stopPropagation()
@@ -89,7 +103,7 @@ export default class BottomController extends BaseComponent {
     }
   }
 
-  private createTouchEndLeftHandler = (player: Player) => {
+  private createTouchEndLeftHandler = (player: IPlayer) => {
     return (event: TouchEvent) => {
       player.stopMovement()
       event.stopPropagation()
@@ -97,7 +111,7 @@ export default class BottomController extends BaseComponent {
     }
   }
 
-  private createTouchStartRightHandler = (player: Player) => {
+  private createTouchStartRightHandler = (player: IPlayer) => {
     return (event: TouchEvent) => {
       player.moveToRight()
       event.stopPropagation()
@@ -105,7 +119,7 @@ export default class BottomController extends BaseComponent {
     }
   }
 
-  private createTouchEndRightHandler = (player: Player) => {
+  private createTouchEndRightHandler = (player: IPlayer) => {
     return (event: TouchEvent) => {
       player.stopMovement()
       event.stopPropagation()
@@ -113,8 +127,7 @@ export default class BottomController extends BaseComponent {
     }
   }
 
-
-  private createTouchStartTopHandler = (player: Player) => {
+  private createTouchStartTopHandler = (player: IPlayer) => {
     return (event: TouchEvent) => {
       player.isJumping || player.jump()
       event.stopPropagation()

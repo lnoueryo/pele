@@ -2,33 +2,32 @@ import { CanvasManager } from './../../entities/interfaces/canvas-manager.interf
 import { Box } from '../../entities/box'
 import { Canvas } from '../../entities/canvas'
 import { Maguma } from '../../entities/maguma'
-import { Player } from '../../entities/player/player'
 import { createEvent } from '../../utils'
 import BaseCanvasComponent from '../atoms/base-canvas.component'
 import { BaseComponent } from '../common/base.component'
 import { Logger } from '../../plugins/logger'
+import { IPlayer } from '../../entities/interfaces/player.interface'
 
-export default class GameCanvas extends BaseComponent {
-  public canvasManager: CanvasManager | null = null
+export default class GameCanvas<T extends IPlayer> extends BaseComponent {
+  public canvasManager: CanvasManager<T> | null = null
   private _baseCanvas: BaseCanvasComponent
   private centerButtons: HTMLDivElement
   private start: HTMLButtonElement
   public isGameRunning = false
   private _canvasManagerClass:
-    | (new (config: {
+    | (new <T extends IPlayer>(config: {
         canvas: Canvas
-        players: Player[]
+        players: T[]
         maguma: Maguma
-      }) => CanvasManager)
+      }) => CanvasManager<T>)
     | null = null
 
-  // セッターを使って親からクラスを受け取る
   set canvasManagerClass(
-    value: new (config: {
+    value: new <T extends IPlayer>(config: {
       canvas: Canvas
-      players: Player[]
+      players: T[]
       maguma: Maguma
-    }) => CanvasManager,
+    }) => CanvasManager<T>,
   ) {
     this._canvasManagerClass = value
   }
@@ -54,18 +53,18 @@ export default class GameCanvas extends BaseComponent {
     ) as HTMLDivElement
     this.start = this.shadow.getElementById('start') as HTMLButtonElement
     createEvent<Event>(this.start, 'click', () => {
-      this.dispatchEvent(new CustomEvent<Player>('setController'))
+      this.dispatchEvent(new CustomEvent<IPlayer>('setController'))
     })
     createEvent<KeyboardEvent>(document, 'keyup', (e) => {
       if (e.key === 'Enter') {
         if (!this.isGameRunning) {
-          this.dispatchEvent(new CustomEvent<Player>('setController'))
+          this.dispatchEvent(new CustomEvent<IPlayer>('setController'))
         }
         e.stopPropagation()
       }
     })
   }
-  onClickStart = async (players: Player[]) => {
+  onClickStart = async (players: T[]) => {
     const centerButtons = this.centerButtons
     centerButtons.classList.add('hide')
     if (!this._canvasManagerClass) {
@@ -80,7 +79,7 @@ export default class GameCanvas extends BaseComponent {
     const canvasManager = this.canvasManager
     Logger.group()
     Logger.log('ゲーム開始')
-    await this.gameLoop(canvasManager, players)
+    await this.gameLoop(canvasManager)
     Logger.log('ゲーム終了')
     Logger.groupEnd()
     this.changeGameStatus(false)
@@ -92,14 +91,14 @@ export default class GameCanvas extends BaseComponent {
       new CustomEvent<boolean>('changeGameStatus', { detail: status }),
     )
   }
-  private async gameLoop(canvasManager: CanvasManager, players: Player[]) {
+  private async gameLoop(canvasManager: CanvasManager<T>) {
     const requestAnimationFrameAsync = (): Promise<number> => {
       return new Promise((resolve) => requestAnimationFrame(resolve))
     }
     let lastTimestamp = 0
     while (true) {
       const timestamp = await requestAnimationFrameAsync()
-      if (canvasManager.isGameOver(players)) {
+      if (canvasManager.isGameOver()) {
         canvasManager.endGame()
         break
       }
@@ -110,7 +109,7 @@ export default class GameCanvas extends BaseComponent {
       this.dispatchEvent(new CustomEvent<Box[]>('updateObject'))
     }
   }
-  fillPlayers(players: Player[]) {
+  fillPlayers(players: IPlayer[]) {
     const canvas = this.baseCanvas.canvas
     canvas.ctx.clearRect(0, 0, canvas.width, canvas.height)
     const ctx = canvas.ctx

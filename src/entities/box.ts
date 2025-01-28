@@ -5,7 +5,7 @@ const TOP_LIMIT = 0
 const MOVE_Y_PROBABILITY = 0.1
 const Y_MOVE_SCALE = 0.15
 const START_POSITION = 0.75
-const SPEED_SALT = 25
+const SPEED_SALT = 0.75
 const MIN_SPEED = 0.3
 const MAX_SPEED = 0.6
 
@@ -32,11 +32,11 @@ export class Box implements CanvasObject {
     this.speed = params.speed
   }
 
-  moveOnIdle() {
-    this._x -= this.speed
+  moveOnIdle(deltaTime: number) {
+    this._x -= this.speed * deltaTime
     this._y +=
       Math.random() < MOVE_Y_PROBABILITY
-        ? (this.ySalt * this.speed) / Y_MOVE_SCALE
+        ? (this.ySalt * this.speed * deltaTime) / Y_MOVE_SCALE
         : 0
   }
 

@@ -1,5 +1,5 @@
+import { IPlayer } from '../../entities/interfaces/player.interface'
 import { BaseComponent } from '../common/base.component'
-import { Player } from '../../entities/player/player'
 
 export default class RightController extends BaseComponent {
   private _top: HTMLDivElement
@@ -14,8 +14,7 @@ export default class RightController extends BaseComponent {
     this._top = this.shadow.getElementById('top') as HTMLDivElement
   }
 
-  setController(player: Player) {
-
+  setController(player: IPlayer) {
     this.top.removeEventListener('touchstart', this.touchStartTopHandler)
 
     this.touchStartTopHandler = this.createTouchStartTopHandler(player)
@@ -23,7 +22,7 @@ export default class RightController extends BaseComponent {
     this.top.addEventListener('touchstart', this.touchStartTopHandler)
   }
   private touchStartTopHandler!: (event: TouchEvent) => void
-  private createTouchStartTopHandler = (player: Player) => {
+  private createTouchStartTopHandler = (player: IPlayer) => {
     return (event: TouchEvent) => {
       player.isJumping || player.jump()
       event.stopPropagation()

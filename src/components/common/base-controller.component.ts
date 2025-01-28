@@ -1,7 +1,7 @@
-import { Player } from '../../entities/player/player'
 import { BaseComponent } from '../common/base.component'
 import { hideElements, showElements } from '../../utils'
 import { Logger } from '../../plugins/logger'
+import { IPlayer } from '../../entities/interfaces/player.interface'
 
 const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 export default class BaseController extends BaseComponent {
@@ -9,7 +9,7 @@ export default class BaseController extends BaseComponent {
     super()
   }
 
-  protected setController(player: Player) {
+  protected setController(player: IPlayer) {
     document.removeEventListener('keydown', this.keydownHandler)
     document.removeEventListener('keyup', this.keyupHandler)
 
@@ -43,7 +43,7 @@ export default class BaseController extends BaseComponent {
   private keydownHandler!: (event: KeyboardEvent) => void
   private keyupHandler!: (event: KeyboardEvent) => void
 
-  private createKeydownHandler = (player: Player) => {
+  private createKeydownHandler = (player: IPlayer) => {
     return (event: KeyboardEvent) => {
       if (event.key === KEYBOARDS.left) player.moveToLeft()
       else if (event.key === KEYBOARDS.right) player.moveToRight()
@@ -51,7 +51,7 @@ export default class BaseController extends BaseComponent {
     }
   }
 
-  private createKeyupHandler = (player: Player) => {
+  private createKeyupHandler = (player: IPlayer) => {
     return () => {
       player.stopMovement()
     }

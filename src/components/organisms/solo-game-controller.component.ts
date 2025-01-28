@@ -1,5 +1,5 @@
 import config from '../../../config'
-import { Player } from '../../entities/player/player'
+import { SoloPlayer } from '../../entities/player/solo-player'
 import GameCanvas from './game-canvas.component'
 import BottomController from '../molecules/bottom-controller.component'
 import LeftController from '../molecules/left-controller.component'
@@ -26,8 +26,8 @@ const playerSetting: {
 } = await loadPlayerSetting()
 Logger.log(playerSetting)
 export default class GameController extends BaseController {
-  private player: Player
-  private _gameCanvas: GameCanvas
+  private player: SoloPlayer
+  private _gameCanvas: GameCanvas<SoloPlayer>
   private _leftController: LeftController
   private _rightController: RightController
   private _bottomController: BottomController
@@ -54,7 +54,9 @@ export default class GameController extends BaseController {
         </bottom-controller>
       </div>
     `
-    this._gameCanvas = this.shadow.querySelector('game-canvas') as GameCanvas
+    this._gameCanvas = this.shadow.querySelector(
+      'game-canvas',
+    ) as GameCanvas<SoloPlayer>
     this._leftController = this.shadow.querySelector(
       'left-controller',
     ) as LeftController
@@ -68,7 +70,15 @@ export default class GameController extends BaseController {
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.gameCanvas.canvasManagerClass = OnePlayerCanvasManager
     this.showController(this.sideContainers, this.bottomContainers)
-    this.player = Player.createPlayer('anonymous', playerSetting)
+    this.player = new SoloPlayer({
+      id: 'anonymous',
+      ...playerSetting,
+      vx: 0,
+      vy: 0,
+      color: `rgb(255,255,255)`,
+      isJumping: false,
+      isOver: false,
+    })
     this.gameCanvas.addEventListener('setController', this.startGame)
     this.bottomController.addEventListener('setController', this.startGame)
     this.gameCanvas.addEventListener('changeGameStatus', (e: Event) => {
@@ -91,9 +101,17 @@ export default class GameController extends BaseController {
     Logger.groupEnd()
   }
 
-  startGame = async() => {
+  startGame = async () => {
     Logger.clear()
-    this.player = Player.createPlayer('anonymous', playerSetting)
+    this.player = new SoloPlayer({
+      id: 'anonymous',
+      ...playerSetting,
+      vx: 0,
+      vy: 0,
+      color: `rgb(255,255,255)`,
+      isJumping: false,
+      isOver: false,
+    })
     this.setController(this.player)
     this.leftController.setController(this.player)
     this.rightController.setController(this.player)
