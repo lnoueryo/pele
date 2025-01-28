@@ -9,7 +9,7 @@ import { Logger } from '../../plugins/logger'
 import { IPlayer } from '../../entities/interfaces/player.interface'
 
 export default class GameCanvas<T extends IPlayer> extends BaseComponent {
-  public canvasManager: CanvasManager<T> | null = null
+  public canvasManager: CanvasManager | null = null
   private _baseCanvas: BaseCanvasComponent
   private centerButtons: HTMLDivElement
   private start: HTMLButtonElement
@@ -19,7 +19,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
         canvas: Canvas
         players: T[]
         maguma: Maguma
-      }) => CanvasManager<T>)
+      }) => CanvasManager)
     | null = null
 
   set canvasManagerClass(
@@ -27,7 +27,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
       canvas: Canvas
       players: T[]
       maguma: Maguma
-    }) => CanvasManager<T>,
+    }) => CanvasManager,
   ) {
     this._canvasManagerClass = value
   }
@@ -91,7 +91,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
       new CustomEvent<boolean>('changeGameStatus', { detail: status }),
     )
   }
-  private async gameLoop(canvasManager: CanvasManager<T>) {
+  private async gameLoop(canvasManager: CanvasManager) {
     const requestAnimationFrameAsync = (): Promise<number> => {
       return new Promise((resolve) => requestAnimationFrame(resolve))
     }

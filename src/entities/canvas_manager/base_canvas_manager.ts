@@ -13,7 +13,7 @@ type ICanvasManager<T extends IPlayer> = {
 }
 
 export abstract class BaseCanvasManager<T extends IPlayer>
-  implements CanvasManager<T>
+  implements CanvasManager
 {
   protected canvas: Canvas
   protected maguma: Maguma
