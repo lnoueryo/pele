@@ -1,5 +1,5 @@
 import { Box } from '../box'
-import { Player } from '../player'
+import { Player } from '../player/player'
 
 export type CanvasManager = {
   loop: (timestamp: number) => Box[]

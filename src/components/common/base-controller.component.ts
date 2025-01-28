@@ -1,4 +1,4 @@
-import { Player } from '../../entities/player'
+import { Player } from '../../entities/player/player'
 import { BaseComponent } from '../common/base.component'
 import { hideElements, showElements } from '../../utils'
 import { Logger } from '../../plugins/logger'

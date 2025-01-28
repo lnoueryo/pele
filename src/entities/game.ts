@@ -1,4 +1,4 @@
-import { Player, PlayerData } from './player'
+import { Player, PlayerData } from './player/player'
 
 const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 

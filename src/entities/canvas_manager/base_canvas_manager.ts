@@ -1,7 +1,8 @@
 import { Box } from '../box'
 import { Canvas } from '../canvas'
+import { CanvasManager } from '../interfaces/canvas-manager.interface'
 import { Maguma } from '../maguma'
-import { Player } from '../player'
+import { Player } from '../player/player'
 const PLAYER_DELAY = 1
 
 type ICanvasManager = {
@@ -11,7 +12,7 @@ type ICanvasManager = {
   boxes?: Box[]
 }
 
-export abstract class BaseCanvasManager {
+export abstract class BaseCanvasManager implements CanvasManager {
   protected canvas: Canvas
   protected maguma: Maguma
   protected boxes: Box[] = []
@@ -27,6 +28,9 @@ export abstract class BaseCanvasManager {
     this.players = params.players || []
     this.boxes = params.boxes || []
   }
+
+  abstract loop(timestamp: number): Box[]
+  abstract updateBoxes(boxesJson: { x: number; y: number; width: number; height: number; speed: number; }[]): void
 
   protected updateCurrentTime(timestamp: number) {
     if (this.startTime === 0) {

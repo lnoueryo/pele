@@ -1,7 +1,7 @@
-import { Logger } from '../plugins/logger'
-import { Box } from './box'
-import { Canvas } from './canvas'
-import { CanvasObject } from './interfaces/canvas-object.interface'
+import { Logger } from '../../plugins/logger'
+import { Box } from '../box'
+import { Canvas } from '../canvas'
+import { CanvasObject } from '../interfaces/canvas-object.interface'
 export type PlayerData = {
   id: string
   x: number
