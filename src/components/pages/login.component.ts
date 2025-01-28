@@ -1,4 +1,3 @@
-import '../../plugins/firebase/firebase-ui'
 export default class IndexPage extends HTMLElement {
   connectedCallback() {
     const sheet = new CSSStyleSheet()
