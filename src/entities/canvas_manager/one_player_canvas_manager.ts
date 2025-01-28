@@ -1,18 +1,16 @@
 import { BaseCanvasManager } from './base_canvas_manager'
 import { Box } from '../box'
-import { Player } from '../player'
 import { Maguma } from '../maguma'
 import { Canvas } from '../canvas'
-import { CanvasManager } from '../interfaces/canvas-manager.interface'
+import { IPlayer } from '../interfaces/player.interface'
 const PLAYER_DELAY = 1
 
-export class OnePlayerCanvasManager
-  extends BaseCanvasManager
-  implements CanvasManager
-{
+export class OnePlayerCanvasManager<
+  T extends IPlayer,
+> extends BaseCanvasManager<T> {
   constructor(params: {
     canvas: Canvas
-    players: Player[]
+    players: T[]
     maguma: Maguma
     boxes?: Box[]
   }) {
@@ -20,16 +18,20 @@ export class OnePlayerCanvasManager
   }
 
   public loop(timestamp: number): Box[] {
+    const deltaTime = (timestamp - this.lastTimestamp) / 1000
     this.updateCurrentTime(timestamp)
+
     this.resetCanvas()
+
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {
-        player.moveOnIdle()
+        player.moveOnIdle(deltaTime)
         player.isGameOver()
       }
     }
+
     for (const box of this.boxes) {
-      box.moveOnIdle()
+      box.moveOnIdle(deltaTime)
       if (box.isOutOfDisplay()) this.deleteBox(box)
 
       this.fillBox(box)

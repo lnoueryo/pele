@@ -65,13 +65,18 @@ export class Logger {
   }
 
   static outputContent() {
-    const timestamp = new Date().toISOString()
-    const stack = new Error().stack || ''
-    const callerLine = stack.split('\n')[2] || '' // 呼び出し元のスタックを取得
-    const fileInfo = callerLine.match(/\((.*):(\d+):(\d+)\)/) // ファイル名と行番号を取得
+    const error = new Error()
+    const stack = error.stack || ''
+
+    // スタック全体を分割して必要な情報を取得
+    const stackLines = stack.split('\n')
+    const callerLine = stackLines[3] || '' // 呼び出し元を調整（3は呼び出し元の深さ）
+
+    const fileInfo = callerLine.match(/at\s+(.*?):(\d+):(\d+)/) // ファイル名と行番号を取得
     const location = fileInfo
       ? `${fileInfo[1]}:${fileInfo[2]}:${fileInfo[3]}`
       : 'unknown location'
-    return `[${timestamp}] [${location}]`
+
+    return `${location}`
   }
 }

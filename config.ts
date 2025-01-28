@@ -23,8 +23,40 @@ const envList = ['development', 'production', , 'staging']
 if (!envList.includes(env)) {
   throw new Error('invalid STAGE')
 }
+async function loadObjectSetting() {
+  const response = await fetch(`${configEnvs[env].httpApiOrigin}/objects`)
+  if (!response.ok) {
+    throw new Error('Failed to fetch player settings')
+  }
+  return await response.json()
+}
+const response: {
+  playerSetting: {
+    x: number
+    y: number
+    width: number
+    height: number
+    vg: number
+    jumpStrength: number
+    speed: number
+  },
+  boxSetting: {
+    moveYProbability: number
+    yMoveScale: number
+    startPosition: number
+    speedSalt: number
+    minSpeed: number
+    maxSpeed: number
+  }
+} = await loadObjectSetting()
+
+const config = {
+  playerSetting: response.playerSetting,
+  boxSetting: response.boxSetting,
+}
 const configEnv = configEnvs[env]
 const output = {
+  ...config,
   ...configEnv,
   env,
 }

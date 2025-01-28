@@ -11,6 +11,7 @@ import RightController from './components/molecules/right-controller.component'
 import IndexPage from './components/pages/index.component'
 import SoloPage from './components/pages/solo.component'
 import MultiPage from './components/pages/multi.component'
+import LoginPage from './components/pages/login.component'
 
 customElements.define('common-head', CommonHead)
 customElements.define('base-canvas', BaseCanvasComponent)
@@ -24,12 +25,14 @@ customElements.define('multi-game-controller', MultiGameController)
 customElements.define('index-page', IndexPage)
 customElements.define('solo-page', SoloPage)
 customElements.define('multi-page', MultiPage)
+customElements.define('login-page', LoginPage)
 
 const routes = new Map<string, string>([
   ['/', 'index-page'],
   ['/index.html', 'index-page'],
   ['/multi.html', 'multi-page'],
   ['/solo.html', 'solo-page'],
+  ['/login.html', 'login-page'],
 ])
 
 const path = location.pathname

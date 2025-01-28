@@ -1,13 +1,16 @@
 import { Canvas } from './canvas'
 import type { CanvasObject } from './interfaces/canvas-object.interface'
-const LEFT_LIMT = 0
+import config from '../../config'
+const LEFT_LIMIT = 0
 const TOP_LIMIT = 0
-const MOVE_Y_PROBABILITY = 0.1
-const Y_MOVE_SCALE = 0.15
-const START_POSITION = 0.75
-const SPEED_SALT = 25
-const MIN_SPEED = 0.3
-const MAX_SPEED = 0.6
+const {
+  moveYProbability: MOVE_Y_PROBABILITY,
+  yMoveScale: Y_MOVE_SCALE,
+  startPosition: START_POSITION,
+  speedSalt: SPEED_SALT,
+  minSpeed: MIN_SPEED,
+  maxSpeed: MAX_SPEED,
+} = config.boxSetting
 
 type IBox = {
   x: number
@@ -32,16 +35,16 @@ export class Box implements CanvasObject {
     this.speed = params.speed
   }
 
-  moveOnIdle() {
-    this._x -= this.speed
+  moveOnIdle(deltaTime: number) {
+    this._x -= this.speed * deltaTime
     this._y +=
       Math.random() < MOVE_Y_PROBABILITY
-        ? (this.ySalt * this.speed) / Y_MOVE_SCALE
+        ? (this.ySalt * this.speed * deltaTime) / Y_MOVE_SCALE
         : 0
   }
 
   isOutOfDisplay() {
-    return this.x + this.width < LEFT_LIMT || this.y + this.height < TOP_LIMIT
+    return this.x + this.width < LEFT_LIMIT || this.y + this.height < TOP_LIMIT
   }
 
   getCanvasSize(canvas: Canvas) {

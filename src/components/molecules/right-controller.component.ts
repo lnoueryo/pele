@@ -1,15 +1,7 @@
+import { IPlayer } from '../../entities/interfaces/player.interface'
 import { BaseComponent } from '../common/base.component'
-import { Player } from '../../entities/player'
-const sheet = new CSSStyleSheet()
-sheet.replaceSync(`
-  .button-container {
-    width: 47%;
-    position: relative;
-  }
-`)
 
 export default class RightController extends BaseComponent {
-  private isControllerReady = false
   private _top: HTMLDivElement
   constructor() {
     super()
@@ -22,18 +14,30 @@ export default class RightController extends BaseComponent {
     this._top = this.shadow.getElementById('top') as HTMLDivElement
   }
 
-  setController(player: Player) {
-    if (this.isControllerReady) {
-      return
-    }
-    this.top.addEventListener('touchstart', (e) => {
+  setController(player: IPlayer) {
+    this.top.removeEventListener('touchstart', this.touchStartTopHandler)
+
+    this.touchStartTopHandler = this.createTouchStartTopHandler(player)
+
+    this.top.addEventListener('touchstart', this.touchStartTopHandler)
+  }
+  private touchStartTopHandler!: (event: TouchEvent) => void
+  private createTouchStartTopHandler = (player: IPlayer) => {
+    return (event: TouchEvent) => {
       player.isJumping || player.jump()
-      e.stopPropagation()
-      e.preventDefault()
-    })
-    this.isControllerReady = true
+      event.stopPropagation()
+      event.preventDefault()
+    }
   }
   get top() {
     return this._top!
   }
 }
+
+const sheet = new CSSStyleSheet()
+sheet.replaceSync(`
+  .button-container {
+    width: 47%;
+    position: relative;
+  }
+`)

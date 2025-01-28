@@ -1,5 +1,21 @@
 import { BaseComponent } from '../common/base.component'
 
+export default class ControllerButton extends BaseComponent {
+  constructor() {
+    super()
+    this.shadow.adoptedStyleSheets.push(sheet)
+    this.shadow.innerHTML = `
+    <tempalte>
+      <div class="button-wrapper">
+        <button class="controller">
+          <slot />
+        </button>
+      </div>
+    </tempalte>
+    `
+  }
+}
+
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
 .button-wrapper {
@@ -16,19 +32,3 @@ sheet.replaceSync(`
   height: 80px;
 }
 `)
-
-export default class ControllerButton extends BaseComponent {
-  constructor() {
-    super()
-    this.shadow.adoptedStyleSheets.push(sheet)
-    this.shadow.innerHTML = `
-    <tempalte>
-      <div class="button-wrapper">
-        <button class="controller">
-          <slot />
-        </button>
-      </div>
-    </tempalte>
-    `
-  }
-}

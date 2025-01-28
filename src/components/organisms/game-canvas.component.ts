@@ -2,52 +2,30 @@ import { CanvasManager } from './../../entities/interfaces/canvas-manager.interf
 import { Box } from '../../entities/box'
 import { Canvas } from '../../entities/canvas'
 import { Maguma } from '../../entities/maguma'
-import { Player } from '../../entities/player'
 import { createEvent } from '../../utils'
 import BaseCanvasComponent from '../atoms/base-canvas.component'
 import { BaseComponent } from '../common/base.component'
 import { Logger } from '../../plugins/logger'
+import { IPlayer } from '../../entities/interfaces/player.interface'
 
-const sheet = new CSSStyleSheet()
-sheet.replaceSync(`
-#canvas-container {
-  margin: 0;
-  padding: 0;
-}
-
-#center-buttons {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.button {
-  padding: 14px;
-  margin: 0 7px;
-}
-`)
-
-export default class GameCanvas extends BaseComponent {
+export default class GameCanvas<T extends IPlayer> extends BaseComponent {
   public canvasManager: CanvasManager | null = null
   private _baseCanvas: BaseCanvasComponent
-  private players: Player[] = []
   private centerButtons: HTMLDivElement
   private start: HTMLButtonElement
   public isGameRunning = false
   private _canvasManagerClass:
-    | (new (config: {
+    | (new <T extends IPlayer>(config: {
         canvas: Canvas
-        players: Player[]
+        players: T[]
         maguma: Maguma
       }) => CanvasManager)
     | null = null
 
-  // セッターを使って親からクラスを受け取る
   set canvasManagerClass(
-    value: new (config: {
+    value: new <T extends IPlayer>(config: {
       canvas: Canvas
-      players: Player[]
+      players: T[]
       maguma: Maguma
     }) => CanvasManager,
   ) {
@@ -75,18 +53,18 @@ export default class GameCanvas extends BaseComponent {
     ) as HTMLDivElement
     this.start = this.shadow.getElementById('start') as HTMLButtonElement
     createEvent<Event>(this.start, 'click', () => {
-      this.dispatchEvent(new CustomEvent<Player>('setController'))
+      this.dispatchEvent(new CustomEvent<IPlayer>('setController'))
     })
     createEvent<KeyboardEvent>(document, 'keyup', (e) => {
       if (e.key === 'Enter') {
         if (!this.isGameRunning) {
-          this.dispatchEvent(new CustomEvent<Player>('setController'))
+          this.dispatchEvent(new CustomEvent<IPlayer>('setController'))
         }
         e.stopPropagation()
       }
     })
   }
-  onClickStart = async () => {
+  onClickStart = async (players: T[]) => {
     const centerButtons = this.centerButtons
     centerButtons.classList.add('hide')
     if (!this._canvasManagerClass) {
@@ -94,10 +72,7 @@ export default class GameCanvas extends BaseComponent {
     }
     this.canvasManager = new this._canvasManagerClass({
       canvas: this.canvas,
-      players: this.players.map((player) => {
-        player.reset()
-        return player
-      }),
+      players,
       maguma: Maguma.createMaguma(),
     })
     this.changeGameStatus(true)
@@ -116,17 +91,6 @@ export default class GameCanvas extends BaseComponent {
       new CustomEvent<boolean>('changeGameStatus', { detail: status }),
     )
   }
-  setPlayers(players: Player[]) {
-    this.players = players
-    this.fillPlayers()
-  }
-  updatePlayers(coordinate: { id: string; x: number; y: number }) {
-    for (const player of this.players) {
-      if (player.id === coordinate.id) {
-        player.updateFromJson(coordinate)
-      }
-    }
-  }
   private async gameLoop(canvasManager: CanvasManager) {
     const requestAnimationFrameAsync = (): Promise<number> => {
       return new Promise((resolve) => requestAnimationFrame(resolve))
@@ -134,7 +98,7 @@ export default class GameCanvas extends BaseComponent {
     let lastTimestamp = 0
     while (true) {
       const timestamp = await requestAnimationFrameAsync()
-      if (canvasManager.isGameOver(this.players)) {
+      if (canvasManager.isGameOver()) {
         canvasManager.endGame()
         break
       }
@@ -145,18 +109,18 @@ export default class GameCanvas extends BaseComponent {
       this.dispatchEvent(new CustomEvent<Box[]>('updateObject'))
     }
   }
-  fillPlayers() {
+  fillPlayers(players: IPlayer[]) {
     const canvas = this.baseCanvas.canvas
     canvas.ctx.clearRect(0, 0, canvas.width, canvas.height)
     const ctx = canvas.ctx
-    const playerCount = this.players.length
+    const playerCount = players.length
     const playerSize = Math.min(
       canvas.width / (playerCount * 1.5),
       canvas.height / 4,
     )
     const playerY = 20
-    for (let i = 0; i < this.players.length; i++) {
-      const player = this.players[i]
+    for (let i = 0; i < players.length; i++) {
+      const player = players[i]
       // 各プレイヤーの `x` 座標を計算
       const playerSpacing =
         (canvas.width - playerSize * playerCount) / (playerCount + 1)
@@ -205,3 +169,23 @@ export default class GameCanvas extends BaseComponent {
     return this._baseCanvas.canvas
   }
 }
+
+const sheet = new CSSStyleSheet()
+sheet.replaceSync(`
+#canvas-container {
+  margin: 0;
+  padding: 0;
+}
+
+#center-buttons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.button {
+  padding: 14px;
+  margin: 0 7px;
+}
+`)

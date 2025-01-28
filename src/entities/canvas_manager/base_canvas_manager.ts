@@ -1,32 +1,46 @@
 import { Box } from '../box'
 import { Canvas } from '../canvas'
+import { CanvasManager } from '../interfaces/canvas-manager.interface'
 import { Maguma } from '../maguma'
-import { Player } from '../player'
+import { IPlayer } from '../interfaces/player.interface'
 const PLAYER_DELAY = 1
 
-type ICanvasManager = {
+type ICanvasManager<T extends IPlayer> = {
   canvas: Canvas
   maguma: Maguma
-  players?: Player[]
+  players?: T[]
   boxes?: Box[]
 }
 
-export abstract class BaseCanvasManager {
+export abstract class BaseCanvasManager<T extends IPlayer>
+  implements CanvasManager
+{
   protected canvas: Canvas
   protected maguma: Maguma
   protected boxes: Box[] = []
-  protected players: Player[] = []
+  protected players: T[] = []
 
   protected startTime = 0
   protected currentTime = 0
   protected lastTimestamp = 0
-  protected boxCreationProbability = 0.07
-  constructor(params: ICanvasManager) {
+  protected boxCreationProbability = 0.075
+  constructor(params: ICanvasManager<T>) {
     this.canvas = params.canvas
     this.maguma = params.maguma
     this.players = params.players || []
     this.boxes = params.boxes || []
   }
+
+  abstract loop(timestamp: number): Box[]
+  abstract updateBoxes(
+    boxesJson: {
+      x: number
+      y: number
+      width: number
+      height: number
+      speed: number
+    }[],
+  ): void
 
   protected updateCurrentTime(timestamp: number) {
     if (this.startTime === 0) {
@@ -41,8 +55,8 @@ export abstract class BaseCanvasManager {
     this.lastTimestamp = timestamp
   }
 
-  isGameOver(players: Player[]) {
-    return players.every((player) => {
+  isGameOver() {
+    return this.players.every((player) => {
       return player.isOver
     })!
   }
@@ -60,7 +74,7 @@ export abstract class BaseCanvasManager {
     this.ctx.fillRect(x, y, width, height)
   }
 
-  protected fillPlayer(player: Player) {
+  protected fillPlayer(player: IPlayer) {
     const { x, y, width, height } = player.getCanvasSize(this.canvas)
     // 外枠
     this.ctx.strokeStyle = 'blue'

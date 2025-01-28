@@ -4,17 +4,6 @@ const CANVAS_WIDTH_PIXEL = 1600
 const CANVAS_HEIGHT_PIXEL = 1600
 const CANVAS_RATIO = CANVAS_WIDTH_PIXEL / CANVAS_HEIGHT_PIXEL
 
-const sheet = new CSSStyleSheet()
-sheet.replaceSync(`
-#canvas-frame {
-  border: 8px solid black;
-}
-
-canvas {
-  height: 100vh;
-}
-`)
-
 export default class BaseCanvasComponent extends BaseComponent {
   private _canvas: Canvas
   constructor() {
@@ -45,3 +34,14 @@ export default class BaseCanvasComponent extends BaseComponent {
     return this._canvas!
   }
 }
+
+const sheet = new CSSStyleSheet()
+sheet.replaceSync(`
+#canvas-frame {
+  border: 8px solid black;
+}
+
+canvas {
+  height: 100vh;
+}
+`)

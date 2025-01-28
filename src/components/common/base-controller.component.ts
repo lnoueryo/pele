@@ -1,30 +1,23 @@
-import { Player } from '../../entities/player'
 import { BaseComponent } from '../common/base.component'
 import { hideElements, showElements } from '../../utils'
 import { Logger } from '../../plugins/logger'
+import { IPlayer } from '../../entities/interfaces/player.interface'
 
 const KEYBOARDS = { top: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight' }
 export default class BaseController extends BaseComponent {
-  private isControllerReady = false
-
   constructor() {
     super()
   }
 
-  protected setController(player: Player) {
-    if (this.isControllerReady) {
-      return
-    }
-    document.addEventListener('keydown', (event) => {
-      if (event.key === KEYBOARDS.left) player.moveToLeft()
-      else if (event.key === KEYBOARDS.right) player.moveToRight()
-      else if (event.key === KEYBOARDS.top && !player.isJumping) player.jump()
-    })
-    document.addEventListener('keyup', (event) => {
-      if (event.key === KEYBOARDS.left || event.key === KEYBOARDS.right)
-        player.stopMovement()
-    })
-    this.isControllerReady = true
+  protected setController(player: IPlayer) {
+    document.removeEventListener('keydown', this.keydownHandler)
+    document.removeEventListener('keyup', this.keyupHandler)
+
+    this.keydownHandler = this.createKeydownHandler(player)
+    this.keyupHandler = this.createKeyupHandler(player)
+
+    document.addEventListener('keydown', this.keydownHandler)
+    document.addEventListener('keyup', this.keyupHandler)
   }
   protected showController(
     sideContainers: NodeListOf<HTMLElement>,
@@ -46,6 +39,22 @@ export default class BaseController extends BaseComponent {
     Logger.log('PC')
     hideElements(sideContainers)
     hideElements(bottomContainers)
+  }
+  private keydownHandler!: (event: KeyboardEvent) => void
+  private keyupHandler!: (event: KeyboardEvent) => void
+
+  private createKeydownHandler = (player: IPlayer) => {
+    return (event: KeyboardEvent) => {
+      if (event.key === KEYBOARDS.left) player.moveToLeft()
+      else if (event.key === KEYBOARDS.right) player.moveToRight()
+      else if (event.key === KEYBOARDS.top && !player.isJumping) player.jump()
+    }
+  }
+
+  private createKeyupHandler = (player: IPlayer) => {
+    return () => {
+      player.stopMovement()
+    }
   }
   private isMobileDevice = () => {
     const isSmallScreen = window.matchMedia('(max-width: 768px)').matches
