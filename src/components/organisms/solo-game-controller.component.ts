@@ -51,7 +51,6 @@ export default class GameController extends BaseController {
     ) as BottomController
     this._sideContainers = this.shadow.querySelectorAll('.side-container')
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
-    this.gameCanvas.canvasManagerClass = OnePlayerCanvasManager
     this.showController(this.sideContainers, this.bottomContainers)
     this.player = new SoloPlayer({
       id: 'anonymous',

@@ -2,15 +2,13 @@ import { BaseCanvasManager } from './base_canvas_manager'
 import { Box } from '../box'
 import { Maguma } from '../maguma'
 import { Canvas } from '../canvas'
-import { IPlayer } from '../interfaces/player.interface'
+import { SoloPlayer } from '../player/solo-player'
 const PLAYER_DELAY = 1
 
-export class OnePlayerCanvasManager<
-  T extends IPlayer,
-> extends BaseCanvasManager<T> {
+export class OnePlayerCanvasManager extends BaseCanvasManager<SoloPlayer> {
   constructor(params: {
     canvas: Canvas
-    players: T[]
+    players: SoloPlayer[]
     maguma: Maguma
     boxes?: Box[]
   }) {

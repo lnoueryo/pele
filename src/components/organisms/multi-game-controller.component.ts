@@ -6,7 +6,6 @@ import RightController from '../molecules/right-controller.component'
 import { WebsocketIO } from '../../plugins/websocket'
 import config from '../../../config'
 import BaseController from '../common/base-controller.component'
-import { MultiPlayerCanvasManager } from '../../entities/canvas_manager/multi_player_canvas_manager'
 import { Logger } from '../../plugins/logger'
 import { onAuthStateChanged, User } from 'firebase/auth'
 import auth from '../../plugins/firebase/firebase-auth'
@@ -54,7 +53,6 @@ export default class GameController extends BaseController {
     this._sideContainers = this.shadow.querySelectorAll('.side-container')
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.showController(this.sideContainers, this.bottomContainers)
-    this.gameCanvas.canvasManagerClass = MultiPlayerCanvasManager
     this.gameCanvas.addEventListener('setController', this.onClickStartGame)
     this.bottomController.addEventListener(
       'setController',
@@ -90,6 +88,10 @@ export default class GameController extends BaseController {
         location.href = '/login.html'
       }
     })
+    window.addEventListener('resize', () => {
+      this.showController.bind(this)(this.sideContainers, this.bottomContainers)
+      this.gameCanvas.fillPlayers(this.players)
+    })
   }
 
   private onClickStartGame = () => {
@@ -118,12 +120,28 @@ export default class GameController extends BaseController {
         Logger.log('user disconnected')
       })
       this.socket.on('join', this.getPlayers)
-      this.socket.on('start', (players) => {
-        Logger.log('start', players)
-        if (this.gameCanvas.isGameRunning) return
-        this.getPlayers(players)
-        this.startGame()
-      })
+      this.socket.on(
+        'start',
+        (
+          players: {
+            id: string
+            name: string
+            x: number
+            y: number
+            width: number
+            height: number
+            vg: number
+            speed: number
+            jumpStrength: number
+            color: string
+          }[],
+        ) => {
+          Logger.log('start', players)
+          if (this.gameCanvas.isGameRunning) return
+          this.getPlayers(players)
+          this.startGame()
+        },
+      )
       this.socket.on(
         'position',
         (data: { id: string; x: number; y: number; isOver: boolean }) => {
@@ -160,7 +178,6 @@ export default class GameController extends BaseController {
       color: string
     }[],
   ) => {
-    this.players = []
     this.players = newPlayers.map((player) => {
       return new OnlinePlayer({
         ...player,
