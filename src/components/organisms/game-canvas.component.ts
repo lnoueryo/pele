@@ -91,22 +91,34 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
       new CustomEvent<boolean>('changeGameStatus', { detail: status }),
     )
   }
-  private async gameLoop(canvasManager: CanvasManager) {
+  private async gameLoop(canvasManager: CanvasManager, targetFPS = 60) {
+    const frameDuration = 1000 / targetFPS // 目標のフレーム時間（ミリ秒）
+
     const requestAnimationFrameAsync = (): Promise<number> => {
       return new Promise((resolve) => requestAnimationFrame(resolve))
     }
-    let lastTimestamp = 0
+
+    let lastTimestamp = performance.now() // 初回のタイムスタンプを取得
+    let accumulatedTime = 0 // フレームスキップ防止用
+
     while (true) {
       const timestamp = await requestAnimationFrameAsync()
+      let deltaTime = (timestamp - lastTimestamp) / 1000 // 秒単位で計算
+      accumulatedTime += deltaTime * 1000 // ミリ秒単位
+
+      // 目標のフレーム時間を超えないように調整
+      while (accumulatedTime >= frameDuration) {
+        accumulatedTime -= frameDuration
+        canvasManager.loop(timestamp)
+        this.dispatchEvent(new CustomEvent<Box[]>('updateObject'))
+      }
+
       if (canvasManager.isGameOver()) {
         canvasManager.endGame()
         break
       }
-      if (lastTimestamp === 0) {
-        lastTimestamp = timestamp
-      }
-      canvasManager.loop(timestamp)
-      this.dispatchEvent(new CustomEvent<Box[]>('updateObject'))
+
+      lastTimestamp = timestamp // 最後のタイムスタンプを更新
     }
   }
   fillPlayers(players: IPlayer[]) {
