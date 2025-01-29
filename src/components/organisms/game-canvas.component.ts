@@ -7,6 +7,10 @@ import BaseCanvasComponent from '../atoms/base-canvas.component'
 import { BaseComponent } from '../common/base.component'
 import { Logger } from '../../plugins/logger'
 import { IPlayer } from '../../entities/interfaces/player.interface'
+import { OnlinePlayer } from '../../entities/player/online-player'
+import { SoloPlayer } from '../../entities/player/solo-player'
+import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
+import { MultiPlayerCanvasManager } from '../../entities/canvas_manager/multi_player_canvas_manager'
 
 export default class GameCanvas<T extends IPlayer> extends BaseComponent {
   public canvasManager: CanvasManager | null = null
@@ -14,23 +18,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
   private centerButtons: HTMLDivElement
   private start: HTMLButtonElement
   public isGameRunning = false
-  private _canvasManagerClass:
-    | (new <T extends IPlayer>(config: {
-        canvas: Canvas
-        players: T[]
-        maguma: Maguma
-      }) => CanvasManager)
-    | null = null
 
-  set canvasManagerClass(
-    value: new <T extends IPlayer>(config: {
-      canvas: Canvas
-      players: T[]
-      maguma: Maguma
-    }) => CanvasManager,
-  ) {
-    this._canvasManagerClass = value
-  }
   constructor() {
     super()
     this.shadow.adoptedStyleSheets.push(sheet)
@@ -67,14 +55,11 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
   onClickStart = async (players: T[]) => {
     const centerButtons = this.centerButtons
     centerButtons.classList.add('hide')
-    if (!this._canvasManagerClass) {
-      throw new Error('fff')
-    }
-    this.canvasManager = new this._canvasManagerClass({
-      canvas: this.canvas,
+    this.canvasManager = this.createCanvasManager(
+      this.canvas,
       players,
-      maguma: Maguma.createMaguma(),
-    })
+      Maguma.createMaguma(),
+    )
     this.changeGameStatus(true)
     const canvasManager = this.canvasManager
     Logger.group()
@@ -103,7 +88,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
 
     while (true) {
       const timestamp = await requestAnimationFrameAsync()
-      let deltaTime = (timestamp - lastTimestamp) / 1000 // 秒単位で計算
+      const deltaTime = (timestamp - lastTimestamp) / 1000 // 秒単位で計算
       accumulatedTime += deltaTime * 1000 // ミリ秒単位
 
       // 目標のフレーム時間を超えないように調整
@@ -121,7 +106,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
       lastTimestamp = timestamp // 最後のタイムスタンプを更新
     }
   }
-  fillPlayers(players: IPlayer[]) {
+  fillPlayers(players: OnlinePlayer[]) {
     const canvas = this.baseCanvas.canvas
     canvas.ctx.clearRect(0, 0, canvas.width, canvas.height)
     const ctx = canvas.ctx
@@ -142,6 +127,13 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
       ctx.fillRect(playerX, playerY, playerSize, playerSize)
       ctx.strokeStyle = 'blue'
       ctx.strokeRect(playerX, playerY, playerSize, playerSize)
+      ctx.fillStyle = 'black'
+      const fontSize = Math.max(12, playerSize / 8)
+      ctx.font = `${fontSize}px Arial`
+      ctx.textAlign = 'center'
+      const textX = playerX + playerSize / 2
+      const textY = playerY + playerSize + fontSize * 1.5
+      ctx.fillText(player.name, textX, textY, playerSize * 0.8)
       // 目と口を描画
       const eyeWidth = playerSize / 6
       const eyeHeight = playerSize / 6
@@ -173,6 +165,35 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
         mouthHeight,
       )
     }
+  }
+  private createCanvasManager(
+    canvas: Canvas,
+    players: IPlayer[],
+    maguma: Maguma,
+  ): CanvasManager {
+    if (players.length === 0) {
+      throw new Error('プレイヤーリストが空です')
+    }
+
+    const firstPlayer = players[0]
+
+    if (firstPlayer instanceof SoloPlayer) {
+      const soloPlayers = players.map((player) => player as SoloPlayer)
+      return new OnePlayerCanvasManager({
+        canvas,
+        players: soloPlayers,
+        maguma,
+      })
+    } else if (firstPlayer instanceof OnlinePlayer) {
+      const onlinePlayers = players.map((player) => player as OnlinePlayer)
+      return new MultiPlayerCanvasManager({
+        canvas,
+        players: onlinePlayers,
+        maguma,
+      })
+    }
+
+    throw new Error('不正なプレイヤークラス')
   }
   get baseCanvas() {
     return this._baseCanvas

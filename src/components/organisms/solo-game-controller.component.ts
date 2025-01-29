@@ -5,7 +5,6 @@ import BottomController from '../molecules/bottom-controller.component'
 import LeftController from '../molecules/left-controller.component'
 import RightController from '../molecules/right-controller.component'
 import BaseController from '../common/base-controller.component'
-import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
 import { Logger } from '../../plugins/logger'
 
 export default class GameController extends BaseController {
@@ -51,7 +50,6 @@ export default class GameController extends BaseController {
     ) as BottomController
     this._sideContainers = this.shadow.querySelectorAll('.side-container')
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
-    this.gameCanvas.canvasManagerClass = OnePlayerCanvasManager
     this.showController(this.sideContainers, this.bottomContainers)
     this.player = new SoloPlayer({
       id: 'anonymous',

@@ -18,7 +18,7 @@ const configEnvs: { [K in STAGE]: ConfigEnv } = {
     websocketApiOrigin: 'wss://pele-server.jounetsism.biz',
   }
 }
-const env = (process.env.NODE_ENV || 'development') as STAGE
+const env = (process.env.VITE_ENV || 'development') as STAGE
 const envList = ['development', 'production', , 'staging']
 if (!envList.includes(env)) {
   throw new Error('invalid STAGE')
