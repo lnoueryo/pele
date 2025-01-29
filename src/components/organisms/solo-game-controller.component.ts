@@ -5,7 +5,6 @@ import BottomController from '../molecules/bottom-controller.component'
 import LeftController from '../molecules/left-controller.component'
 import RightController from '../molecules/right-controller.component'
 import BaseController from '../common/base-controller.component'
-import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
 import { Logger } from '../../plugins/logger'
 
 export default class GameController extends BaseController {
