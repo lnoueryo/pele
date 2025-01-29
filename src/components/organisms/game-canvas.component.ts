@@ -103,7 +103,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
 
     while (true) {
       const timestamp = await requestAnimationFrameAsync()
-      let deltaTime = (timestamp - lastTimestamp) / 1000 // 秒単位で計算
+      const deltaTime = (timestamp - lastTimestamp) / 1000 // 秒単位で計算
       accumulatedTime += deltaTime * 1000 // ミリ秒単位
 
       // 目標のフレーム時間を超えないように調整

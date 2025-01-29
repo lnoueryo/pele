@@ -11,12 +11,12 @@
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --mode staging",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "ci": "rm -rf node_modules && npm install --no-audit --no-fund --production=false && npm run build",
     "deploy": "tsc && vite build && firebase deploy",
-    "deploy-stg": "cross-env NODE_ENV=staging tsc && vite build && firebase hosting:channel:deploy",
+    "deploy-stg": "tsc && vite build --mode staging && firebase hosting:channel:deploy",
     "preview": "vite preview"
   },
   "dependencies": {
