@@ -18,24 +18,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
   private centerButtons: HTMLDivElement
   private start: HTMLButtonElement
   public isGameRunning = false
-  private _canvasManagerClass:
-    | (new (config: {
-        canvas: Canvas
-        players: OnlinePlayer[] | SoloPlayer[]
-        maguma: Maguma
-      }) => CanvasManager)
-    | null = null
 
-  // セッターを変更
-  set canvasManagerClass(
-    value: new (config: {
-      canvas: Canvas
-      players: OnlinePlayer[] | SoloPlayer[]
-      maguma: Maguma
-    }) => CanvasManager,
-  ) {
-    this._canvasManagerClass = value
-  }
   constructor() {
     super()
     this.shadow.adoptedStyleSheets.push(sheet)
