@@ -9,4 +9,3 @@ const uiConfig = {
   privacyPolicyUrl: '/privacy-policy',
 }
 ui.start('#firebaseui-auth-container', uiConfig)
-export default ui
