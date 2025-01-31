@@ -130,12 +130,17 @@ export abstract class BaseCanvasManager<T extends IPlayer>
     const fontSize = Math.min(canvasWidth, canvasHeight) / 30
     const textX = canvasWidth / 5
     const textY = canvasHeight * 0.04
-    this.ctx.clearRect(textX - canvasWidth / 4, textY - fontSize, canvasWidth / 2, fontSize * 1.5)
+    this.ctx.clearRect(
+      textX - canvasWidth / 4,
+      textY - fontSize,
+      canvasWidth / 2,
+      fontSize * 1.5,
+    )
 
     const min = Math.floor(elapsedTime / 60000)
     const sec = Math.floor((elapsedTime % 60000) / 1000)
     const ms = Math.floor(elapsedTime % 1000)
-  
+
     this.ctx.fillStyle = 'black'
     this.ctx.font = `${fontSize}px Arial`
     this.ctx.textAlign = 'center'
@@ -166,7 +171,11 @@ export abstract class BaseCanvasManager<T extends IPlayer>
       const min = Math.floor(elapsedTime / 60000)
       const sec = Math.floor((elapsedTime % 60000) / 1000)
       const ms = Math.floor(elapsedTime % 1000)
-      this.ctx.fillText(`${index + 1}位: ${player.name} ${min}分${sec + Math.floor(ms / 10) / 100}秒`, textX, textY)
+      this.ctx.fillText(
+        `${index + 1}位: ${player.name} ${min}分${sec + Math.floor(ms / 10) / 100}秒`,
+        textX,
+        textY,
+      )
       textY += fontSize * 1.5
     })
   }

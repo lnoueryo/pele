@@ -6,7 +6,7 @@ import { OnlinePlayer } from '../player/online-player'
 const PLAYER_DELAY = 1
 
 export class MultiPlayerCanvasManager extends BaseCanvasManager<OnlinePlayer> {
-  public isGameOver: boolean = false
+  public isGameOver = false
   constructor(params: {
     canvas: Canvas
     players: OnlinePlayer[]
