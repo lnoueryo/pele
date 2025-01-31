@@ -1,5 +1,4 @@
 import { CanvasManager } from './../../entities/interfaces/canvas-manager.interface'
-import { Box } from '../../entities/box'
 import { Canvas } from '../../entities/canvas'
 import { Maguma } from '../../entities/maguma'
 import { createEvent } from '../../utils'
@@ -83,26 +82,39 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
       return new Promise((resolve) => requestAnimationFrame(resolve))
     }
 
-    let lastTimestamp = performance.now() // 初回のタイムスタンプを取得
-    let accumulatedTime = 0 // フレームスキップ防止用
+    const startTimestamp = Date.now()
+    let lastTimestamp = performance.now()
+    let accumulatedTime = 0
 
     while (true) {
       const timestamp = await requestAnimationFrameAsync()
-      const deltaTime = (timestamp - lastTimestamp) / 1000 // 秒単位で計算
-      accumulatedTime += deltaTime * 1000 // ミリ秒単位
+      const deltaTime = (timestamp - lastTimestamp) / 1000
+      accumulatedTime += deltaTime * 1000
 
       // 目標のフレーム時間を超えないように調整
       while (accumulatedTime >= frameDuration) {
         accumulatedTime -= frameDuration
-        canvasManager.loop(timestamp)
-        this.dispatchEvent(new CustomEvent<Box[]>('updateObject'))
+        canvasManager.loop(timestamp, startTimestamp)
+        this.dispatchEvent(new CustomEvent('updateObject'))
       }
 
-      if (canvasManager.isGameOver()) {
-        canvasManager.endGame()
+      if (canvasManager.isGameOver) {
+        this.dispatchEvent(
+          new CustomEvent<{
+            ranking: { name: string; timestamp: number }[]
+            startTimestamp: number
+          }>('endGame', {
+            detail: {
+              ranking: [{ name: 'player1', timestamp: Date.now() }],
+              startTimestamp,
+            },
+          }),
+        )
         break
       }
-
+      {
+        startTimestamp
+      }
       lastTimestamp = timestamp // 最後のタイムスタンプを更新
     }
   }

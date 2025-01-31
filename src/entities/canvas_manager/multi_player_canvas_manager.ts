@@ -6,6 +6,7 @@ import { OnlinePlayer } from '../player/online-player'
 const PLAYER_DELAY = 1
 
 export class MultiPlayerCanvasManager extends BaseCanvasManager<OnlinePlayer> {
+  public isGameOver = false
   constructor(params: {
     canvas: Canvas
     players: OnlinePlayer[]
@@ -15,12 +16,10 @@ export class MultiPlayerCanvasManager extends BaseCanvasManager<OnlinePlayer> {
     super(params)
   }
 
-  public loop(timestamp: number): Box[] {
+  public loop(timestamp: number, startTimestamp: number): Box[] {
     const deltaTime = (timestamp - this.lastTimestamp) / 1000 // フレーム間の経過時間を秒単位で計算
-    this.updateCurrentTime(timestamp) // ゲーム全体の時間を更新
-
+    this.updateCurrentTime(timestamp)
     this.resetCanvas()
-
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {
         player.moveOnIdle(deltaTime)
@@ -39,6 +38,7 @@ export class MultiPlayerCanvasManager extends BaseCanvasManager<OnlinePlayer> {
     })
 
     this.fillMaguma()
+    this.fillTime(Date.now() - startTimestamp)
     return this.boxes
   }
 
@@ -71,8 +71,8 @@ export class MultiPlayerCanvasManager extends BaseCanvasManager<OnlinePlayer> {
     this.ctx.font = `${fontSize}px Arial`
     this.ctx.textAlign = 'center'
     const textX = x + width / 2
-    const textY = y - fontSize / 2
-    const maxTextLength = 5
+    const textY = y - fontSize / 0.75
+    const maxTextLength = 3
     const displayName =
       player.name.length > maxTextLength
         ? player.name.slice(0, maxTextLength)

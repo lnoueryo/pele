@@ -1,9 +1,17 @@
 import { Box } from '../box'
 
 export type CanvasManager = {
-  loop: (timestamp: number) => Box[]
-  isGameOver: () => boolean
-  endGame: () => void
+  isGameOver: boolean
+  loop: (timestamp: number, startTimestamp: number) => Box[]
+  endGame: (result: {
+    ranking: [
+      {
+        name: string
+        timestamp: number
+      },
+    ]
+    startTimestamp: number
+  }) => void
   updateBoxes: (
     boxesJson: {
       x: number
@@ -13,4 +21,5 @@ export type CanvasManager = {
       speed: number
     }[],
   ) => void
+  fillTime(elapsedTime: number): void
 }
