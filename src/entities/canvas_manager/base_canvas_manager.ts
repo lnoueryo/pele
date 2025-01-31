@@ -102,7 +102,6 @@ export abstract class BaseCanvasManager<T extends IPlayer>
           : MOUTH_OFFSET_LEFT - BASE_MOUTH_DIVISOR))
     const mouthOffsetY = height / 1.5 // プレイヤーの上端から口までのオフセット
 
-    // 修正後のコード
     this.ctx.fillRect(
       x + mouthOffsetX,
       y + mouthOffsetY,

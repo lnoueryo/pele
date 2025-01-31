@@ -71,8 +71,8 @@ export class MultiPlayerCanvasManager extends BaseCanvasManager<OnlinePlayer> {
     this.ctx.font = `${fontSize}px Arial`
     this.ctx.textAlign = 'center'
     const textX = x + width / 2
-    const textY = y - fontSize / 2
-    const maxTextLength = 5
+    const textY = y - fontSize / 0.75
+    const maxTextLength = 3
     const displayName =
       player.name.length > maxTextLength
         ? player.name.slice(0, maxTextLength)
