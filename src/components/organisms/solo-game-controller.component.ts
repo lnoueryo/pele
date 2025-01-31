@@ -66,6 +66,18 @@ export default class GameController extends BaseController {
       const event = e as CustomEvent<boolean>
       this.bottomController.changeGameStatus(event.detail)
     })
+    this.gameCanvas.addEventListener('endGame', (e: Event) => {
+      const event = e as CustomEvent<{
+        ranking: [
+          {
+            name: ''
+            timestamp: number
+          },
+        ]
+        startTimestamp: number
+      }>
+      this.gameCanvas.canvasManager?.endGame(event.detail)
+    })
     window.addEventListener('resize', () => {
       this.showController.bind(this)(this.sideContainers, this.bottomContainers)
     })

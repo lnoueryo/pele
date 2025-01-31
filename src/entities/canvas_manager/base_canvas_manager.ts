@@ -3,7 +3,6 @@ import { Canvas } from '../canvas'
 import { CanvasManager } from '../interfaces/canvas-manager.interface'
 import { Maguma } from '../maguma'
 import { IPlayer } from '../interfaces/player.interface'
-const PLAYER_DELAY = 1
 
 type ICanvasManager<T extends IPlayer> = {
   canvas: Canvas
@@ -11,15 +10,14 @@ type ICanvasManager<T extends IPlayer> = {
   players?: T[]
   boxes?: Box[]
 }
-
 export abstract class BaseCanvasManager<T extends IPlayer>
   implements CanvasManager
 {
+  abstract isGameOver: boolean
   protected canvas: Canvas
   protected maguma: Maguma
   protected boxes: Box[] = []
   protected players: T[] = []
-
   protected startTime = 0
   protected currentTime = 0
   protected lastTimestamp = 0
@@ -31,7 +29,7 @@ export abstract class BaseCanvasManager<T extends IPlayer>
     this.boxes = params.boxes || []
   }
 
-  abstract loop(timestamp: number): Box[]
+  abstract loop(timestamp: number, startTimestamp: number): Box[]
   abstract updateBoxes(
     boxesJson: {
       x: number
@@ -53,19 +51,6 @@ export abstract class BaseCanvasManager<T extends IPlayer>
     }
 
     this.lastTimestamp = timestamp
-  }
-
-  isGameOver() {
-    return this.players.every((player) => {
-      return player.isOver
-    })!
-  }
-
-  endGame() {
-    this.fillEndText(
-      `ゲームオーバー`,
-      `頑張った時間: ${(this.currentTime - PLAYER_DELAY).toFixed(2)} 秒`,
-    )
   }
 
   protected fillBox(box: Box) {
@@ -136,20 +121,54 @@ export abstract class BaseCanvasManager<T extends IPlayer>
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
-  protected fillEndText(firstText: string, secondText: string) {
+  protected shouldCreateBox() {
+    return Math.random() < this.boxCreationProbability
+  }
+  fillTime(elapsedTime: number) {
     const canvasWidth = this.canvas.width
     const canvasHeight = this.canvas.height
-    const fontSize = Math.min(canvasWidth, canvasHeight) / 20
-    const textX = canvasWidth / 2
+    const fontSize = Math.min(canvasWidth, canvasHeight) / 30
+    const textX = canvasWidth / 5
+    const textY = canvasHeight * 0.04
+    this.ctx.clearRect(textX - canvasWidth / 4, textY - fontSize, canvasWidth / 2, fontSize * 1.5)
+
+    const min = Math.floor(elapsedTime / 60000)
+    const sec = Math.floor((elapsedTime % 60000) / 1000)
+    const ms = Math.floor(elapsedTime % 1000)
+  
     this.ctx.fillStyle = 'black'
     this.ctx.font = `${fontSize}px Arial`
     this.ctx.textAlign = 'center'
-    this.ctx.textBaseline = 'middle'
-    this.ctx.fillText(firstText, textX, this.canvas.height / 4)
-    this.ctx.fillText(secondText, textX, this.canvas.height / 3)
+    this.ctx.textBaseline = 'top'
+    this.ctx.fillText(`経過時間: ${min}分${sec}秒${ms}ms`, textX, textY)
   }
-  protected shouldCreateBox() {
-    return Math.random() < this.boxCreationProbability
+  endGame(result: {
+    ranking: { name: string; timestamp: number }[]
+    startTimestamp: number
+  }) {
+    const canvasWidth = this.canvas.width
+    const canvasHeight = this.canvas.height
+    const fontSize = Math.min(canvasWidth, canvasHeight) / 20
+    const textX = canvasWidth * 0.05
+    let textY = canvasHeight / 6
+
+    this.ctx.fillStyle = 'black'
+    this.ctx.font = `${fontSize}px Arial`
+    this.ctx.textAlign = 'left'
+    this.ctx.textBaseline = 'top'
+
+    this.ctx.textAlign = 'center'
+    this.ctx.fillText('ゲームオーバー', canvasWidth / 2, canvasHeight / 10)
+    this.ctx.textAlign = 'left'
+
+    result.ranking.forEach((player, index) => {
+      const elapsedTime = player.timestamp - result.startTimestamp
+      const min = Math.floor(elapsedTime / 60000)
+      const sec = Math.floor((elapsedTime % 60000) / 1000)
+      const ms = Math.floor(elapsedTime % 1000)
+      this.ctx.fillText(`${index + 1}位: ${player.name} ${min}分${sec + Math.floor(ms / 10) / 100}秒`, textX, textY)
+      textY += fontSize * 1.5
+    })
   }
   get ctx() {
     return this.canvas.ctx

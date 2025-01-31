@@ -15,12 +15,11 @@ export class OnePlayerCanvasManager extends BaseCanvasManager<SoloPlayer> {
     super(params)
   }
 
-  public loop(timestamp: number): Box[] {
+  public loop(timestamp: number, startTimestamp: number): Box[] {
     const deltaTime = (timestamp - this.lastTimestamp) / 1000
     this.updateCurrentTime(timestamp)
-
     this.resetCanvas()
-
+    this.fillTime(Date.now() - startTimestamp)
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {
         player.moveOnIdle(deltaTime)
@@ -70,5 +69,11 @@ export class OnePlayerCanvasManager extends BaseCanvasManager<SoloPlayer> {
     }[],
   ) {
     console.log(boxesJson)
+  }
+
+  get isGameOver() {
+    return this.players.every((player) => {
+      return player.isOver
+    })!
   }
 }

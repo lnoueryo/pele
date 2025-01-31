@@ -148,9 +148,30 @@ export default class GameController extends BaseController {
           this.updatePlayers(data)
         },
       )
-      this.socket.on('stage', ({ boxes: BoxesArrayBuffer }) => {
+      this.socket.on('stage', ({ boxes: BoxesArrayBuffer, currentTime }) => {
         const boxes = BoxesArrayBuffer.map(this.parseBox)
         this.gameCanvas.canvasManager?.updateBoxes(boxes)
+      })
+      this.socket.on('end', (endData: {
+        ranking: [
+          {
+            name: string
+            timestamp: number
+          },
+        ]
+        startTimestamp: number
+      }) => {
+        if (!this.gameCanvas.canvasManager) {
+          throw new Error()
+        }
+        const game = this.gameCanvas.canvasManager
+        game.isGameOver = true
+        const timer = setInterval(() => {
+          if (!this.gameCanvas.isGameRunning) {
+            clearInterval(timer)
+            game.endGame(endData)
+          }
+        })
       })
     })
   }
