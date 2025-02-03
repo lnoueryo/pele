@@ -56,5 +56,4 @@ export default class BaseController extends BaseComponent {
       player.stopMovement()
     }
   }
-
 }

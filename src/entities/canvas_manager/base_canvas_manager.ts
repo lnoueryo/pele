@@ -136,18 +136,16 @@ export abstract class BaseCanvasManager<T extends IPlayer>
   protected shouldCreateBox() {
     return Math.random() < this.boxCreationProbability
   }
+  fillBackground(color = '#e4d5c4') {
+    this.ctx.fillStyle = color
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+  }
   fillTime(elapsedTime: number) {
     const canvasWidth = this.canvas.width
     const canvasHeight = this.canvas.height
     const fontSize = Math.min(canvasWidth, canvasHeight) / 30
     const textX = canvasWidth / 5
     const textY = canvasHeight * 0.04
-    this.ctx.clearRect(
-      textX - canvasWidth / 4,
-      textY - fontSize,
-      canvasWidth / 2,
-      fontSize * 1.5,
-    )
 
     const min = Math.floor(elapsedTime / 60000)
     const sec = Math.floor((elapsedTime % 60000) / 1000)

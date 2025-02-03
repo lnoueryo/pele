@@ -48,5 +48,4 @@ export class OnlinePlayer extends BasePlayer {
   get id() {
     return this._id
   }
-
 }

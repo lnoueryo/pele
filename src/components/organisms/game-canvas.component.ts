@@ -48,7 +48,9 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
     ) as HTMLDivElement
     this.start = this.shadow.getElementById('start') as HTMLButtonElement
     this.dropdown = this.shadow.getElementById('dropdown') as HTMLDivElement
-    const modeSelect = this.shadow.getElementById('mode-select') as HTMLSelectElement
+    const modeSelect = this.shadow.getElementById(
+      'mode-select',
+    ) as HTMLSelectElement
     createEvent<Event>(this.start, 'click', () => {
       this.dispatchEvent(new CustomEvent<IPlayer>('setController'))
     })
@@ -124,7 +126,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
             startTimestamp: number
           }>('endGame', {
             detail: {
-              ranking: this.canvasManager!.players.map(player => {
+              ranking: this.canvasManager!.players.map((player) => {
                 return {
                   name: player.name,
                   timestamp: player.timestamp,
@@ -274,6 +276,11 @@ sheet.replaceSync(`
   position: absolute;
   top: 5%;
   right: 5%;
+}
+
+#mode-select {
+  height: 28px;
+  min-width: 112px;
 }
 
 .button {

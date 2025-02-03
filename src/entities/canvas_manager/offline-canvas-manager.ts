@@ -21,6 +21,7 @@ export class OfflineCanvasManager extends BaseCanvasManager<IPlayer> {
     const deltaTime = (timestamp - this.lastTimestamp) / 1000
     this.updateCurrentTime(timestamp)
     this.resetCanvas()
+    this.fillBackground()
     this.fillTime(Date.now() - startTimestamp)
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {

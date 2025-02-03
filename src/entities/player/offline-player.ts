@@ -42,5 +42,4 @@ export class OfflinePlayer extends BasePlayer {
     this._x = params.x
     this._y = params.y
   }
-
 }

@@ -44,7 +44,7 @@ export class ComputerPlayer extends BasePlayer {
     const speedFactor = 0.9
     this._vx += moveDirection * speedFactor
     if (Math.abs(this.vx) > 0.25) this._vx *= 0.4
-    boxes.forEach(box => {
+    boxes.forEach((box) => {
       if (this.isPlayerCollidingWithBox(box)) {
         this._vx *= 0.1
       }
