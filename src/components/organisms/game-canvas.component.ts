@@ -106,7 +106,12 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
             startTimestamp: number
           }>('endGame', {
             detail: {
-              ranking: [{ name: 'player1', timestamp: Date.now() }],
+              ranking: this.canvasManager!.players.map(player => {
+                return {
+                  name: player.name,
+                  timestamp: player.timestamp,
+                }
+              }).sort((a, b) => b.timestamp - a.timestamp),
               startTimestamp,
             },
           }),

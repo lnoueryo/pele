@@ -62,21 +62,4 @@ export class OnlineCanvasManager extends BaseCanvasManager<OnlinePlayer> {
         }),
     )
   }
-
-  public fillPlayer(player: OnlinePlayer): void {
-    super.fillPlayer(player)
-    const { x, y, width, height } = player.getCanvasSize(this.canvas)
-    this.ctx.fillStyle = 'black'
-    const fontSize = Math.max(12, height / 8)
-    this.ctx.font = `${fontSize}px Arial`
-    this.ctx.textAlign = 'center'
-    const textX = x + width / 2
-    const textY = y - fontSize / 0.75
-    const maxTextLength = 3
-    const displayName =
-      player.name.length > maxTextLength
-        ? player.name.slice(0, maxTextLength)
-        : player.name
-    this.ctx.fillText(displayName, textX, textY, height * 0.8)
-  }
 }

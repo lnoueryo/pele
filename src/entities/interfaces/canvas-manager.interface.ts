@@ -1,7 +1,9 @@
 import { Box } from '../box'
+import { IPlayer } from './player.interface'
 
 export type CanvasManager = {
   isGameOver: boolean
+  players: IPlayer[]
   loop: (timestamp: number, startTimestamp: number) => Box[]
   endGame: (result: {
     ranking: [

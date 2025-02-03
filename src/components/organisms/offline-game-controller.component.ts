@@ -63,7 +63,7 @@ export default class GameController extends BaseController {
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.showController(this.sideContainers, this.bottomContainers)
     this.player = new OfflinePlayer({
-      id: 'anonymous',
+      name: 'you',
       ...config.playerSetting,
       vx: 0,
       vy: 0,
@@ -86,7 +86,7 @@ export default class GameController extends BaseController {
       const event = e as CustomEvent<{
         ranking: [
           {
-            name: ''
+            name: string
             timestamp: number
           },
         ]
@@ -114,7 +114,7 @@ export default class GameController extends BaseController {
   startGame = async () => {
     Logger.clear()
     this.player = new OfflinePlayer({
-      id: 'anonymous',
+      name: 'you',
       ...config.playerSetting,
       vx: 0,
       vy: 0,
@@ -130,35 +130,35 @@ export default class GameController extends BaseController {
     players.push(this.player)
     if (this.gameCanvas.mode === 'battle-royale') {
       type Computer = {
-        id: string
+        name: string
         mode: ComputerMode
         color: string
       }
       const computers: Computer[] = [
         {
-          id: '1',
+          name: '1st CPU',
           mode: 'nearest',
           color: `rgb(0,0,255)`,
         },
         {
-          id: '2',
+          name: '2nd CPU',
           mode: 'fastest',
           color: `rgb(255,0,0)`,
         },
         {
-          id: '3',
+          name: '3rd CPU',
           mode: 'slowest',
           color: `rgb(0,255,0)`,
         },
         {
-          id: '4',
+          name: '4th CPU',
           mode: 'highest',
           color: `rgb(255,255,0)`,
         },
       ]
       computers.forEach((computer) => {
         const cpu = new ComputerPlayer({
-          id: computer.id,
+          name: computer.name,
           mode: computer.mode,
           ...config.playerSetting,
           vx: 0,

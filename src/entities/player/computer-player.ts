@@ -4,10 +4,10 @@ import { BasePlayer, PlayerData } from './base-player'
 export type ComputerMode = 'slowest' | 'fastest' | 'highest' | 'nearest'
 
 export class ComputerPlayer extends BasePlayer {
-  private id
   private mode: ComputerMode = 'nearest'
-  constructor(params: PlayerData & { id: string; mode: ComputerMode }) {
+  constructor(params: PlayerData & { name: string; mode: ComputerMode }) {
     super({
+      name: params.name,
       x: params.x,
       y: params.y,
       width: params.width,
@@ -21,7 +21,6 @@ export class ComputerPlayer extends BasePlayer {
       color: params.color,
       isOver: params.isOver,
     })
-    this.id = params.id
     this.mode = params.mode
   }
 
@@ -35,16 +34,21 @@ export class ComputerPlayer extends BasePlayer {
       this.jump()
     }
     if (
-      Math.abs(this.x - targetBox.x) < 0.1 &&
-      Math.abs(this.y - targetBox.y) < 0.1
+      Math.abs(this.x - targetBox.x - targetBox.width) < 0.05 &&
+      Math.abs(this.y - targetBox.y) < 0.05
     ) {
       const candidates = this.getCandidateBoxes(boxes)
       targetBox = this.getTargetBox(candidates, 'nearest')
     }
     const moveDirection = this.x < targetBox.x ? 1 : -1
-    const speedFactor = 0.8 // 移動速度を上げて強化 0.8
+    const speedFactor = 0.9
     this._vx += moveDirection * speedFactor
-    if (Math.abs(this.vx) > 0.25) this._vx *= 0.45 // 速度が出過ぎたら減速 0.9
+    if (Math.abs(this.vx) > 0.25) this._vx *= 0.4
+    boxes.forEach(box => {
+      if (this.isPlayerCollidingWithBox(box)) {
+        this._vx *= 0.1
+      }
+    })
   }
 
   private getCandidateBoxes(boxes: Box[]) {
@@ -53,7 +57,7 @@ export class ComputerPlayer extends BasePlayer {
         box.x >= 0.3 &&
         box.x <= 0.9 &&
         box.y <= 0.7 &&
-        box.y >= 0.05 &&
+        box.y >= 0.1 &&
         box.speed < 0.6,
     )
     return candidates.length === 0 ? boxes : candidates
@@ -92,7 +96,7 @@ export class ComputerPlayer extends BasePlayer {
 
   convertToJson() {
     return {
-      id: this.id,
+      name: this.name,
       x: this.x,
       y: this.y,
       width: this.width,

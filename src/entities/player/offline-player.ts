@@ -1,9 +1,9 @@
 import { BasePlayer, PlayerData } from './base-player'
 
 export class OfflinePlayer extends BasePlayer {
-  private id
-  constructor(params: PlayerData & { id: string }) {
+  constructor(params: PlayerData & { name: string }) {
     super({
+      name: params.name,
       x: params.x,
       y: params.y,
       width: params.width,
@@ -17,12 +17,12 @@ export class OfflinePlayer extends BasePlayer {
       color: params.color,
       isOver: params.isOver,
     })
-    this.id = params.id
+    this._name = params.name
   }
 
   convertToJson() {
     return {
-      id: this.id,
+      name: this.name,
       x: this.x,
       y: this.y,
       width: this.width,
@@ -42,4 +42,5 @@ export class OfflinePlayer extends BasePlayer {
     this._x = params.x
     this._y = params.y
   }
+
 }
