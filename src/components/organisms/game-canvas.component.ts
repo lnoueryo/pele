@@ -7,9 +7,9 @@ import { BaseComponent } from '../common/base.component'
 import { Logger } from '../../plugins/logger'
 import { IPlayer } from '../../entities/interfaces/player.interface'
 import { OnlinePlayer } from '../../entities/player/online-player'
-import { SoloPlayer } from '../../entities/player/solo-player'
-import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
-import { MultiPlayerCanvasManager } from '../../entities/canvas_manager/multi_player_canvas_manager'
+import { OfflinePlayer } from '../../entities/player/offline-player'
+import { OfflineCanvasManager } from '../../entities/canvas_manager/offline-canvas-manager'
+import { OnlineCanvasManager } from '../../entities/canvas_manager/online-canvas-manager'
 
 export default class GameCanvas<T extends IPlayer> extends BaseComponent {
   public canvasManager: CanvasManager | null = null
@@ -189,16 +189,16 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
 
     const firstPlayer = players[0]
 
-    if (firstPlayer instanceof SoloPlayer) {
-      const soloPlayers = players.map((player) => player as SoloPlayer)
-      return new OnePlayerCanvasManager({
+    if (firstPlayer instanceof OfflinePlayer) {
+      const soloPlayers = players.map((player) => player as OfflinePlayer)
+      return new OfflineCanvasManager({
         canvas,
         players: soloPlayers,
         maguma,
       })
     } else if (firstPlayer instanceof OnlinePlayer) {
       const onlinePlayers = players.map((player) => player as OnlinePlayer)
-      return new MultiPlayerCanvasManager({
+      return new OnlineCanvasManager({
         canvas,
         players: onlinePlayers,
         maguma,

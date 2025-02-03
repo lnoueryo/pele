@@ -1,7 +1,7 @@
 import { IPlayer } from '../interfaces/player.interface'
 import { BasePlayer, PlayerData } from './base-player'
 
-export class OnlinePlayer extends BasePlayer implements IPlayer {
+export class OnlinePlayer extends BasePlayer {
   private _id
   private _name
   constructor(params: PlayerData & { id: string; name: string }) {

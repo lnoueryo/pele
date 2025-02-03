@@ -5,7 +5,7 @@ import { Maguma } from '../maguma'
 import { OnlinePlayer } from '../player/online-player'
 const PLAYER_DELAY = 1
 
-export class MultiPlayerCanvasManager extends BaseCanvasManager<OnlinePlayer> {
+export class OnlineCanvasManager extends BaseCanvasManager<OnlinePlayer> {
   public isGameOver = false
   constructor(params: {
     canvas: Canvas

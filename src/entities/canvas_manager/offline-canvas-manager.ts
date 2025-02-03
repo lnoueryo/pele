@@ -2,13 +2,13 @@ import { BaseCanvasManager } from './base_canvas_manager'
 import { Box } from '../box'
 import { Maguma } from '../maguma'
 import { Canvas } from '../canvas'
-import { SoloPlayer } from '../player/solo-player'
+import { OfflinePlayer } from '../player/offline-player'
 const PLAYER_DELAY = 1
 
-export class OnePlayerCanvasManager extends BaseCanvasManager<SoloPlayer> {
+export class OfflineCanvasManager extends BaseCanvasManager<OfflinePlayer> {
   constructor(params: {
     canvas: Canvas
-    players: SoloPlayer[]
+    players: OfflinePlayer[]
     maguma: Maguma
     boxes?: Box[]
   }) {

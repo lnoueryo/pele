@@ -25,14 +25,14 @@ export class Box implements CanvasObject {
   private _y
   private _width
   private _height
-  private speed
+  private _speed
   private ySalt = Math.random() - 0.5
   constructor(params: IBox) {
     this._width = params.width
     this._height = params.height
     this._x = params.x
     this._y = params.y
-    this.speed = params.speed
+    this._speed = params.speed
   }
 
   moveOnIdle(deltaTime: number) {
@@ -88,5 +88,8 @@ export class Box implements CanvasObject {
   }
   get height() {
     return this._height
+  }
+  get speed() {
+    return this._speed
   }
 }

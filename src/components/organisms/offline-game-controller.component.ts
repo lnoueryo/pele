@@ -1,5 +1,5 @@
 import config from '../../../config'
-import { SoloPlayer } from '../../entities/player/solo-player'
+import { OfflinePlayer } from '../../entities/player/offline-player'
 import GameCanvas from './game-canvas.component'
 import BottomController from '../molecules/bottom-controller.component'
 import LeftController from '../molecules/left-controller.component'
@@ -8,8 +8,8 @@ import BaseController from '../common/base-controller.component'
 import { Logger } from '../../plugins/logger'
 
 export default class GameController extends BaseController {
-  private player: SoloPlayer
-  private _gameCanvas: GameCanvas<SoloPlayer>
+  private player: OfflinePlayer
+  private _gameCanvas: GameCanvas<OfflinePlayer>
   private _leftController: LeftController
   private _rightController: RightController
   private _bottomController: BottomController
@@ -38,7 +38,7 @@ export default class GameController extends BaseController {
     `
     this._gameCanvas = this.shadow.querySelector(
       'game-canvas',
-    ) as GameCanvas<SoloPlayer>
+    ) as GameCanvas<OfflinePlayer>
     this._leftController = this.shadow.querySelector(
       'left-controller',
     ) as LeftController
@@ -51,7 +51,7 @@ export default class GameController extends BaseController {
     this._sideContainers = this.shadow.querySelectorAll('.side-container')
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.showController(this.sideContainers, this.bottomContainers)
-    this.player = new SoloPlayer({
+    this.player = new OfflinePlayer({
       id: 'anonymous',
       ...config.playerSetting,
       vx: 0,
@@ -96,7 +96,7 @@ export default class GameController extends BaseController {
 
   startGame = async () => {
     Logger.clear()
-    this.player = new SoloPlayer({
+    this.player = new OfflinePlayer({
       id: 'anonymous',
       ...config.playerSetting,
       vx: 0,
