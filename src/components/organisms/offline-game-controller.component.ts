@@ -14,7 +14,6 @@ import { IPlayer } from '../../entities/interfaces/player.interface'
 
 export default class GameController extends BaseController {
   private player: OfflinePlayer
-  private _mode: HTMLSelectElement
   private _gameCanvas: GameCanvas<IPlayer>
   private _leftController: LeftController
   private _rightController: RightController
@@ -28,10 +27,6 @@ export default class GameController extends BaseController {
     this.shadow.adoptedStyleSheets.push(sheet)
     this.shadow.innerHTML = `
     <div id="wrapper">
-      <select id="mode">
-        <option value="time-survival">Time Survival</option>
-        <option value="battle-royale">Battle Royale</option>
-      </select>
       <div id="controller-wrapper">
         <div class="side-container">
           <left-controller class="buttons-container" />
@@ -46,7 +41,6 @@ export default class GameController extends BaseController {
       </div>
     </div>
     `
-    this._mode = this.shadow.getElementById('mode') as HTMLSelectElement
     this._gameCanvas = this.shadow.querySelector(
       'game-canvas',
     ) as GameCanvas<IPlayer>
@@ -71,10 +65,6 @@ export default class GameController extends BaseController {
       isJumping: false,
       isOver: false,
     })
-    this.mode.addEventListener('change', (e: Event) => {
-      const target = e.target as HTMLSelectElement
-      this.gameCanvas.mode = target.value
-    })
     this.gameCanvas.addEventListener('setController', this.startGame)
     this.bottomController.addEventListener('setController', this.startGame)
     this.rightController.addEventListener('setController', this.startGame)
@@ -93,7 +83,6 @@ export default class GameController extends BaseController {
         startTimestamp: number
       }>
       this.gameCanvas.canvasManager?.endGame(event.detail)
-      this.mode.classList.remove('hide')
     })
     window.addEventListener('resize', () => {
       this.showController.bind(this)(this.sideContainers, this.bottomContainers)
@@ -177,13 +166,9 @@ export default class GameController extends BaseController {
         y: player.y,
       })
     })
-    this.mode.classList.add('hide')
     await this.gameCanvas.onClickStart(players)
   }
 
-  get mode() {
-    return this._mode!
-  }
   get gameCanvas() {
     return this._gameCanvas!
   }
