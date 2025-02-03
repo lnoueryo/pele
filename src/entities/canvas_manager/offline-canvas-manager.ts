@@ -3,9 +3,11 @@ import { Box } from '../box'
 import { Maguma } from '../maguma'
 import { Canvas } from '../canvas'
 import { OfflinePlayer } from '../player/offline-player'
+import { IPlayer } from '../interfaces/player.interface'
+import { ComputerPlayer } from '../player/computer-player'
 const PLAYER_DELAY = 1
 
-export class OfflineCanvasManager extends BaseCanvasManager<OfflinePlayer> {
+export class OfflineCanvasManager extends BaseCanvasManager<IPlayer> {
   constructor(params: {
     canvas: Canvas
     players: OfflinePlayer[]
@@ -22,6 +24,9 @@ export class OfflineCanvasManager extends BaseCanvasManager<OfflinePlayer> {
     this.fillTime(Date.now() - startTimestamp)
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {
+        if (player instanceof ComputerPlayer) {
+          player.decideNextMove(this.boxes)
+        }
         player.moveOnIdle(deltaTime)
         player.isGameOver()
       }

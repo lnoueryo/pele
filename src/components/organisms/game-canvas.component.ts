@@ -12,6 +12,7 @@ import { OfflineCanvasManager } from '../../entities/canvas_manager/offline-canv
 import { OnlineCanvasManager } from '../../entities/canvas_manager/online-canvas-manager'
 
 export default class GameCanvas<T extends IPlayer> extends BaseComponent {
+  public mode = 'time-survival'
   public canvasManager: CanvasManager | null = null
   private _baseCanvas: BaseCanvasComponent
   private centerButtons: HTMLDivElement
@@ -190,12 +191,21 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
     const firstPlayer = players[0]
 
     if (firstPlayer instanceof OfflinePlayer) {
-      const soloPlayers = players.map((player) => player as OfflinePlayer)
-      return new OfflineCanvasManager({
-        canvas,
-        players: soloPlayers,
-        maguma,
-      })
+      if (this.mode === 'time-survival') {
+        const soloPlayers = players.map((player) => player as OfflinePlayer)
+        return new OfflineCanvasManager({
+          canvas,
+          players: soloPlayers,
+          maguma,
+        })
+      } else {
+        const soloPlayers = players.map((player) => player as OfflinePlayer)
+        return new OfflineCanvasManager({
+          canvas,
+          players: soloPlayers,
+          maguma,
+        })
+      }
     } else if (firstPlayer instanceof OnlinePlayer) {
       const onlinePlayers = players.map((player) => player as OnlinePlayer)
       return new OnlineCanvasManager({

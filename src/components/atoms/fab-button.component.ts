@@ -14,7 +14,7 @@ export default class BaseCanvasComponent extends BaseComponent {
   setEvent(eventName: string) {
     const button = this.shadow.getElementById('button') as HTMLButtonElement
     createEvent<Event>(button, 'click', (e: Event) => {
-      this.dispatchEvent(new CustomEvent<Event>(eventName, { detail: e}))
+      this.dispatchEvent(new CustomEvent<Event>(eventName, { detail: e }))
     })
   }
 }

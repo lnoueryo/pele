@@ -54,7 +54,10 @@ export default class GameController extends BaseController {
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.showController(this.sideContainers, this.bottomContainers)
     this.gameCanvas.addEventListener('setController', this.onClickStartGame)
-    this.rightController.addEventListener('setController', this.onClickStartGame)
+    this.rightController.addEventListener(
+      'setController',
+      this.onClickStartGame,
+    )
     this.bottomController.addEventListener(
       'setController',
       this.onClickStartGame,

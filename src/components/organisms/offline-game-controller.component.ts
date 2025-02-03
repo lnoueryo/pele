@@ -6,10 +6,16 @@ import LeftController from '../molecules/left-controller.component'
 import RightController from '../molecules/right-controller.component'
 import BaseController from '../common/base-controller.component'
 import { Logger } from '../../plugins/logger'
+import {
+  ComputerMode,
+  ComputerPlayer,
+} from '../../entities/player/computer-player'
+import { IPlayer } from '../../entities/interfaces/player.interface'
 
 export default class GameController extends BaseController {
   private player: OfflinePlayer
-  private _gameCanvas: GameCanvas<OfflinePlayer>
+  private _mode: HTMLSelectElement
+  private _gameCanvas: GameCanvas<IPlayer>
   private _leftController: LeftController
   private _rightController: RightController
   private _bottomController: BottomController
@@ -21,7 +27,12 @@ export default class GameController extends BaseController {
     super()
     this.shadow.adoptedStyleSheets.push(sheet)
     this.shadow.innerHTML = `
-      <div id="wrapper">
+    <div id="wrapper">
+      <select id="mode">
+        <option value="time-survival">Time Survival</option>
+        <option value="battle-royale">Battle Royale</option>
+      </select>
+      <div id="controller-wrapper">
         <div class="side-container">
           <left-controller class="buttons-container" />
         </div>
@@ -33,10 +44,12 @@ export default class GameController extends BaseController {
       <div class="bottom-container">
         <bottom-controller class="buttons-container" />
       </div>
+    </div>
     `
+    this._mode = this.shadow.getElementById('mode') as HTMLSelectElement
     this._gameCanvas = this.shadow.querySelector(
       'game-canvas',
-    ) as GameCanvas<OfflinePlayer>
+    ) as GameCanvas<IPlayer>
     this._leftController = this.shadow.querySelector(
       'left-controller',
     ) as LeftController
@@ -58,6 +71,10 @@ export default class GameController extends BaseController {
       isJumping: false,
       isOver: false,
     })
+    this.mode.addEventListener('change', (e: Event) => {
+      const target = e.target as HTMLSelectElement
+      this.gameCanvas.mode = target.value
+    })
     this.gameCanvas.addEventListener('setController', this.startGame)
     this.bottomController.addEventListener('setController', this.startGame)
     this.rightController.addEventListener('setController', this.startGame)
@@ -76,6 +93,7 @@ export default class GameController extends BaseController {
         startTimestamp: number
       }>
       this.gameCanvas.canvasManager?.endGame(event.detail)
+      this.mode.classList.remove('hide')
     })
     window.addEventListener('resize', () => {
       this.showController.bind(this)(this.sideContainers, this.bottomContainers)
@@ -108,9 +126,64 @@ export default class GameController extends BaseController {
     this.leftController.setController(this.player)
     this.rightController.setController(this.player)
     this.bottomController.setController(this.player)
-    await this.gameCanvas.onClickStart([this.player])
+    const players = []
+    players.push(this.player)
+    if (this.gameCanvas.mode === 'battle-royale') {
+      type Computer = {
+        id: string
+        mode: ComputerMode
+        color: string
+      }
+      const computers: Computer[] = [
+        {
+          id: '1',
+          mode: 'nearest',
+          color: `rgb(0,0,255)`,
+        },
+        {
+          id: '2',
+          mode: 'fastest',
+          color: `rgb(255,0,0)`,
+        },
+        {
+          id: '3',
+          mode: 'slowest',
+          color: `rgb(0,255,0)`,
+        },
+        {
+          id: '4',
+          mode: 'highest',
+          color: `rgb(255,255,0)`,
+        },
+      ]
+      computers.forEach((computer) => {
+        const cpu = new ComputerPlayer({
+          id: computer.id,
+          mode: computer.mode,
+          ...config.playerSetting,
+          vx: 0,
+          vy: 0,
+          color: computer.color,
+          isJumping: false,
+          isOver: false,
+        })
+        players.push(cpu)
+      })
+    }
+    const spacing = 1 / (players.length + 1)
+    players.forEach((player, i) => {
+      player.updateFromJson({
+        x: spacing * (i + 1),
+        y: player.y,
+      })
+    })
+    this.mode.classList.add('hide')
+    await this.gameCanvas.onClickStart(players)
   }
 
+  get mode() {
+    return this._mode!
+  }
   get gameCanvas() {
     return this._gameCanvas!
   }
@@ -134,6 +207,15 @@ export default class GameController extends BaseController {
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
 #wrapper {
+  position: relative
+}
+#mode {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 3;
+}
+#controller-wrapper {
   position: relative;
   display: flex;
   justify-content: space-around;
