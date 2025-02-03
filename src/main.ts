@@ -1,6 +1,7 @@
 import './styles/styles.css'
 import CommonHead from './components/common/head.component'
 import BaseCanvasComponent from './components/atoms/base-canvas.component'
+import FabButton from './components/atoms/fab-button.component'
 import ControllerButton from './components/atoms/controller-button.component'
 import BottomController from './components/molecules/bottom-controller.component'
 import LeftController from './components/molecules/left-controller.component'
@@ -15,6 +16,7 @@ import LoginPage from './components/pages/login.component'
 
 customElements.define('common-head', CommonHead)
 customElements.define('base-canvas', BaseCanvasComponent)
+customElements.define('fab-button', FabButton)
 customElements.define('controller-button', ControllerButton)
 customElements.define('game-canvas', GameCanvas)
 customElements.define('bottom-controller', BottomController)

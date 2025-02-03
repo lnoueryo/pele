@@ -60,6 +60,7 @@ export default class GameController extends BaseController {
     })
     this.gameCanvas.addEventListener('setController', this.startGame)
     this.bottomController.addEventListener('setController', this.startGame)
+    this.rightController.addEventListener('setController', this.startGame)
     this.gameCanvas.addEventListener('changeGameStatus', (e: Event) => {
       const event = e as CustomEvent<boolean>
       this.bottomController.changeGameStatus(event.detail)
@@ -145,13 +146,18 @@ sheet.replaceSync(`
   justify-content: center;
   padding: 8px;
 }
+.bottom-container {
+  position: relative;
+  height: 50vh;
+}
 .bottom-container .buttons-container {
   position: absolute;
-  bottom: 10%;
+  bottom: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  transform: translate(0px, 50%);
 }
 .buttons-container {
   position: relative;
