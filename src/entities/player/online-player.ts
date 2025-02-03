@@ -1,4 +1,3 @@
-import { IPlayer } from '../interfaces/player.interface'
 import { BasePlayer, PlayerData } from './base-player'
 
 export class OnlinePlayer extends BasePlayer {
