@@ -1,7 +1,7 @@
-export default class MultiPage extends HTMLElement {
+export default class OnlinePage extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-      <multi-game-controller></multi-game-controller>
+      <online-game-controller></online-game-controller>
     `
   }
 }

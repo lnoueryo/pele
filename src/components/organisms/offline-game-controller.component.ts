@@ -31,9 +31,7 @@ export default class GameController extends BaseController {
         </div>
       </div>
       <div class="bottom-container">
-        <bottom-controller class="buttons-container">
-          <button>start</button>
-        </bottom-controller>
+        <bottom-controller class="buttons-container" />
       </div>
     `
     this._gameCanvas = this.shadow.querySelector(
