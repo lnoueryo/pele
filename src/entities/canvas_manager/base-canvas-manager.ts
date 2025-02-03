@@ -17,7 +17,7 @@ export abstract class BaseCanvasManager<T extends IPlayer>
   protected canvas: Canvas
   protected maguma: Maguma
   protected boxes: Box[] = []
-  protected players: T[] = []
+  protected _players: T[] = []
   protected startTime = 0
   protected currentTime = 0
   protected lastTimestamp = 0
@@ -25,7 +25,7 @@ export abstract class BaseCanvasManager<T extends IPlayer>
   constructor(params: ICanvasManager<T>) {
     this.canvas = params.canvas
     this.maguma = params.maguma
-    this.players = params.players || []
+    this._players = params.players || []
     this.boxes = params.boxes || []
   }
 
@@ -108,6 +108,19 @@ export abstract class BaseCanvasManager<T extends IPlayer>
       mouthWidth,
       mouthHeight,
     )
+
+    this.ctx.fillStyle = 'black'
+    const fontSize = Math.max(12, height / 8)
+    this.ctx.font = `${fontSize}px Arial`
+    this.ctx.textAlign = 'center'
+    const textX = x + width / 2
+    const textY = y - fontSize / 0.75
+    const maxTextLength = 3
+    const displayName =
+      player.name.length > maxTextLength
+        ? player.name.slice(0, maxTextLength)
+        : player.name
+    this.ctx.fillText(displayName, textX, textY, height * 0.8)
   }
 
   protected fillMaguma() {
@@ -123,18 +136,16 @@ export abstract class BaseCanvasManager<T extends IPlayer>
   protected shouldCreateBox() {
     return Math.random() < this.boxCreationProbability
   }
+  fillBackground(color = '#e4d5c4') {
+    this.ctx.fillStyle = color
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+  }
   fillTime(elapsedTime: number) {
     const canvasWidth = this.canvas.width
     const canvasHeight = this.canvas.height
     const fontSize = Math.min(canvasWidth, canvasHeight) / 30
     const textX = canvasWidth / 5
     const textY = canvasHeight * 0.04
-    this.ctx.clearRect(
-      textX - canvasWidth / 4,
-      textY - fontSize,
-      canvasWidth / 2,
-      fontSize * 1.5,
-    )
 
     const min = Math.floor(elapsedTime / 60000)
     const sec = Math.floor((elapsedTime % 60000) / 1000)
@@ -180,5 +191,8 @@ export abstract class BaseCanvasManager<T extends IPlayer>
   }
   get ctx() {
     return this.canvas.ctx
+  }
+  get players() {
+    return this._players
   }
 }

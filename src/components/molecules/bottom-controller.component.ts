@@ -33,6 +33,9 @@ export default class BottomController extends BaseComponent {
           <controller-button id="start-button" class="button-container">
             開始
           </controller-button>
+          <controller-button onclick="location.href='/'" class="button-container">
+            戻る
+          </controller-button>
         </div>
       </div>
     </div>

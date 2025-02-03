@@ -1,14 +1,16 @@
-import { BaseCanvasManager } from './base_canvas_manager'
+import { BaseCanvasManager } from './base-canvas-manager'
 import { Box } from '../box'
 import { Maguma } from '../maguma'
 import { Canvas } from '../canvas'
-import { SoloPlayer } from '../player/solo-player'
+import { OfflinePlayer } from '../player/offline-player'
+import { IPlayer } from '../interfaces/player.interface'
+import { ComputerPlayer } from '../player/computer-player'
 const PLAYER_DELAY = 1
 
-export class OnePlayerCanvasManager extends BaseCanvasManager<SoloPlayer> {
+export class OfflineCanvasManager extends BaseCanvasManager<IPlayer> {
   constructor(params: {
     canvas: Canvas
-    players: SoloPlayer[]
+    players: OfflinePlayer[]
     maguma: Maguma
     boxes?: Box[]
   }) {
@@ -19,9 +21,13 @@ export class OnePlayerCanvasManager extends BaseCanvasManager<SoloPlayer> {
     const deltaTime = (timestamp - this.lastTimestamp) / 1000
     this.updateCurrentTime(timestamp)
     this.resetCanvas()
+    this.fillBackground()
     this.fillTime(Date.now() - startTimestamp)
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {
+        if (player instanceof ComputerPlayer) {
+          player.decideNextMove(this.boxes)
+        }
         player.moveOnIdle(deltaTime)
         player.isGameOver()
       }

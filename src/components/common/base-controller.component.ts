@@ -1,5 +1,5 @@
 import { BaseComponent } from '../common/base.component'
-import { hideElements, showElements } from '../../utils'
+import { hideElements, isMobileDevice, showElements } from '../../utils'
 import { Logger } from '../../plugins/logger'
 import { IPlayer } from '../../entities/interfaces/player.interface'
 
@@ -23,7 +23,7 @@ export default class BaseController extends BaseComponent {
     sideContainers: NodeListOf<HTMLElement>,
     bottomContainers: NodeListOf<HTMLElement>,
   ) {
-    if (this.isMobileDevice()) {
+    if (isMobileDevice()) {
       if (window.innerWidth - 200 < window.innerHeight) {
         Logger.log('モバイル　縦向き')
         // 縦向きまたは十分な画面サイズではない端末
@@ -55,14 +55,5 @@ export default class BaseController extends BaseComponent {
     return () => {
       player.stopMovement()
     }
-  }
-  private isMobileDevice = () => {
-    const isSmallScreen = window.matchMedia('(max-width: 768px)').matches
-    const userAgent = navigator.userAgent || navigator.vendor
-    const isMobileUA =
-      /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
-        userAgent,
-      )
-    return isSmallScreen || isMobileUA
   }
 }

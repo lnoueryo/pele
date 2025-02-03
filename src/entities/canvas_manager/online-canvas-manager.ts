@@ -1,11 +1,11 @@
-import { BaseCanvasManager } from './base_canvas_manager'
+import { BaseCanvasManager } from './base-canvas-manager'
 import { Box } from '../box'
 import { Canvas } from '../canvas'
 import { Maguma } from '../maguma'
 import { OnlinePlayer } from '../player/online-player'
 const PLAYER_DELAY = 1
 
-export class MultiPlayerCanvasManager extends BaseCanvasManager<OnlinePlayer> {
+export class OnlineCanvasManager extends BaseCanvasManager<OnlinePlayer> {
   public isGameOver = false
   constructor(params: {
     canvas: Canvas
@@ -61,22 +61,5 @@ export class MultiPlayerCanvasManager extends BaseCanvasManager<OnlinePlayer> {
           speed: box.speed,
         }),
     )
-  }
-
-  public fillPlayer(player: OnlinePlayer): void {
-    super.fillPlayer(player)
-    const { x, y, width, height } = player.getCanvasSize(this.canvas)
-    this.ctx.fillStyle = 'black'
-    const fontSize = Math.max(12, height / 8)
-    this.ctx.font = `${fontSize}px Arial`
-    this.ctx.textAlign = 'center'
-    const textX = x + width / 2
-    const textY = y - fontSize / 0.75
-    const maxTextLength = 3
-    const displayName =
-      player.name.length > maxTextLength
-        ? player.name.slice(0, maxTextLength)
-        : player.name
-    this.ctx.fillText(displayName, textX, textY, height * 0.8)
   }
 }

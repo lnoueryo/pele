@@ -1,15 +1,20 @@
 import config from '../../../config'
-import { SoloPlayer } from '../../entities/player/solo-player'
+import { OfflinePlayer } from '../../entities/player/offline-player'
 import GameCanvas from './game-canvas.component'
 import BottomController from '../molecules/bottom-controller.component'
 import LeftController from '../molecules/left-controller.component'
 import RightController from '../molecules/right-controller.component'
 import BaseController from '../common/base-controller.component'
 import { Logger } from '../../plugins/logger'
+import {
+  ComputerMode,
+  ComputerPlayer,
+} from '../../entities/player/computer-player'
+import { IPlayer } from '../../entities/interfaces/player.interface'
 
 export default class GameController extends BaseController {
-  private player: SoloPlayer
-  private _gameCanvas: GameCanvas<SoloPlayer>
+  private player: OfflinePlayer
+  private _gameCanvas: GameCanvas<IPlayer>
   private _leftController: LeftController
   private _rightController: RightController
   private _bottomController: BottomController
@@ -21,7 +26,8 @@ export default class GameController extends BaseController {
     super()
     this.shadow.adoptedStyleSheets.push(sheet)
     this.shadow.innerHTML = `
-      <div id="wrapper">
+    <div id="wrapper">
+      <div id="controller-wrapper">
         <div class="side-container">
           <left-controller class="buttons-container" />
         </div>
@@ -31,14 +37,13 @@ export default class GameController extends BaseController {
         </div>
       </div>
       <div class="bottom-container">
-        <bottom-controller class="buttons-container">
-          <button>start</button>
-        </bottom-controller>
+        <bottom-controller class="buttons-container" />
       </div>
+    </div>
     `
     this._gameCanvas = this.shadow.querySelector(
       'game-canvas',
-    ) as GameCanvas<SoloPlayer>
+    ) as GameCanvas<IPlayer>
     this._leftController = this.shadow.querySelector(
       'left-controller',
     ) as LeftController
@@ -51,8 +56,8 @@ export default class GameController extends BaseController {
     this._sideContainers = this.shadow.querySelectorAll('.side-container')
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.showController(this.sideContainers, this.bottomContainers)
-    this.player = new SoloPlayer({
-      id: 'anonymous',
+    this.player = new OfflinePlayer({
+      name: 'you',
       ...config.playerSetting,
       vx: 0,
       vy: 0,
@@ -62,6 +67,7 @@ export default class GameController extends BaseController {
     })
     this.gameCanvas.addEventListener('setController', this.startGame)
     this.bottomController.addEventListener('setController', this.startGame)
+    this.rightController.addEventListener('setController', this.startGame)
     this.gameCanvas.addEventListener('changeGameStatus', (e: Event) => {
       const event = e as CustomEvent<boolean>
       this.bottomController.changeGameStatus(event.detail)
@@ -70,7 +76,7 @@ export default class GameController extends BaseController {
       const event = e as CustomEvent<{
         ranking: [
           {
-            name: ''
+            name: string
             timestamp: number
           },
         ]
@@ -96,8 +102,8 @@ export default class GameController extends BaseController {
 
   startGame = async () => {
     Logger.clear()
-    this.player = new SoloPlayer({
-      id: 'anonymous',
+    this.player = new OfflinePlayer({
+      name: 'you',
       ...config.playerSetting,
       vx: 0,
       vy: 0,
@@ -109,7 +115,58 @@ export default class GameController extends BaseController {
     this.leftController.setController(this.player)
     this.rightController.setController(this.player)
     this.bottomController.setController(this.player)
-    await this.gameCanvas.onClickStart([this.player])
+    const players = []
+    players.push(this.player)
+    if (this.gameCanvas.mode === 'battle-royale') {
+      type Computer = {
+        name: string
+        mode: ComputerMode
+        color: string
+      }
+      const computers: Computer[] = [
+        {
+          name: '1st CPU',
+          mode: 'nearest',
+          color: `rgb(0,0,255)`,
+        },
+        {
+          name: '2nd CPU',
+          mode: 'fastest',
+          color: `rgb(255,0,0)`,
+        },
+        {
+          name: '3rd CPU',
+          mode: 'slowest',
+          color: `rgb(0,255,0)`,
+        },
+        {
+          name: '4th CPU',
+          mode: 'highest',
+          color: `rgb(255,255,0)`,
+        },
+      ]
+      computers.forEach((computer) => {
+        const cpu = new ComputerPlayer({
+          name: computer.name,
+          mode: computer.mode,
+          ...config.playerSetting,
+          vx: 0,
+          vy: 0,
+          color: computer.color,
+          isJumping: false,
+          isOver: false,
+        })
+        players.push(cpu)
+      })
+    }
+    const spacing = 1 / (players.length + 1)
+    players.forEach((player, i) => {
+      player.updateFromJson({
+        x: spacing * (i + 1),
+        y: player.y,
+      })
+    })
+    await this.gameCanvas.onClickStart(players)
   }
 
   get gameCanvas() {
@@ -135,6 +192,15 @@ export default class GameController extends BaseController {
 const sheet = new CSSStyleSheet()
 sheet.replaceSync(`
 #wrapper {
+  position: relative
+}
+#mode {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 3;
+}
+#controller-wrapper {
   position: relative;
   display: flex;
   justify-content: space-around;
@@ -147,13 +213,18 @@ sheet.replaceSync(`
   justify-content: center;
   padding: 8px;
 }
+.bottom-container {
+  position: relative;
+  height: 50vh;
+}
 .bottom-container .buttons-container {
   position: absolute;
-  bottom: 10%;
+  bottom: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  transform: translate(0px, 50%);
 }
 .buttons-container {
   position: relative;

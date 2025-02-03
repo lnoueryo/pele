@@ -1,11 +1,10 @@
-import { IPlayer } from '../interfaces/player.interface'
 import { BasePlayer, PlayerData } from './base-player'
 
-export class OnlinePlayer extends BasePlayer implements IPlayer {
+export class OnlinePlayer extends BasePlayer {
   private _id
-  private _name
   constructor(params: PlayerData & { id: string; name: string }) {
     super({
+      name: params.name,
       x: params.x,
       y: params.y,
       width: params.width,
@@ -20,7 +19,6 @@ export class OnlinePlayer extends BasePlayer implements IPlayer {
       isOver: params.isOver,
     })
     this._id = params.id
-    this._name = params.name
   }
 
   convertToJson() {
@@ -49,9 +47,5 @@ export class OnlinePlayer extends BasePlayer implements IPlayer {
 
   get id() {
     return this._id
-  }
-
-  get name() {
-    return this._name
   }
 }

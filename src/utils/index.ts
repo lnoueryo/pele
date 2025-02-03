@@ -16,3 +16,13 @@ export const showElements = (elements: NodeListOf<HTMLElement>) => {
     element.classList.remove('hide')
   })
 }
+
+export const isMobileDevice = () => {
+  const isSmallScreen = window.matchMedia('(max-width: 768px)').matches
+  const userAgent = navigator.userAgent || navigator.vendor
+  const isMobileUA =
+    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+      userAgent,
+    )
+  return isSmallScreen || isMobileUA
+}

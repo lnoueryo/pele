@@ -1,21 +1,23 @@
 import { CanvasManager } from './../../entities/interfaces/canvas-manager.interface'
 import { Canvas } from '../../entities/canvas'
 import { Maguma } from '../../entities/maguma'
-import { createEvent } from '../../utils'
+import { createEvent, isMobileDevice } from '../../utils'
 import BaseCanvasComponent from '../atoms/base-canvas.component'
 import { BaseComponent } from '../common/base.component'
 import { Logger } from '../../plugins/logger'
 import { IPlayer } from '../../entities/interfaces/player.interface'
 import { OnlinePlayer } from '../../entities/player/online-player'
-import { SoloPlayer } from '../../entities/player/solo-player'
-import { OnePlayerCanvasManager } from '../../entities/canvas_manager/one_player_canvas_manager'
-import { MultiPlayerCanvasManager } from '../../entities/canvas_manager/multi_player_canvas_manager'
+import { OfflinePlayer } from '../../entities/player/offline-player'
+import { OfflineCanvasManager } from '../../entities/canvas_manager/offline-canvas-manager'
+import { OnlineCanvasManager } from '../../entities/canvas_manager/online-canvas-manager'
 
 export default class GameCanvas<T extends IPlayer> extends BaseComponent {
+  public mode = 'time-survival'
   public canvasManager: CanvasManager | null = null
   private _baseCanvas: BaseCanvasComponent
   private centerButtons: HTMLDivElement
   private start: HTMLButtonElement
+  private dropdown: HTMLDivElement
   public isGameRunning = false
 
   constructor() {
@@ -23,7 +25,13 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
     this.shadow.adoptedStyleSheets.push(sheet)
     this.shadow.innerHTML = `
       <div id="canvas-container">
-        <div id="center-buttons">
+        <div id="dropdown">
+          <select id="mode-select">
+            <option value="time-survival">Time Survival</option>
+            <option value="battle-royale">Battle Royale</option>
+          </select>
+        </div>
+        <div id="center-buttons" class="mobile-hide">
           <button id="start" class="button">start</button>
           <button class="button" onclick="location.href = '/'">back</button>
         </div>
@@ -39,6 +47,10 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
       'center-buttons',
     ) as HTMLDivElement
     this.start = this.shadow.getElementById('start') as HTMLButtonElement
+    this.dropdown = this.shadow.getElementById('dropdown') as HTMLDivElement
+    const modeSelect = this.shadow.getElementById(
+      'mode-select',
+    ) as HTMLSelectElement
     createEvent<Event>(this.start, 'click', () => {
       this.dispatchEvent(new CustomEvent<IPlayer>('setController'))
     })
@@ -50,10 +62,18 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
         e.stopPropagation()
       }
     })
+    modeSelect.addEventListener('change', (e: Event) => {
+      const target = e.target as HTMLSelectElement
+      this.mode = target.value
+    })
+    this.switchHideButtons()
+    window.addEventListener('resize', this.switchHideButtons)
   }
   onClickStart = async (players: T[]) => {
     const centerButtons = this.centerButtons
+    const dropdown = this.dropdown
     centerButtons.classList.add('hide')
+    dropdown.classList.add('hide')
     this.canvasManager = this.createCanvasManager(
       this.canvas,
       players,
@@ -68,6 +88,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
     Logger.groupEnd()
     this.changeGameStatus(false)
     centerButtons.classList.remove('hide')
+    dropdown.classList.remove('hide')
   }
   changeGameStatus(status: boolean) {
     this.isGameRunning = status
@@ -105,7 +126,12 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
             startTimestamp: number
           }>('endGame', {
             detail: {
-              ranking: [{ name: 'player1', timestamp: Date.now() }],
+              ranking: this.canvasManager!.players.map((player) => {
+                return {
+                  name: player.name,
+                  timestamp: player.timestamp,
+                }
+              }).sort((a, b) => b.timestamp - a.timestamp),
               startTimestamp,
             },
           }),
@@ -189,16 +215,25 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
 
     const firstPlayer = players[0]
 
-    if (firstPlayer instanceof SoloPlayer) {
-      const soloPlayers = players.map((player) => player as SoloPlayer)
-      return new OnePlayerCanvasManager({
-        canvas,
-        players: soloPlayers,
-        maguma,
-      })
+    if (firstPlayer instanceof OfflinePlayer) {
+      if (this.mode === 'time-survival') {
+        const soloPlayers = players.map((player) => player as OfflinePlayer)
+        return new OfflineCanvasManager({
+          canvas,
+          players: soloPlayers,
+          maguma,
+        })
+      } else {
+        const soloPlayers = players.map((player) => player as OfflinePlayer)
+        return new OfflineCanvasManager({
+          canvas,
+          players: soloPlayers,
+          maguma,
+        })
+      }
     } else if (firstPlayer instanceof OnlinePlayer) {
       const onlinePlayers = players.map((player) => player as OnlinePlayer)
-      return new MultiPlayerCanvasManager({
+      return new OnlineCanvasManager({
         canvas,
         players: onlinePlayers,
         maguma,
@@ -206,6 +241,13 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
     }
 
     throw new Error('不正なプレイヤークラス')
+  }
+  private switchHideButtons = () => {
+    if (isMobileDevice()) {
+      this.centerButtons.classList.add('mobile-hide')
+    } else {
+      this.centerButtons.classList.remove('mobile-hide')
+    }
   }
   get baseCanvas() {
     return this._baseCanvas
@@ -220,6 +262,7 @@ sheet.replaceSync(`
 #canvas-container {
   margin: 0;
   padding: 0;
+  position: relative;
 }
 
 #center-buttons {
@@ -229,8 +272,22 @@ sheet.replaceSync(`
   transform: translate(-50%, -50%);
 }
 
+#dropdown {
+  position: absolute;
+  top: 5%;
+  right: 5%;
+}
+
+#mode-select {
+  height: 28px;
+  min-width: 112px;
+}
+
 .button {
   padding: 14px;
   margin: 0 7px;
 }
+  .mobile-hide {
+    display: none;
+  }
 `)

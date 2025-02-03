@@ -8,6 +8,7 @@ export default class LeftController extends BaseComponent {
     super()
     this.shadow.adoptedStyleSheets.push(sheet)
     this.shadow.innerHTML = `
+      <fab-button onclick="location.href='/'">戻る</fab-button>
       <controller-button id="left" class="button-container">
         左
       </controller-button>
@@ -55,5 +56,10 @@ sheet.replaceSync(`
   .button-container {
     width: 47%;
     position: relative;
+  }
+  fab-button {
+    position: fixed;
+    left: 10px;
+    top: 10px;
   }
 `)

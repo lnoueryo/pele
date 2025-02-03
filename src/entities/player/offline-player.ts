@@ -1,10 +1,9 @@
-import { IPlayer } from '../interfaces/player.interface'
 import { BasePlayer, PlayerData } from './base-player'
 
-export class SoloPlayer extends BasePlayer implements IPlayer {
-  private id
-  constructor(params: PlayerData & { id: string }) {
+export class OfflinePlayer extends BasePlayer {
+  constructor(params: PlayerData & { name: string }) {
     super({
+      name: params.name,
       x: params.x,
       y: params.y,
       width: params.width,
@@ -18,12 +17,12 @@ export class SoloPlayer extends BasePlayer implements IPlayer {
       color: params.color,
       isOver: params.isOver,
     })
-    this.id = params.id
+    this._name = params.name
   }
 
   convertToJson() {
     return {
-      id: this.id,
+      name: this.name,
       x: this.x,
       y: this.y,
       width: this.width,

@@ -1,6 +1,7 @@
 import { Box } from '../box'
 import { Canvas } from '../canvas'
 export type PlayerData = {
+  name: string
   x: number
   y: number
   width: number
@@ -15,6 +16,7 @@ export type PlayerData = {
   isOver: boolean
 }
 export abstract class BasePlayer {
+  protected _name
   protected _x
   protected _y
   protected _width
@@ -27,7 +29,9 @@ export abstract class BasePlayer {
   protected _speed
   public color
   protected _isOver
+  protected _timestamp: number = Date.now()
   constructor(params: PlayerData) {
+    this._name = params.name
     this._x = params.x
     this._y = params.y
     this._width = params.width
@@ -87,7 +91,12 @@ export abstract class BasePlayer {
   }
 
   isGameOver() {
+    if (this.isOver) return
     this._isOver = this.y - this.height > 1
+    if (this.isOver) {
+      console.log(Date.now())
+      this._timestamp = Date.now()
+    }
   }
 
   isMovingToRight() {
@@ -101,6 +110,10 @@ export abstract class BasePlayer {
       width: this.width * canvas.width,
       height: this.height * canvas.height,
     }
+  }
+
+  get name() {
+    return this._name
   }
 
   get x() {
@@ -145,5 +158,9 @@ export abstract class BasePlayer {
 
   get isOver() {
     return this._isOver
+  }
+
+  get timestamp() {
+    return this._timestamp
   }
 }

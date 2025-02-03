@@ -54,6 +54,10 @@ export default class GameController extends BaseController {
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.showController(this.sideContainers, this.bottomContainers)
     this.gameCanvas.addEventListener('setController', this.onClickStartGame)
+    this.rightController.addEventListener(
+      'setController',
+      this.onClickStartGame,
+    )
     this.bottomController.addEventListener(
       'setController',
       this.onClickStartGame,
@@ -265,13 +269,18 @@ sheet.replaceSync(`
   justify-content: center;
   padding: 8px;
 }
+.bottom-container {
+  position: relative;
+  height: 50vh;
+}
 .bottom-container .buttons-container {
   position: absolute;
-  bottom: 10%;
+  bottom: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  transform: translate(0px, 50%);
 }
 .buttons-container {
   position: relative;
