@@ -1,4 +1,4 @@
-import { BaseCanvasManager } from './base_canvas_manager'
+import { BaseCanvasManager } from './base-canvas-manager'
 import { Box } from '../box'
 import { Canvas } from '../canvas'
 import { Maguma } from '../maguma'
