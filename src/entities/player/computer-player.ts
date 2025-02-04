@@ -7,6 +7,7 @@ export class ComputerPlayer extends BasePlayer {
   private mode: ComputerMode = 'nearest'
   constructor(params: PlayerData & { name: string; mode: ComputerMode }) {
     super({
+      id: params.id,
       name: params.name,
       x: params.x,
       y: params.y,
@@ -27,20 +28,23 @@ export class ComputerPlayer extends BasePlayer {
   decideNextMove(boxes: Box[]) {
     if (boxes.length === 0) return
     const candidates = this.getCandidateBoxes(boxes)
-    let targetBox = this.getTargetBox(candidates, this.mode)
-
+    const targetBox = this.getTargetBox(candidates, this.mode)
+    let { x: targetBoxX } = targetBox.convertToJson()
+    const { y: targetBoxY, width: targetBoxWidth } = targetBox.convertToJson()
     // **目標のボックスが上にある**
-    if (!this.isJumping && targetBox.y < this.y) {
+    if (!this.isJumping && targetBoxY < this.y) {
       this.jump()
     }
     if (
-      Math.abs(this.x - targetBox.x - targetBox.width) < 0.05 &&
-      Math.abs(this.y - targetBox.y) < 0.05
+      Math.abs(this.x - targetBoxX - targetBoxWidth) < 0.05 &&
+      Math.abs(this.y - targetBoxY) < 0.05
     ) {
       const candidates = this.getCandidateBoxes(boxes)
-      targetBox = this.getTargetBox(candidates, 'nearest')
+      const newTargetBox = this.getTargetBox(candidates, 'nearest')
+      const { x } = newTargetBox.convertToJson()
+      targetBoxX = x
     }
-    const moveDirection = this.x < targetBox.x ? 1 : -1
+    const moveDirection = this.x < targetBoxX ? 1 : -1
     const speedFactor = 0.9
     this._vx += moveDirection * speedFactor
     if (Math.abs(this.vx) > 0.25) this._vx *= 0.4
@@ -52,14 +56,10 @@ export class ComputerPlayer extends BasePlayer {
   }
 
   private getCandidateBoxes(boxes: Box[]) {
-    const candidates = boxes.filter(
-      (box) =>
-        box.x >= 0.3 &&
-        box.x <= 0.9 &&
-        box.y <= 0.7 &&
-        box.y >= 0.1 &&
-        box.speed < 0.6,
-    )
+    const candidates = boxes.filter((box) => {
+      const { x, y, speed } = box.convertToJson()
+      return x >= 0.3 && x <= 0.9 && y <= 0.7 && y >= 0.1 && speed < 0.6
+    })
     return candidates.length === 0 ? boxes : candidates
   }
 
@@ -67,17 +67,23 @@ export class ComputerPlayer extends BasePlayer {
     switch (mode) {
       case 'slowest':
         return candidates.reduce((slowestBox, currentBox) => {
-          return currentBox.speed < slowestBox.speed ? currentBox : slowestBox
+          const { speed: currentBoxSpeed } = currentBox.convertToJson()
+          const { speed: slowestBoxSpeed } = slowestBox.convertToJson()
+          return currentBoxSpeed < slowestBoxSpeed ? currentBox : slowestBox
         }, candidates[0])
 
       case 'fastest':
         return candidates.reduce((fastestBox, currentBox) => {
-          return currentBox.speed > fastestBox.speed ? currentBox : fastestBox
+          const { speed: currentBoxSpeed } = currentBox.convertToJson()
+          const { speed: fastestBoxSpeed } = fastestBox.convertToJson()
+          return currentBoxSpeed > fastestBoxSpeed ? currentBox : fastestBox
         }, candidates[0])
 
       case 'highest':
-        return candidates.reduce((highest, box) => {
-          return box.y < highest.y ? box : highest
+        return candidates.reduce((highestBox, currentBox) => {
+          const { y: currentBoxY } = currentBox.convertToJson()
+          const { y: highestBoxY } = highestBox.convertToJson()
+          return currentBoxY < highestBoxY ? currentBox : highestBox
         }, candidates[0])
 
       case 'nearest':
@@ -91,7 +97,8 @@ export class ComputerPlayer extends BasePlayer {
   }
 
   private calculateDistance(box: Box) {
-    return Math.sqrt(Math.pow(box.x - this.x, 2) + Math.pow(box.y - this.y, 2))
+    const { x, y } = box.convertToJson()
+    return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2))
   }
 
   convertToJson() {
@@ -110,10 +117,5 @@ export class ComputerPlayer extends BasePlayer {
       color: this.color,
       isOver: this.isOver,
     }
-  }
-
-  updateFromJson(params: { x: number; y: number }) {
-    this._x = params.x
-    this._y = params.y
   }
 }

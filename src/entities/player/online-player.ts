@@ -1,9 +1,9 @@
 import { BasePlayer, PlayerData } from './base-player'
 
 export class OnlinePlayer extends BasePlayer {
-  private _id
   constructor(params: PlayerData & { id: string; name: string }) {
     super({
+      id: params.id,
       name: params.name,
       x: params.x,
       y: params.y,
@@ -18,7 +18,6 @@ export class OnlinePlayer extends BasePlayer {
       color: params.color,
       isOver: params.isOver,
     })
-    this._id = params.id
   }
 
   convertToJson() {
@@ -38,14 +37,5 @@ export class OnlinePlayer extends BasePlayer {
       color: this.color,
       isOver: this.isOver,
     }
-  }
-
-  updateFromJson(params: { x: number; y: number }) {
-    this._x = params.x
-    this._y = params.y
-  }
-
-  get id() {
-    return this._id
   }
 }

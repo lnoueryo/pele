@@ -1,20 +1,18 @@
 import config from '../../../config'
-import { OfflinePlayer } from '../../entities/player/offline-player'
 import GameCanvas from './game-canvas.component'
 import BottomController from '../molecules/bottom-controller.component'
 import LeftController from '../molecules/left-controller.component'
 import RightController from '../molecules/right-controller.component'
 import BaseController from '../common/base-controller.component'
 import { Logger } from '../../plugins/logger'
-import {
-  ComputerMode,
-  ComputerPlayer,
-} from '../../entities/player/computer-player'
+import { ComputerPlayer } from '../../entities/player/computer-player'
 import { IPlayer } from '../../entities/interfaces/player.interface'
+import { MainPlayer } from '../../entities/player/main-player'
+import { OfflineCanvasManager } from '../../entities/canvas_manager/offline-canvas-manager'
 
 export default class GameController extends BaseController {
-  private player: OfflinePlayer
-  private _gameCanvas: GameCanvas<IPlayer>
+  private player: MainPlayer
+  private _gameCanvas: GameCanvas<IPlayer, OfflineCanvasManager>
   private _leftController: LeftController
   private _rightController: RightController
   private _bottomController: BottomController
@@ -41,9 +39,10 @@ export default class GameController extends BaseController {
       </div>
     </div>
     `
-    this._gameCanvas = this.shadow.querySelector(
-      'game-canvas',
-    ) as GameCanvas<IPlayer>
+    this._gameCanvas = this.shadow.querySelector('game-canvas') as GameCanvas<
+      IPlayer,
+      OfflineCanvasManager
+    >
     this._leftController = this.shadow.querySelector(
       'left-controller',
     ) as LeftController
@@ -56,7 +55,8 @@ export default class GameController extends BaseController {
     this._sideContainers = this.shadow.querySelectorAll('.side-container')
     this._bottomContainers = this.shadow.querySelectorAll('.bottom-container')
     this.showController(this.sideContainers, this.bottomContainers)
-    this.player = new OfflinePlayer({
+    this.player = new MainPlayer({
+      id: 'you',
       name: 'you',
       ...config.playerSetting,
       vx: 0,
@@ -97,12 +97,14 @@ export default class GameController extends BaseController {
       this.bottomContainers,
       this.gameCanvas,
     )
+    this.gameCanvas.canvasManagerClass = OfflineCanvasManager
     Logger.groupEnd()
   }
 
   startGame = async () => {
     Logger.clear()
-    this.player = new OfflinePlayer({
+    this.player = new MainPlayer({
+      id: 'you',
       name: 'you',
       ...config.playerSetting,
       vx: 0,
@@ -115,38 +117,12 @@ export default class GameController extends BaseController {
     this.leftController.setController(this.player)
     this.rightController.setController(this.player)
     this.bottomController.setController(this.player)
-    const players = []
+    const players: IPlayer[] = []
     players.push(this.player)
     if (this.gameCanvas.mode === 'battle-royale') {
-      type Computer = {
-        name: string
-        mode: ComputerMode
-        color: string
-      }
-      const computers: Computer[] = [
-        {
-          name: '1st CPU',
-          mode: 'nearest',
-          color: `rgb(0,0,255)`,
-        },
-        {
-          name: '2nd CPU',
-          mode: 'fastest',
-          color: `rgb(255,0,0)`,
-        },
-        {
-          name: '3rd CPU',
-          mode: 'slowest',
-          color: `rgb(0,255,0)`,
-        },
-        {
-          name: '4th CPU',
-          mode: 'highest',
-          color: `rgb(255,255,0)`,
-        },
-      ]
-      computers.forEach((computer) => {
+      config.computerSetting.forEach((computer) => {
         const cpu = new ComputerPlayer({
+          id: computer.id,
           name: computer.name,
           mode: computer.mode,
           ...config.playerSetting,
@@ -161,9 +137,10 @@ export default class GameController extends BaseController {
     }
     const spacing = 1 / (players.length + 1)
     players.forEach((player, i) => {
+      const { y } = player.convertToJson()
       player.updateFromJson({
         x: spacing * (i + 1),
-        y: player.y,
+        y,
       })
     })
     await this.gameCanvas.onClickStart(players)

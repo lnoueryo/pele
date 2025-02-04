@@ -1,14 +1,13 @@
 import { Box } from '../box'
-import { CanvasObject } from './canvas-object.interface'
-
-export interface IPlayer extends CanvasObject {
+import type { GameObject } from '../game-object'
+export interface IPlayer {
+  id: string
   name: string
   vx: number
   vy: number
   vg: number
   jumpStrength: number
   isJumping: boolean
-  speed: number
   color: string
   isOver: boolean
   timestamp: number
@@ -21,6 +20,7 @@ export interface IPlayer extends CanvasObject {
   moveToRight(): void
   jump(): void
   stopMovement(): void
-  convertToJson(): object
   updateFromJson(data: object): void
+  convertToJson: GameObject['convertToJson']
+  getCanvasSize: GameObject['getCanvasSize']
 }

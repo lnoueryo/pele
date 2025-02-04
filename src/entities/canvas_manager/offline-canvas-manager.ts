@@ -2,7 +2,6 @@ import { BaseCanvasManager } from './base-canvas-manager'
 import { Box } from '../box'
 import { Maguma } from '../maguma'
 import { Canvas } from '../canvas'
-import { OfflinePlayer } from '../player/offline-player'
 import { IPlayer } from '../interfaces/player.interface'
 import { ComputerPlayer } from '../player/computer-player'
 const PLAYER_DELAY = 1
@@ -10,7 +9,7 @@ const PLAYER_DELAY = 1
 export class OfflineCanvasManager extends BaseCanvasManager<IPlayer> {
   constructor(params: {
     canvas: Canvas
-    players: OfflinePlayer[]
+    players: IPlayer[]
     maguma: Maguma
     boxes?: Box[]
   }) {
@@ -39,7 +38,10 @@ export class OfflineCanvasManager extends BaseCanvasManager<IPlayer> {
 
       this.fillBox(box)
       this.players.forEach((player) => {
-        if (player.isPlayerCollidingWithBox(box)) player.moveOnTopBox(box.y)
+        if (player.isPlayerCollidingWithBox(box)) {
+          const { y } = box.convertToJson()
+          player.moveOnTopBox(y)
+        }
       })
     }
 
@@ -55,17 +57,7 @@ export class OfflineCanvasManager extends BaseCanvasManager<IPlayer> {
     return this.boxes
   }
 
-  private createBox() {
-    const box = Box.createBox()
-    this.boxes.push(box)
-    return box
-  }
-
-  private deleteBox(box: Box) {
-    const index = this.boxes.indexOf(box)
-    this.boxes.splice(index, 1)
-  }
-  updateBoxes(
+  public updateBoxes(
     boxesJson: {
       x: number
       y: number
@@ -75,6 +67,17 @@ export class OfflineCanvasManager extends BaseCanvasManager<IPlayer> {
     }[],
   ) {
     console.log(boxesJson)
+  }
+
+  private createBox() {
+    const box = Box.createBox()
+    this.boxes.push(box)
+    return box
+  }
+
+  private deleteBox(box: Box) {
+    const index = this.boxes.indexOf(box)
+    this.boxes.splice(index, 1)
   }
 
   get isGameOver() {

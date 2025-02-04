@@ -1,8 +1,9 @@
 import { BasePlayer, PlayerData } from './base-player'
 
-export class OfflinePlayer extends BasePlayer {
+export class MainPlayer extends BasePlayer {
   constructor(params: PlayerData & { name: string }) {
     super({
+      id: params.id,
       name: params.name,
       x: params.x,
       y: params.y,
@@ -17,11 +18,11 @@ export class OfflinePlayer extends BasePlayer {
       color: params.color,
       isOver: params.isOver,
     })
-    this._name = params.name
   }
 
   convertToJson() {
     return {
+      id: this.id,
       name: this.name,
       x: this.x,
       y: this.y,
@@ -36,10 +37,5 @@ export class OfflinePlayer extends BasePlayer {
       color: this.color,
       isOver: this.isOver,
     }
-  }
-
-  updateFromJson(params: { x: number; y: number }) {
-    this._x = params.x
-    this._y = params.y
   }
 }
