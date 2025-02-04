@@ -106,7 +106,7 @@ export default class GameController extends BaseController {
   }
 
   private onClickStartGame = () => {
-    this.socket.emit('start')
+    this.socket.emit('start', this.gameCanvas.mode)
   }
 
   startGame = async () => {

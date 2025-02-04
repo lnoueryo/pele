@@ -1,5 +1,4 @@
 import { Box } from '../box'
-import { Canvas } from '../canvas'
 import type { GameObject } from '../game-object'
 export interface IPlayer {
   id: string
