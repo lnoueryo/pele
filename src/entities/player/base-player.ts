@@ -93,10 +93,7 @@ export abstract class BasePlayer {
   isGameOver() {
     if (this.isOver) return
     this._isOver = this.y - this.height > 1
-    if (this.isOver) {
-      console.log(Date.now())
-      this._timestamp = Date.now()
-    }
+    this._timestamp = Date.now()
   }
 
   isMovingToRight() {
