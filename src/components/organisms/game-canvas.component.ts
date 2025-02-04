@@ -7,13 +7,21 @@ import { BaseComponent } from '../common/base.component'
 import { Logger } from '../../plugins/logger'
 import { IPlayer } from '../../entities/interfaces/player.interface'
 import { OnlinePlayer } from '../../entities/player/online-player'
-import { OfflinePlayer } from '../../entities/player/offline-player'
-import { OfflineCanvasManager } from '../../entities/canvas_manager/offline-canvas-manager'
-import { OnlineCanvasManager } from '../../entities/canvas_manager/online-canvas-manager'
+import { MainPlayer } from '../../entities/player/main-player'
 
-export default class GameCanvas<T extends IPlayer> extends BaseComponent {
+export default class GameCanvas<
+  T extends IPlayer,
+  U extends CanvasManager,
+> extends BaseComponent {
   public mode = 'time-survival'
-  public canvasManager: CanvasManager | null = null
+  public canvasManagerClass:
+    | (new (params: {
+        canvas: Canvas
+        players: IPlayer[]
+        maguma: Maguma
+      }) => U)
+    | null = null
+  public canvasManager: U | null = null
   private _baseCanvas: BaseCanvasComponent
   private centerButtons: HTMLDivElement
   private start: HTMLButtonElement
@@ -70,20 +78,22 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
     window.addEventListener('resize', this.switchHideButtons)
   }
   onClickStart = async (players: T[]) => {
+    if (!this.canvasManagerClass) {
+      throw new Error('no canvas manager')
+    }
     const centerButtons = this.centerButtons
     const dropdown = this.dropdown
     centerButtons.classList.add('hide')
     dropdown.classList.add('hide')
-    this.canvasManager = this.createCanvasManager(
-      this.canvas,
-      players,
-      Maguma.createMaguma(),
-    )
     this.changeGameStatus(true)
-    const canvasManager = this.canvasManager
+    this.canvasManager = new this.canvasManagerClass({
+      canvas: this.canvas,
+      players,
+      maguma: Maguma.createMaguma(),
+    })
     Logger.group()
     Logger.log('ゲーム開始')
-    await this.gameLoop(canvasManager)
+    await this.gameLoop(this.canvasManager)
     Logger.log('ゲーム終了')
     Logger.groupEnd()
     this.changeGameStatus(false)
@@ -96,7 +106,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
       new CustomEvent<boolean>('changeGameStatus', { detail: status }),
     )
   }
-  private async gameLoop(canvasManager: CanvasManager, targetFPS = 60) {
+  private async gameLoop(canvasManager: U, targetFPS = 60) {
     const frameDuration = 1000 / targetFPS // 目標のフレーム時間（ミリ秒）
 
     const requestAnimationFrameAsync = (): Promise<number> => {
@@ -126,12 +136,14 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
             startTimestamp: number
           }>('endGame', {
             detail: {
-              ranking: this.canvasManager!.players.map((player) => {
-                return {
-                  name: player.name,
-                  timestamp: player.timestamp,
-                }
-              }).sort((a, b) => b.timestamp - a.timestamp),
+              ranking: canvasManager.players
+                .map((player) => {
+                  return {
+                    name: player.name,
+                    timestamp: player.timestamp,
+                  }
+                })
+                .sort((a, b) => b.timestamp - a.timestamp),
               startTimestamp,
             },
           }),
@@ -144,7 +156,7 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
       lastTimestamp = timestamp // 最後のタイムスタンプを更新
     }
   }
-  fillPlayers(players: OnlinePlayer[]) {
+  fillPlayers(players: OnlinePlayer[] & MainPlayer[]) {
     const canvas = this.baseCanvas.canvas
     canvas.ctx.clearRect(0, 0, canvas.width, canvas.height)
     const ctx = canvas.ctx
@@ -203,44 +215,6 @@ export default class GameCanvas<T extends IPlayer> extends BaseComponent {
         mouthHeight,
       )
     }
-  }
-  private createCanvasManager(
-    canvas: Canvas,
-    players: IPlayer[],
-    maguma: Maguma,
-  ): CanvasManager {
-    if (players.length === 0) {
-      throw new Error('プレイヤーリストが空です')
-    }
-
-    const firstPlayer = players[0]
-
-    if (firstPlayer instanceof OfflinePlayer) {
-      if (this.mode === 'time-survival') {
-        const soloPlayers = players.map((player) => player as OfflinePlayer)
-        return new OfflineCanvasManager({
-          canvas,
-          players: soloPlayers,
-          maguma,
-        })
-      } else {
-        const soloPlayers = players.map((player) => player as OfflinePlayer)
-        return new OfflineCanvasManager({
-          canvas,
-          players: soloPlayers,
-          maguma,
-        })
-      }
-    } else if (firstPlayer instanceof OnlinePlayer) {
-      const onlinePlayers = players.map((player) => player as OnlinePlayer)
-      return new OnlineCanvasManager({
-        canvas,
-        players: onlinePlayers,
-        maguma,
-      })
-    }
-
-    throw new Error('不正なプレイヤークラス')
   }
   private switchHideButtons = () => {
     if (isMobileDevice()) {

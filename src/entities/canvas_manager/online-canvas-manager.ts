@@ -2,14 +2,15 @@ import { BaseCanvasManager } from './base-canvas-manager'
 import { Box } from '../box'
 import { Canvas } from '../canvas'
 import { Maguma } from '../maguma'
-import { OnlinePlayer } from '../player/online-player'
+import { IPlayer } from '../interfaces/player.interface'
+import { MainPlayer } from '../player/main-player'
 const PLAYER_DELAY = 1
 
-export class OnlineCanvasManager extends BaseCanvasManager<OnlinePlayer> {
+export class OnlineCanvasManager extends BaseCanvasManager<IPlayer> {
   public isGameOver = false
   constructor(params: {
     canvas: Canvas
-    players: OnlinePlayer[]
+    players: IPlayer[]
     maguma: Maguma
     boxes?: Box[]
   }) {
@@ -22,19 +23,26 @@ export class OnlineCanvasManager extends BaseCanvasManager<OnlinePlayer> {
     this.resetCanvas()
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {
-        player.moveOnIdle(deltaTime)
-        player.isGameOver()
+        if (player instanceof MainPlayer && !player.isOver) {
+          player.moveOnIdle(deltaTime)
+          player.isGameOver()
+        }
       }
     }
     for (const box of this.boxes) {
       this.fillBox(box)
       this.players.forEach((player) => {
-        if (player.isPlayerCollidingWithBox(box)) player.moveOnTopBox(box.y)
+        if (player.isPlayerCollidingWithBox(box)) {
+          const { y } = box.convertToJson()
+          player.moveOnTopBox(y)
+        }
       })
     }
 
     this.players.forEach((player) => {
-      this.fillPlayer(player)
+      if (!player.isOver) {
+        this.fillPlayer(player)
+      }
     })
 
     this.fillMaguma()

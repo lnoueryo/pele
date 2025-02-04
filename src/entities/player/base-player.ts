@@ -1,6 +1,8 @@
 import { Box } from '../box'
-import { Canvas } from '../canvas'
+import { GameObject } from '../game-object'
+import { IPlayer } from '../interfaces/player.interface'
 export type PlayerData = {
+  id: string
   name: string
   x: number
   y: number
@@ -15,43 +17,36 @@ export type PlayerData = {
   color: string
   isOver: boolean
 }
-export abstract class BasePlayer {
+export abstract class BasePlayer extends GameObject implements IPlayer {
+  protected _id
   protected _name
-  protected _x
-  protected _y
-  protected _width
-  protected _height
   protected _vx
   protected _vy
   protected _vg
   protected _jumpStrength
   protected _isJumping
-  protected _speed
   public color
   protected _isOver
   protected _timestamp: number = Date.now()
   constructor(params: PlayerData) {
+    super(params.x, params.y, params.width, params.height, params.speed)
+    this._id = params.id
     this._name = params.name
-    this._x = params.x
-    this._y = params.y
-    this._width = params.width
-    this._height = params.height
     this._vx = params.vx
     this._vy = params.vy
     this._vg = params.vg
     this._jumpStrength = params.jumpStrength
     this._isJumping = params.isJumping
-    this._speed = params.speed
     this.color = params.color
     this._isOver = params.isOver
   }
 
   moveToLeft() {
-    this._vx = -this._speed
+    this._vx = -this.speed
   }
 
   moveToRight() {
-    this._vx = this._speed
+    this._vx = this.speed
   }
 
   jump() {
@@ -65,68 +60,58 @@ export abstract class BasePlayer {
 
   moveOnIdle(deltaTime: number) {
     this._vy += this._vg * deltaTime
-    this._x += this.vx * deltaTime
-    this._y += this.vy * deltaTime
+    this.x += this.vx * deltaTime
+    this.y += this.vy * deltaTime
   }
 
   moveOnTopBox(boxY: number) {
-    this._y = boxY - this.height
+    this.y = boxY - this.height
     this._vy = 0
     this._isJumping = false
   }
 
   isPlayerCollidingWithBox(box: Box) {
+    const { x, y, width, height } = box.convertToJson()
     return (
-      this.x + this.width > box.x &&
-      this.x < box.x + box.width &&
-      this.y + this.height > box.y &&
-      this.y < box.y + box.height &&
+      this.x + this.width > x &&
+      this.x < x + width &&
+      this.y + this.height > y &&
+      this.y < y + height &&
       this.vy >= 0
     )
   }
 
-  updateFromJson(params: { x: number; y: number }) {
-    this._x = params.x
-    this._y = params.y
+  updateFromJson(params: {
+    x: number
+    y: number
+    isOver: boolean
+    timestamp: number
+  }) {
+    this.x = params.x
+    this.y = params.y
+    this._isOver = params.isOver
+    this._timestamp = params.timestamp
   }
 
   isGameOver() {
     if (this.isOver) return
-    this._isOver = this.y - this.height > 1
+    this._isOver = this.y - this.height >= 1
     this._timestamp = Date.now()
+    if (this.isOver) {
+      this.y = 1
+    }
   }
 
   isMovingToRight() {
     return 0 <= this.vx
   }
 
-  getCanvasSize(canvas: Canvas) {
-    return {
-      x: this.x * canvas.width,
-      y: this.y * canvas.height,
-      width: this.width * canvas.width,
-      height: this.height * canvas.height,
-    }
+  get id() {
+    return this._id
   }
 
   get name() {
     return this._name
-  }
-
-  get x() {
-    return this._x
-  }
-
-  get y() {
-    return this._y
-  }
-
-  get width() {
-    return this._width
-  }
-
-  get height() {
-    return this._height
   }
 
   get jumpStrength() {
@@ -147,10 +132,6 @@ export abstract class BasePlayer {
 
   get vg() {
     return this._vg
-  }
-
-  get speed() {
-    return this._speed
   }
 
   get isOver() {

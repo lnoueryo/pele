@@ -1,6 +1,6 @@
 import { Canvas } from './canvas'
-import type { CanvasObject } from './interfaces/canvas-object.interface'
 import config from '../../config'
+import { GameObject } from './game-object'
 const LEFT_LIMIT = 0
 const TOP_LIMIT = 0
 const {
@@ -20,24 +20,15 @@ type IBox = {
   speed: number
 }
 
-export class Box implements CanvasObject {
-  private _x
-  private _y
-  private _width
-  private _height
-  private _speed
+export class Box extends GameObject {
   private ySalt = Math.random() - 0.5
   constructor(params: IBox) {
-    this._width = params.width
-    this._height = params.height
-    this._x = params.x
-    this._y = params.y
-    this._speed = params.speed
+    super(params.x, params.y, params.width, params.height, params.speed)
   }
 
   moveOnIdle(deltaTime: number) {
-    this._x -= this.speed * deltaTime
-    this._y +=
+    this.x -= this.speed * deltaTime
+    this.y +=
       Math.random() < MOVE_Y_PROBABILITY
         ? (this.ySalt * this.speed * deltaTime) / Y_MOVE_SCALE
         : 0
@@ -75,21 +66,5 @@ export class Box implements CanvasObject {
       y,
       speed,
     })
-  }
-
-  get x() {
-    return this._x
-  }
-  get y() {
-    return this._y
-  }
-  get width() {
-    return this._width
-  }
-  get height() {
-    return this._height
-  }
-  get speed() {
-    return this._speed
   }
 }

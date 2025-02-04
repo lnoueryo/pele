@@ -9,11 +9,14 @@ import BaseController from '../common/base-controller.component'
 import { Logger } from '../../plugins/logger'
 import { onAuthStateChanged, User } from 'firebase/auth'
 import auth from '../../plugins/firebase/firebase-auth'
+import { IPlayer } from '../../entities/interfaces/player.interface'
+import { OnlineCanvasManager } from '../../entities/canvas_manager/online-canvas-manager'
+import { MainPlayer } from '../../entities/player/main-player'
 
 export default class GameController extends BaseController {
   private _user: User | null = null
-  private players: OnlinePlayer[] = []
-  private _gameCanvas: GameCanvas<OnlinePlayer>
+  private players: IPlayer[] = []
+  private _gameCanvas: GameCanvas<IPlayer, OnlineCanvasManager>
   private _leftController: LeftController
   private _rightController: RightController
   private _bottomController: BottomController
@@ -38,9 +41,10 @@ export default class GameController extends BaseController {
         <bottom-controller class="buttons-container" />
       </div>
     `
-    this._gameCanvas = this.shadow.querySelector(
-      'game-canvas',
-    ) as GameCanvas<OnlinePlayer>
+    this._gameCanvas = this.shadow.querySelector('game-canvas') as GameCanvas<
+      IPlayer,
+      OnlineCanvasManager
+    >
     this._leftController = this.shadow.querySelector(
       'left-controller',
     ) as LeftController
@@ -69,6 +73,7 @@ export default class GameController extends BaseController {
     this.gameCanvas.addEventListener('updateObject', () => {
       this.socket.emit('position', this.player?.convertToJson())
     })
+    this.gameCanvas.canvasManagerClass = OnlineCanvasManager
     Logger.log(
       this.gameCanvas,
       this.leftController,
@@ -94,7 +99,9 @@ export default class GameController extends BaseController {
     })
     window.addEventListener('resize', () => {
       this.showController.bind(this)(this.sideContainers, this.bottomContainers)
-      this.gameCanvas.fillPlayers(this.players)
+      if (this.players.every((player) => player instanceof OnlinePlayer)) {
+        this.gameCanvas.fillPlayers(this.players)
+      }
     })
   }
 
@@ -207,6 +214,15 @@ export default class GameController extends BaseController {
     }[],
   ) => {
     this.players = newPlayers.map((player) => {
+      if (player.id === this.user.uid) {
+        return new MainPlayer({
+          ...player,
+          vx: 0,
+          vy: 0,
+          isJumping: false,
+          isOver: false,
+        })
+      }
       return new OnlinePlayer({
         ...player,
         vx: 0,
@@ -215,10 +231,22 @@ export default class GameController extends BaseController {
         isOver: false,
       })
     })
-    this.gameCanvas.fillPlayers(this.players)
+    if (
+      this.players.every(
+        (player) =>
+          player instanceof OnlinePlayer || player instanceof MainPlayer,
+      )
+    ) {
+      this.gameCanvas.fillPlayers(this.players)
+    }
     Logger.log('newPlayers', this.players)
   }
-  updatePlayers(coordinate: { id: string; x: number; y: number }) {
+  updatePlayers(coordinate: {
+    id: string
+    x: number
+    y: number
+    isOver: boolean
+  }) {
     for (const player of this.players) {
       if (player.id === coordinate.id) {
         player.updateFromJson(coordinate)

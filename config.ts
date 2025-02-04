@@ -1,3 +1,5 @@
+import { ComputerMode } from "./src/entities/player/computer-player"
+
 type ConfigEnv = {
   httpApiOrigin: string
   websocketApiOrigin: string
@@ -39,7 +41,7 @@ const response: {
     vg: number
     jumpStrength: number
     speed: number
-  },
+  }
   boxSetting: {
     moveYProbability: number
     yMoveScale: number
@@ -48,11 +50,18 @@ const response: {
     minSpeed: number
     maxSpeed: number
   }
+  computerSetting: {
+    id: string
+    name: string
+    mode: ComputerMode
+    color: string
+  }[]
 } = await loadObjectSetting()
 
-const config = {
+const config: typeof response = {
   playerSetting: response.playerSetting,
   boxSetting: response.boxSetting,
+  computerSetting: response.computerSetting,
 }
 const configEnv = configEnvs[env]
 const output = {
