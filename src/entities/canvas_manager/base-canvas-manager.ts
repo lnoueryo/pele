@@ -1,6 +1,5 @@
 import { Box } from '../box'
 import { Canvas } from '../canvas'
-import { CanvasManager } from '../interfaces/canvas-manager.interface'
 import { Maguma } from '../maguma'
 import { IPlayer } from '../interfaces/player.interface'
 
@@ -10,9 +9,7 @@ type ICanvasManager<T extends IPlayer> = {
   players?: T[]
   boxes?: Box[]
 }
-export abstract class BaseCanvasManager<T extends IPlayer>
-  implements CanvasManager
-{
+export abstract class BaseCanvasManager<T extends IPlayer> {
   abstract isGameOver: boolean
   protected canvas: Canvas
   protected maguma: Maguma
@@ -29,7 +26,33 @@ export abstract class BaseCanvasManager<T extends IPlayer>
     this.boxes = params.boxes || []
   }
 
-  abstract loop(timestamp: number, startTimestamp: number): Box[]
+  protected loopStart(timestamp: number, startTimestamp: number): number {
+    const deltaTime = (timestamp - this.lastTimestamp) / 1000
+    this.updateCurrentTime(timestamp)
+    this.resetCanvas()
+    this.fillBackground()
+    this.fillTime(Date.now() - startTimestamp)
+    return deltaTime
+  }
+
+  protected loopEnd(): void {
+    for (const box of this.boxes) {
+      this.fillBox(box)
+      this.players.forEach((player) => {
+        if (player.isPlayerCollidingWithBox(box)) {
+          const { y } = box.convertToJson()
+          player.moveOnTopBox(y)
+        }
+      })
+    }
+    this.players.forEach((player) => {
+      if (!player.isOver) {
+        this.fillPlayer(player)
+      }
+    })
+
+    this.fillMaguma()
+  }
   abstract updateBoxes(
     boxesJson: {
       x: number

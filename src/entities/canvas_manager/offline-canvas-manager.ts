@@ -4,9 +4,13 @@ import { Maguma } from '../maguma'
 import { Canvas } from '../canvas'
 import { IPlayer } from '../interfaces/player.interface'
 import { ComputerPlayer } from '../player/computer-player'
+import { CanvasManager } from '../interfaces/canvas-manager.interface'
 const PLAYER_DELAY = 1
 
-export class OfflineCanvasManager extends BaseCanvasManager<IPlayer> {
+export class OfflineCanvasManager
+  extends BaseCanvasManager<IPlayer>
+  implements CanvasManager
+{
   constructor(params: {
     canvas: Canvas
     players: IPlayer[]
@@ -17,11 +21,7 @@ export class OfflineCanvasManager extends BaseCanvasManager<IPlayer> {
   }
 
   public loop(timestamp: number, startTimestamp: number): Box[] {
-    const deltaTime = (timestamp - this.lastTimestamp) / 1000
-    this.updateCurrentTime(timestamp)
-    this.resetCanvas()
-    this.fillBackground()
-    this.fillTime(Date.now() - startTimestamp)
+    const deltaTime = super.loopStart(timestamp, startTimestamp)
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {
         if (player instanceof ComputerPlayer) {
@@ -35,25 +35,13 @@ export class OfflineCanvasManager extends BaseCanvasManager<IPlayer> {
     for (const box of this.boxes) {
       box.moveOnIdle(deltaTime)
       if (box.isOutOfDisplay()) this.deleteBox(box)
-
-      this.fillBox(box)
-      this.players.forEach((player) => {
-        if (player.isPlayerCollidingWithBox(box)) {
-          const { y } = box.convertToJson()
-          player.moveOnTopBox(y)
-        }
-      })
     }
 
     if (this.shouldCreateBox()) {
       this.createBox()
     }
 
-    this.players.forEach((player) => {
-      this.fillPlayer(player)
-    })
-
-    this.fillMaguma()
+    super.loopEnd()
     return this.boxes
   }
 

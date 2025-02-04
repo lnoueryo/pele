@@ -4,9 +4,13 @@ import { Canvas } from '../canvas'
 import { Maguma } from '../maguma'
 import { IPlayer } from '../interfaces/player.interface'
 import { MainPlayer } from '../player/main-player'
+import { CanvasManager } from '../interfaces/canvas-manager.interface'
 const PLAYER_DELAY = 1
 
-export class OnlineCanvasManager extends BaseCanvasManager<IPlayer> {
+export class OnlineCanvasManager
+  extends BaseCanvasManager<IPlayer>
+  implements CanvasManager
+{
   public isGameOver = false
   constructor(params: {
     canvas: Canvas
@@ -18,9 +22,7 @@ export class OnlineCanvasManager extends BaseCanvasManager<IPlayer> {
   }
 
   public loop(timestamp: number, startTimestamp: number): Box[] {
-    const deltaTime = (timestamp - this.lastTimestamp) / 1000 // フレーム間の経過時間を秒単位で計算
-    this.updateCurrentTime(timestamp)
-    this.resetCanvas()
+    const deltaTime = super.loopStart(timestamp, startTimestamp)
     if (this.currentTime > PLAYER_DELAY) {
       for (const player of this.players) {
         if (player instanceof MainPlayer && !player.isOver) {
@@ -29,24 +31,8 @@ export class OnlineCanvasManager extends BaseCanvasManager<IPlayer> {
         }
       }
     }
-    for (const box of this.boxes) {
-      this.fillBox(box)
-      this.players.forEach((player) => {
-        if (player.isPlayerCollidingWithBox(box)) {
-          const { y } = box.convertToJson()
-          player.moveOnTopBox(y)
-        }
-      })
-    }
 
-    this.players.forEach((player) => {
-      if (!player.isOver) {
-        this.fillPlayer(player)
-      }
-    })
-
-    this.fillMaguma()
-    this.fillTime(Date.now() - startTimestamp)
+    super.loopEnd()
     return this.boxes
   }
 
