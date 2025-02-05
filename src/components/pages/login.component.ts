@@ -1,4 +1,4 @@
-export default class IndexPage extends HTMLElement {
+export default class LoginPage extends HTMLElement {
   connectedCallback() {
     const sheet = new CSSStyleSheet()
     document.adoptedStyleSheets = [sheet]
