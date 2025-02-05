@@ -13,6 +13,7 @@ import IndexPage from './components/pages/index.component'
 import OfflinePage from './components/pages/offline.component'
 import OnlinePage from './components/pages/online.component'
 import LoginPage from './components/pages/login.component'
+import RankingPage from './components/pages/ranking.component'
 
 customElements.define('common-head', CommonHead)
 customElements.define('base-canvas', BaseCanvasComponent)
@@ -28,6 +29,7 @@ customElements.define('index-page', IndexPage)
 customElements.define('offline-page', OfflinePage)
 customElements.define('online-page', OnlinePage)
 customElements.define('login-page', LoginPage)
+customElements.define('ranking-page', RankingPage)
 
 const routes = new Map<string, string>([
   ['/', 'index-page'],
@@ -35,6 +37,7 @@ const routes = new Map<string, string>([
   ['/multi.html', 'online-page'],
   ['/solo.html', 'offline-page'],
   ['/login.html', 'login-page'],
+  ['/ranking.html', 'ranking-page'],
 ])
 
 const path = location.pathname
