@@ -14,7 +14,7 @@
     "build": "tsc && vite build --mode staging",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "ci": "rm -rf node_modules && npm install --no-audit --no-fund --production=true && npm run build",
+    "ci": "rm -rf node_modules && npm install --no-audit --no-fund --production=true && vite build --mode production",
     "deploy": "tsc && vite build && firebase deploy",
     "deploy-stg": "tsc && vite build --mode staging && firebase hosting:channel:deploy",
     "preview": "vite preview"
