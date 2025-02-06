@@ -85,5 +85,23 @@ export default class IndexPage extends HTMLElement {
     multiButton.style.height = `${eyeHeight}px`
     multiButton.style.backgroundColor = 'rgba(255, 0, 0, 0.5)'
     document.body.appendChild(multiButton)
+
+    const existingRanking = document.getElementById('ranking')
+    if (existingRanking) {
+      existingRanking.remove()
+    }
+    const rankingButton = document.createElement('button')
+    rankingButton.id = 'ranking'
+    rankingButton.onclick = () => {
+      location.href = '/ranking.html'
+    }
+    rankingButton.textContent = 'Ranking'
+    rankingButton.style.position = 'absolute'
+    rankingButton.style.left = `${canvas.offsetLeft + mouthOffsetX}px`
+    rankingButton.style.top = `${canvas.offsetTop + mouthOffsetY}px`
+    rankingButton.style.width = `${mouthWidth}px`
+    rankingButton.style.height = `${mouthHeight}px`
+    rankingButton.style.backgroundColor = 'rgba(255, 0, 0, 0.5)'
+    document.body.appendChild(rankingButton)
   }
 }
