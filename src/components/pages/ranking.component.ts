@@ -38,7 +38,6 @@ export default class RankingPage extends HTMLElement {
 
       /* ランキングページのコンテナ */
       #wrapper {
-        width: 100%;
         max-width: 600px;
         padding: 24px;
         background: white;
